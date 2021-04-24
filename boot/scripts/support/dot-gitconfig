@@ -1,0 +1,9 @@
+[core]
+	excludesfile = ~/.gitignore_global
+	pager = less -r
+[user]
+	name = Your Name
+	email = email@domain.com
+	signingkey = 04B9CD3D381B574D
+[pull]
+	rebase = false

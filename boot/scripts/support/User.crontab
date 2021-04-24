@@ -1,0 +1,17 @@
+# this is a crontab template. Replace it with your own crontab which
+# you can capture with
+#
+#    $ crontab -l >User.crontab
+#
+# Your own crontab should contain ALL of the lines below. The SHELL
+# HOME and PATH lines are important. Do not omit.
+
+SHELL=/bin/bash
+HOME=/home/pi
+PATH=/home/pi/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# your timed commands go here (the next line is the syntax)
+#min hour mday month wday command
+
+# commands to run at reboot go here (the next line is the syntax)
+#@reboot command arguments...

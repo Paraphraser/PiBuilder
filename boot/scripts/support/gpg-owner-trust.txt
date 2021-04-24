@@ -1,0 +1,22 @@
+# Assume:
+#
+# GPGKEYID=04B9CD3D381B574D
+#
+# Trust for that key would be established via:
+#   gpg --edit-key $GPGKEYID
+#   trust
+#   5
+#   y
+#   quit
+#
+# Trust can be saved by:
+#   gpg --export-ownertrust >gpg-owner-trust.txt
+#
+# Restore trust with
+#   gpg --import-ownertrust <gpg-owner-trust.txt
+#
+# Replace the last line below with the last line of output from
+# running the export command on your own system
+#
+#                       ----GPGKEYID----
+9ED2BB0ADA90385370FAC77E04B9CD3D381B574D:6:

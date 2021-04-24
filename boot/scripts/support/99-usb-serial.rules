@@ -1,0 +1,36 @@
+# This is:
+#
+#   -rw-r--r-- 1 root root /etc/udev/rules.d/99-usb-serial.rules
+#
+# See http://hintshop.ludvig.co.nz/show/persistent-names-usb-serial-devices/
+# See also "man udev"
+#
+# When you are about to connect a new USB device, run:
+#
+#   tail -f /var/log/messages
+#
+# then connect the device. You are looking for these two lines:
+#
+#   ... New USB device found, idVendor=dead, idProduct=beef, bcdDevice= 1.00
+#   ... SerialNumber: 9c0eee82d4b43ea0f06871fa11b8e711
+#
+# idVendor and idProduct come from the first, serial from the second.
+#
+# Use the following line as a template and substitute values from the
+# /var/log/messages output:
+#
+#    SUBSYSTEM=="tty", ATTRS{idVendor}=="dead", ATTRS{idProduct}=="beef", ATTRS{serial}=="9c0eee82d4b43ea0f06871fa11b8e711", SYMLINK+="sensibleName"
+#
+# Replace "sensibleName" with the name for your device. Examples:
+#
+#    SYMLINK+="Zigbee_CC2531"
+#    SYMLINK+="My3DPrinter"
+#
+# Append one line for each of your devices at the end of this file.
+# Then, as a device is connected, it will appear as:
+#
+#    /dev/Zigbee_CC2531
+#    /dev/My3DPrinter
+#
+# This file is read dynamically. No reset or reload command needed.
+

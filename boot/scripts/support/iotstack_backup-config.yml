@@ -1,0 +1,30 @@
+backup:
+  method: "RSYNC"
+  prefix: "user@host:path/to/prefix/folder"
+  retain: 8
+
+restore:
+  method: "RSYNC"
+  prefix: "user@host:path/to/prefix/folder"
+
+# --- settings above this line are active. Those below are examples ---
+
+backup-rclone:
+  method: "RCLONE"
+  prefix: "dropbox:path/to/prefix/folder"
+  retain: 8
+
+restore-rclone:
+  method: "RCLONE"
+  prefix: "dropbox:path/to/prefix/folder"
+
+# ---------------------------------------------------------------------
+
+backup-scp:
+  method: "SCP"
+  prefix: "user@host:path/to/prefix/folder"
+  retain: 8
+
+restore-scp:
+  method: "SCP"
+  prefix: "user@host:path/to/prefix/folder"

@@ -1,0 +1,4 @@
+
+logger "EVENT MARK - running /etc/rc.local"
+
+/usr/bin/isc-dhcp-fix.sh &
