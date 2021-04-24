@@ -194,7 +194,7 @@ Assuming you have done all the necessary customisation…
 	
 	* "raspberrypi" is the default name. Even if you only have a single Raspberry Pi, you should always give it a name that is unique on your network. You have only yourself to blame if you ever get into the situation where two or more Raspberry Pis are using the same name. It will confused both you and your Raspberry Pis.
 
-6. Your ssh client will present the Trust On First Use (TOFU) pattern where is asks for authority to proceed and then prompts for the password for user "pi" on the target machine, which is:
+6. Your ssh client will present the Trust On First Use (TOFU) pattern where it asks for authority to proceed and then prompts for the password for user "pi" on the target machine, which is:
 
 	```
 	raspberry
@@ -296,12 +296,12 @@ Installing and configuring software on a Raspberry Pi (or any computer) involves
 	- Will not have had to think about configuring `iotstack_backup`.
 
 * If you decide to install IOTstackBackup then you will need to think about all those things.
-* Once you have obtained an "app key" for Dropbox, have established an `rclone` remote to talk to Dropbox, and have configured IOTstackBackup to use that remote, you will probably expect to be able to rebuild a Raspberry Pi and restore your IOTstack from a backup.
-* To be able to restore, you **must** have the `rclone` and `iotstack_backup` configurations in place. You either need to:
+* Once you have obtained an "app key" for Dropbox, have established an `rclone` remote to talk to Dropbox, and have configured IOTstackBackup to use that remote, you will expect to be able to take backups, and then restore those backups on your Raspberry Pi. And you will…
+* … until you rebuild your Raspberry Pi. To be able to restore after a rebuild, you **must** have the `rclone` and `iotstack_backup` configurations in place. You either need to:
 
-	- recreate those (eg obtain a new Dropbox app key), or
-	- recover them from somewhere (eg another RPi), or
-	- make sure they are in the right place to be copied into place automatically as part of your RPi rebuild process.
+	- recreate those by hand (and obtain a new Dropbox app key), or
+	- recover them from somewhere else (eg another RPi), or
+	- make sure they are in the right place for this build process to be able to copy them into place automatically at the right time.
 
 * This repo assumes the last option: you have saved the `rclone` and `iotstack_backup` configuration files into the `support` subdirectory.
 * Of course, in order to have saved those configurations in the `support` subdirectory, you will first have had to have set them up and tested them.
@@ -316,15 +316,13 @@ There is no substitute for thinking, planning and testing.
 
 ### About `/etc/ssh`
 
-Each time you install a clean Raspberry Pi OS image and boot a Raspberry Pi, the startup process initialises the contents of:
+Whenever you start from a clean Raspberry Pi OS image (BalenaEtcher), the very first boot-up initialises the contents of:
 
 ```
 /etc/ssh
 ```
 
-The contents of that folder can be thought of as a unique identity for the Raspberry Pi.
-
-That "identity" can be captured by running the following script in the `helpers` folder:
+The contents of that folder can be thought of as a unique identity for the SSH service on your Raspberry Pi. That "identity" can be captured by running the following script in the `helpers` folder:
 
 ```
 $ ./etc_ssh_backup.sh
@@ -336,7 +334,7 @@ Suppose you gave the RPi the name "fred" then the result of running that script 
 ~/fred.etc-ssh-backup.tar.gz
 ```
 
-If you copy that file into the `support` folder **before** you run `setup_boot_volume.sh` then that `.tar.gz` will be copied to the `boot` volume along with everything else.
+If you copy that file into the `support` folder **before** you run `setup_boot_volume.sh` then that `.tar.gz` will be copied onto the `boot` volume along with everything else.
 
 Then, when it comes time to run the first script and you do:
 
@@ -344,11 +342,11 @@ Then, when it comes time to run the first script and you do:
 $ /boot/scripts/01_setup.sh fred «password»
 ``` 
 
-part of the process will restore `/etc/ssh` as it was at the time the snapshot was taken. In effect, you have given it back its SSH identity.
+the script will look for `fred.etc-ssh-backup.tar.gz` and, if found, will use it to restore `/etc/ssh` as it was at the time the snapshot was taken. In effect, you have given the machine its original SSH identity.
 
 The contents of `/etc/ssh` are not tied to the physical hardware so if, for example, your "live" RPi emits magic smoke and you have to repurpose your "test" RPi, you can cause the replacement to take on the SSH identity of the failed hardware.
 
-Fairly obviously, you will still need to do things like change your DHCP server so what *was* the test RPi now gets the IP address(es) of the now broken live RPi, but the SSH side of things will be in place.
+> Fairly obviously, you will still need to do things like change your DHCP server so that the working hardware gets the IP address(es) of the failed hardware, but the SSH side of things will be in place.
 
 Whether you do this for any or all of your hosts is entirely up to you. I have gone to the trouble of setting up ssh certificates and it is a real pain to have to run around and re-sign the host keys every time I rebuild a Raspberry Pi. It is much easier to set up `/etc/ssh` **once**, then take a snapshot, and re-use the snapshot each time I rebuild.
 
@@ -375,11 +373,11 @@ Personally, I use a different approach to maintain and manage `~/.ssh` but it is
 $ user_ssh_backup.sh
 ``` 
 
-and then restore the snapshot in the same way as `01_setup.sh` does for `/etc/ssh`. That side of things is not part of this repository. You will have to come up with the solution yourself.
+and then restore the snapshot in the same way as `01_setup.sh` does for `/etc/ssh`. I haven't provided a solution in this repository. You will have to come up with that for yourself.
 
 ### Security of snapshots
 
-There is an assumption that `etc/ssh` and, to a lesser extent, `~/.ssh` is "hard" for an unauthorised person to get to. How "hard" that actually is depends on a lot of things, not the least of which is whether you are in the habit of leaving terminal sessions unattended.......
+There is an assumption that it is "hard" for an unauthorised person to gain access to `etc/ssh` and, to a lesser extent, `~/.ssh`. How "hard" that actually is depends on a lot of things, not the least of which is whether you are in the habit of leaving terminal sessions unattended.......
 
 Nevertheless, it is important to be aware that the snapshots do contain sufficient information to allow a third party to impersonate your hosts so it is probably worthwhile making some attempt to keep them reasonably secure.
 
