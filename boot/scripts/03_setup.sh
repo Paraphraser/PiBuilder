@@ -11,45 +11,105 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
+set -x
+
 SUPPORT="/boot/scripts/support"
 
+# a function to handle installation of a list of packages done ONE AT
+# A TIME to reduce failure problems resulting from the all-too-frequent
+#  Failed to fetch http://raspbian.raspberrypi.org/raspbian/pool/main/z/zip/zip_3.0-11_armhf.deb
+#   Unable to connect to raspbian.raspberrypi.org:http: [IP: 93.93.128.193 80]
+
+install_packages() {
+
+   # declare nothing to retry
+   unset RETRIES
+   
+   # iterate the contents of the file argument
+   for PACKAGE in $(cat "$1") ; do
+
+      # attempt to install the package
+      sudo apt install -y "$PACKAGE"
+
+      # did the installation succeed or is something playing up?
+      if [ $? -ne 0 ] ; then
+
+         # the installation failed - does a retry list exist?
+         if [ -z "$RETRIES" ] ; then
+
+            # no! create the file
+            RETRIES="$(mktemp -p /dev/shm/)"
+
+         fi
+
+         # add a manual retry
+         echo "sudo apt install -y $PACKAGE" >>"$RETRIES"
+
+         # report the event
+         echo "PACKAGE INSTALL FAILURE - retry $PACKAGE by hand"
+
+      fi
+
+   done
+
+   # any retries?
+   if [ ! -z "$RETRIES" ] ; then
+
+      # yes! bung out the list
+      echo "Some base packages could not be installed. This is usually"
+      echo "because of some transient problem with APT."
+      echo "Retry the errant installations listed below by hand, and"
+      echo "then re-run $SCRIPT"
+      cat "$RETRIES"
+      exit -1
+
+   fi
+
+}
+
 echo "Installing additional packages"
-# remember: ONE AT A TIME (so a failure of one doesn't stuff others)
-sudo apt install -y acl
-sudo apt install -y curl
-sudo apt install -y dnsutils
-sudo apt install -y git
-sudo apt install -y iotop
-sudo apt install -y iperf
-sudo apt install -y jq
-sudo apt install -y libreadline-dev
-sudo apt install -y mosquitto-clients
-sudo apt install -y nmap
-sudo apt install -y rlwrap
-sudo apt install -y ruby
-sudo apt install -y sqlite3
-sudo apt install -y subversion
-sudo apt install -y sysstat
-sudo apt install -y tcpdump
-sudo apt install -y time
-sudo apt install -y uuid-runtime
-sudo apt install -y wget
+PACKAGES="$(mktemp -p /dev/shm/)"
+cat <<-BASE_PACKAGES >"$PACKAGES"
+acl
+curl
+dnsutils
+git
+iotop
+iperf
+jq
+libreadline-dev
+mosquitto-clients
+nmap
+rlwrap
+ruby
+sqlite3
+subversion
+sysstat
+tcpdump
+time
+uuid-runtime
+wget
+BASE_PACKAGES
 
+install_packages "$PACKAGES"
 
-echo "Installing additional packages for YubiKey"
-sudo apt install -y at
-sudo apt install -y cryptsetup
-sudo apt install -y dirmngr
-sudo apt install -y gnupg-agent
-sudo apt install -y gnupg2
-sudo apt install -y hopenpgp-tools
-sudo apt install -y openssl
-sudo apt install -y pcscd
-sudo apt install -y python-gnupg
-sudo apt install -y rng-tools
-sudo apt install -y scdaemon
-sudo apt install -y secure-delete
-sudo apt install -y yubikey-personalization
+cat <<-CRYPTO_PACKAGES >"$PACKAGES"
+at
+cryptsetup
+dirmngr
+gnupg-agent
+gnupg2
+hopenpgp-tools
+openssl
+pcscd
+python-gnupg
+rng-tools
+scdaemon
+secure-delete
+yubikey-personalization
+CRYPTO_PACKAGES
+
+install_packages "$PACKAGES"
 
 SOURCE="/etc/systemd/timesyncd.conf"
 PATCH="$SUPPORT/timesyncd.conf.patch"

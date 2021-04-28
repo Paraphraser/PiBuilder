@@ -12,7 +12,7 @@ if [ "$#" -gt 0 ]; then
 fi
 
 # this script should terminate on errors
-set -e
+set -ex
 
 # this should be kept up-to-date
 SQLITEYEAR="2021"

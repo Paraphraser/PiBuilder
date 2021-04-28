@@ -200,12 +200,20 @@ Assuming you have done all the necessary customisation…
 	raspberry
 	```
 	
-7. Run the first script, replacing «hostname» and «password»:
+7. Run the first script using one of the following forms:
 
-	```
-	$ /boot/scripts/01_setup.sh «hostname» «password»
-	```
-	
+	- Supply both the hostname and password as parameters
+
+		```
+		$ /boot/scripts/01_setup.sh «hostname» «password»
+		```
+		
+	- Supply the hostname as a parameter and be prompted for the password:
+
+		```
+		$ /boot/scripts/01_setup.sh «hostname»
+		```
+		
 	Notes:
 	
 	* «hostname» is the name your RPi will be known by (and for heaven's sake, **don't** use "raspberrypi")
@@ -248,6 +256,12 @@ Assuming you have done all the necessary customisation…
 	```
 	$ /boot/scripts/03_setup.sh
 	```
+	
+	A common problem with this script is the error "Unable to connect to raspbian.raspberrypi.org". This seems to be transient but it also happens far more frequently than you would like or expect. The script attempts to work around this problem by processing each package individually, and keeping track of packages that could not be installed. Then, if there are any packages that could not be installed, the script:
+	
+	- displays a list of the failed packages;
+	- invites you to try running the failed installations by hand; and
+	- asks you to re-run 03_setup.sh (which will skip over any packages that are already installed).
 
 	This script also ends in a reboot. Wait for the Pi to come back from the reboot and login as above.
 	

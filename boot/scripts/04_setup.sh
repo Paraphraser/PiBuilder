@@ -11,6 +11,8 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
+set -x
+
 SUPPORT="/boot/scripts/support"
 
 echo "Setting up git (config and ignores)"
