@@ -45,6 +45,11 @@ echo "Setting up ssh"
 #
 [[ -x $(which ssh_setup) ]] && ssh_setup
 
+echo "Adding mkdocs support"
+pip install -U mkdocs
+pip install -U mkdocs-awesome-pages-plugin
+pip install -U mkdocs-material
+
 echo "Resetting bash history"
 history -c
 
