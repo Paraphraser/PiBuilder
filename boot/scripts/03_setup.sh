@@ -156,6 +156,9 @@ sudo apt install -y python3-pip python3-dev
 sudo pip3 install -U docker-compose
 sudo pip3 install -U ruamel.yaml==0.16.12 blessed
 
+echo "Making python3 the default"
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
 echo "Cloning IOTstackAliases"
 git clone https://github.com/Paraphraser/IOTstackAliases.git ~/.local/IOTstackAliases
 
