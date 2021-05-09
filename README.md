@@ -8,21 +8,44 @@ I am putting this material on GitHub in response to several requests to share my
 
 1. The scripts and supporting files implement **my** requirements for **my** Raspberry Pis. The material is **not** intended to be "one size fits all" for all possible Raspberry Pi configurations. You will almost certainly need to make adjustments for your own situation.
 2. It is highly **unlikely** that the scripts and supporting files will work "as is" on your system. You **will** need to customise this material and you **will** need to know what you are doing.
-3. I do **not** promise to fix any bugs.
-4. I do **not** promise to keep this project maintained.
+3. I can't promise to fix any bugs.
+4. I can't promise to keep this project maintained.
 
-## Caveats and assumptions
+<hr>
+
+- [Caveats and assumptions](#caveats)
+- [Design goals](#goals)
+- [Recommended approach](#recommendedApproach)
+- [Script synopses](#synopses)
+
+	- [Script `01_setup.sh`](#script01)
+	- [Script `02_setup.sh`](#script02)
+	- [Script `03_setup.sh`](#script03)
+	- [Script `04_setup.sh`](#script04)
+	- [Script `05_setup.sh`](#script05)
+
+- [Building a Rapberry Pi using these scripts](#buildSequence)
+- [Beware of chickens and eggs](#chickenEgg)
+- [Some words about SSH](#aboutSSH)
+
+	- [About `/etc/ssh`](#aboutEtcSSH)
+	- [About `~/.ssh`](#aboutDotSSH)
+	- [Security of snapshots](#snapshotSecurity)
+
+<hr>
+
+## <a name="caveats"> Caveats and assumptions </a>
 
 The material in this project assumes and has been tested on:
 
 * Raspberry Pi 3B+ and 4B hardware
 * Raspberry Pi OS (aka Raspbian)
 
-The scripts **may** work on other Raspberry Pi hardware but I have no idea about, nor any interest in, other hardware platforms. I also have no idea about, nor any interest in, other operating systems, even if they claim to run on Raspberry Pi hardware.
+The scripts **may** work on other Raspberry Pi hardware but I have no idea about, nor any interest in, other hardware platforms. I also have no idea about other operating systems, even if they claim to run on Raspberry Pi hardware.
 
 > I have nothing against either non- Raspberry Pi hardware or operating systems. I just want to make it clear that I can only test using the hardware I have, and that I have no intention of spinning-up other operating systems.
 
-## Design goals
+## <a name="goals"> Design goals </a>
 
 My design goals were:
 
@@ -30,9 +53,11 @@ My design goals were:
 2. Insofar as was possible, eliminate the need for interaction. I don't want "yes/no" prompts. I don't want to interact with menus like `raspi-config`. I want **speed**.
 3. All work done via ssh. I do not have an HDMI screen and I don't run VNC. I'm a command-line geek.
 
-## Recommended approach
+## <a name="recommendedApproach"> Recommended approach </a>
 
-1. Download this project as a zip (do not clone the repo).
+1. I recommend downloading this project as a zip.
+
+	> You can clone the repo if you wish but that sort of implies you expect to receive updates. The problem is that you *will* have to mod these scripts. If you make your mods in a clone of the repo, your mods will block updates coming down from GitHub. To deal with that, you will need a "working copy" where it is safe to make your own mods. Which is sort of what you get by starting from a zip.
 2. Unpack the zip.
 3. Work through the scripts to see what they do and customise them to your needs. In some cases:
 
@@ -78,7 +103,7 @@ My design goals were:
 		Running `sed` like that doesn't change the original. Then you can compare the unmodified original with the edited version to see if it is correct.
 	
 	- You will need to decide, case by case, whether you want to adopt a particular "feature". An example is at the end of `02_setup.sh` where IPv6 is turned off. Do you want IPv6 enabled or turned off?
-	- Another example is the additional packages in `02_setup.sh`. They are broken into two groups. The first group should almost certainly be installed on all systems. The second group is under the "YubiKey" heading but only *some* of those are needed for the YubiKey while others are needed for GnuPG. You may not have a YubiKey but that doesn't mean GnuPU can't be useful all by itself.
+	- Another example is the additional packages in `02_setup.sh`. They are broken into two groups. The first group should almost certainly be installed on all systems. The second group is under the "YubiKey" heading but only *some* of those are needed for the YubiKey while others are needed for GnuPG. You may not have a YubiKey but that doesn't mean GnuPG can't be useful all by itself.
 	
 		> see the excellent [Dr Duh guide](https://github.com/drduh/YubiKey-Guide) if you want to set up a YubiKey and use it to digitally sign your GitHub commits.
 	
@@ -118,9 +143,9 @@ My design goals were:
 	
 6. Read [some words about SSH](#aboutSSH) and decide if you wish to take snapshots and add the resulting `.tar.gz` files to the `support` directory.
 	
-## Script synopsis
+## <a name="synopses"> Script synopses </a>
 
-### Script `01_setup.sh`
+### <a name="script01"> Script `01_setup.sh` </a>
 
 * Assumes fresh install of Raspberry Pi OS.
 * Runs full OS update/upgrade.
@@ -138,7 +163,7 @@ My design goals were:
 
 * Reboots
 
-### Script `02_setup.sh`
+### <a name="script02"> Script `02_setup.sh` </a>
 
 * Cleans up any leftovers from `/etc/ssh` replacement.
 * Applies recommended `allowinterfaces eth0,wlan0` patch.
@@ -147,7 +172,7 @@ My design goals were:
 * Disables IPv6
 * Reboots
 
-### Script `03_setup.sh`
+### <a name="script03"> Script `03_setup.sh` </a>
 
 * Installs add-on packages.
 * Sets up Network Time Protocol sync with local time-servers. See [Configuring Raspbian to use local time-servers](https://gist.github.com/Paraphraser/e1129880015203c29f5e1376c6ca4a08).
@@ -156,24 +181,40 @@ My design goals were:
 * Clones old-menu branch of [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack).
 * Installs IOTstack dependencies.
 * Clones [IOTstackAliases](https://github.com/Paraphraser/IOTstackAliases)
+* Makes Python3 the default.
 * Installs IOTstackBackup dependencies.
 * Clones and installs [IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup)
 * Copies support files for `rclone` and IOTstackBackup into `~/.config`
 * Reboots
 
-### Script `04_setup.sh` (optional but recommended)
+### <a name="script04"> Script `04_setup.sh` (optional but recommended) </a>
 
 * Sets up git scaffolding.
 * Imports GPG public key from key-server and assigns trust.
 * Sets up ssh (if you supply a script to do it).
+* Adds `mkdocs` support. With that in place, you can do:
+
+	```
+	$ cd ~/IOTstack
+	$ mkdocs serve -a «ipaddress»:«port»
+	```
+
+	where «ipaddress» is the IP address of your Raspberry Pi, and «port» is a port not otherwise in use (eg 9780). Then, from another host you can point your browser at:
+	
+	```
+	http://«ipaddress»:«port»
+	```
+	
+	and see the Wiki view of the IOTstack documentation.
+	
 * Erases bash history.
 * Logs out
 
-### Script `05_setup.sh` (fully optional)
+### <a name="script05">Script `05_setup.sh` (fully optional)</a>
 
 * Rebuilds SQLite from source code. The one you get from `apt install` doesn't have all the features you might want.
 
-## Building an RPi using these scripts
+## <a name="buildSequence"> Building a Rapberry Pi using these scripts </a>
 
 Assuming you have done all the necessary customisation…
 
@@ -328,7 +369,7 @@ There is no substitute for thinking, planning and testing.
 
 ## <a name="aboutSSH"> Some words about SSH </a>
 
-### About `/etc/ssh`
+### <a name="aboutEtcSSH"> About `/etc/ssh` </a>
 
 Whenever you start from a clean Raspberry Pi OS image (BalenaEtcher), the very first boot-up initialises the contents of:
 
@@ -377,7 +418,7 @@ $ ssh previousname
 
 No `pi@` on the front. No `.local` or domain name on the end. No TOFU pattern. No password prompt. Just logged-in.
 
-### About `~/.ssh`
+### <a name="aboutDotSSH"> About `~/.ssh` </a>
 
 The contents of `~/.ssh` carry the client identity (how "pi" authenticates to target hosts), as distinct from the machine identity (how the RPi proves itself to clients seeking to connect).
 
@@ -389,7 +430,7 @@ $ user_ssh_backup.sh
 
 and then restore the snapshot in the same way as `01_setup.sh` does for `/etc/ssh`. I haven't provided a solution in this repository. You will have to come up with that for yourself.
 
-### Security of snapshots
+### <a name="snapshotSecurity"> Security of snapshots </a>
 
 There is an assumption that it is "hard" for an unauthorised person to gain access to `etc/ssh` and, to a lesser extent, `~/.ssh`. How "hard" that actually is depends on a lot of things, not the least of which is whether you are in the habit of leaving terminal sessions unattended.......
 
