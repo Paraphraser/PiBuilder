@@ -43,7 +43,7 @@ The material in this project assumes and has been tested on:
 
 The scripts **may** work on other Raspberry Pi hardware but I have no idea about, nor any interest in, other hardware platforms. I also have no idea about other operating systems, even if they claim to run on Raspberry Pi hardware.
 
-> I have nothing against either non- Raspberry Pi hardware or operating systems. I just want to make it clear that I can only test using the hardware I have, and that I have no intention of spinning-up other operating systems.
+> I have nothing against either non- Raspberry Pi hardware or operating systems. I just want to make it clear that I can only test using the hardware I have.
 
 ## <a name="goals"> Design goals </a>
 
@@ -112,6 +112,7 @@ My design goals were:
 	```
 	99-usb-serial.rules ✅
 	common.custom 🚫 (DON'T add password!)
+	debian-backports.list 🚫
 	dhcpcd.conf.patch 🚫
 	dot-gitconfig 👁‍🗨
 	dot-gitignore_global 🚫
@@ -148,6 +149,7 @@ My design goals were:
 ### <a name="script01"> Script `01_setup.sh` </a>
 
 * Assumes fresh install of Raspberry Pi OS.
+* Adds support for fetching libseccomp2 from Debian Buster backports (needed for Alpine-based Docker images).
 * Runs full OS update/upgrade.
 * Snapshots `/etc` as `/etc-baseline` (a baseline reference).
 * Optionally replaces `/etc/ssh` with a preset.
@@ -174,7 +176,7 @@ My design goals were:
 
 ### <a name="script03"> Script `03_setup.sh` </a>
 
-* Installs add-on packages.
+* Installs add-on packages, including backports libseccomp2.
 * Sets up Network Time Protocol sync with local time-servers. See [Configuring Raspbian to use local time-servers](https://gist.github.com/Paraphraser/e1129880015203c29f5e1376c6ca4a08).
 * Replaces `~/.profile`
 * Initialises crontab
