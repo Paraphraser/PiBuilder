@@ -33,6 +33,14 @@ SUPPORT="/boot/scripts/support"
 LOCALCC="AU"
 LOCALTZ="Australia/Sydney"
 
+echo "Adding Debian Buster Backports support (for libseccomp2)"
+sudo apt-key adv \
+   --keyserver keyserver.ubuntu.com \
+   --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+SOURCE="$SUPPORT/debian-backports.list"
+TARGET="/etc/apt/sources.list.d/debian-backports.list"
+cat "$SOURCE" | sudo tee -a "$TARGET" >/dev/null
+
 echo "Running sudo apt update"
 sudo apt update
 

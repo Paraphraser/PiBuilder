@@ -67,6 +67,9 @@ install_packages() {
 
 }
 
+echo "Installing updated libseccomp2 (for Alpine images)"
+sudo apt install libseccomp2 -t buster-backports
+
 echo "Installing additional packages"
 PACKAGES="$(mktemp -p /dev/shm/)"
 cat <<-BASE_PACKAGES >"$PACKAGES"
