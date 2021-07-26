@@ -28,8 +28,11 @@ if [ -n "$GPGKEYID" ] ; then
    echo "Importing GPG public key"
    gpg --keyserver hkps://keyserver.ubuntu.com:443 --recv $GPGKEYID
 
-   echo "Setting trust level on GPG public key"
-   gpg --import-ownertrust "$SUPPORT/gpg-owner-trust.txt"
+   SOURCE="$SUPPORT/gpg-owner-trust.txt"
+   if [ -e "$SOURCE" -a $(grep -v "^#" "$SOURCE" | wc -l) -gt 0 ] then
+      echo "Setting trust level on GPG public key"
+      gpg --import-ownertrust "$SOURCE"
+   fi
 
 fi
 
