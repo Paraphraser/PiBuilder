@@ -22,7 +22,7 @@ if [ -d "/etc/ssh.old" ] ; then
 fi
 
 # tell dhcpcd and docker not to fight
-echo "Adding allowinterfaces eth0,wlan0 to /etc/dhcpcd.conf"
+echo "Adding allowinterfaces eth*,wlan* to /etc/dhcpcd.conf"
 sudo sed -i.bak "\$r $SUPPORT/dhcpcd.conf.patch" /etc/dhcpcd.conf
 sudo systemctl daemon-reload
 sudo systemctl restart dhcpcd
@@ -60,9 +60,9 @@ else
 fi
 
 # patch sysctl.conf to disable IPv6
-# note that sudo sysctl -p is disabled. If the current session was
-# initiated via IPv6 (eg from Termius) we don't want to pull the
-# rug out while is is needed 
+# note that there is no call to sudo sysctl -p to activate this change.
+# If the current session was initiated via IPv6 (eg from Termius) we
+# don't want to pull the rug out while is actually being used. 
 SOURCE="/etc/sysctl.conf"
 PATCH="$SUPPORT/sysctl.conf.patch"
 MATCH="^#net.ipv6.conf.all.forwarding=1"

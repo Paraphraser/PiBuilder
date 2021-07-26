@@ -41,7 +41,7 @@ The material in this project assumes and has been tested on:
 * Raspberry Pi 3B+ and 4B hardware
 * Raspberry Pi OS (aka Raspbian)
 
-The scripts **may** work on other Raspberry Pi hardware but I have no idea about, nor any interest in, other hardware platforms. I also have no idea about other operating systems, even if they claim to run on Raspberry Pi hardware.
+The scripts **may** work on other Raspberry Pi hardware but I have no idea about other hardware platforms or operating systems, even if they claim to run on Raspberry Pi hardware.
 
 > I have nothing against either non- Raspberry Pi hardware or operating systems. I just want to make it clear that I can only test using the hardware I have.
 
@@ -168,7 +168,7 @@ My design goals were:
 ### <a name="script02"> Script `02_setup.sh` </a>
 
 * Cleans up any leftovers from `/etc/ssh` replacement.
-* Applies recommended `allowinterfaces eth0,wlan0` patch.
+* Applies recommended `allowinterfaces eth*,wlan*` patch.
 * Applies [Does your Raspberry Pi's Wireless Interface freeze?](https://gist.github.com/Paraphraser/305f7c70e798a844d25293d496916e77). You may need to edit `isc-dhcp-fix.sh` if you don't have both Ethernet and WiFi interfaces active.
 * Sets up local DNS (does nothing if you don't edit `resolvconf.conf.patch`)
 * Disables IPv6
