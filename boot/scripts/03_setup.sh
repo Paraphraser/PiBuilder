@@ -134,7 +134,7 @@ sudo chown root:root "/etc/udev/rules.d/99-usb-serial.rules"
 sudo chmod 644 "/etc/udev/rules.d/99-usb-serial.rules"
 
 echo "Setting up ~/.local/bin"
-mkdir -p ~/.local
+mkdir -p ~/.local/bin
 #
 # the way I do this is to "svn checkout" from a local subversion server
 # you will need to come up with some mechanism of your own to get any
