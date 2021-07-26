@@ -11,6 +11,10 @@ ifconfig $1 | grep -Po '(?<=inet )[\d.]+' &> /dev/null
     fi
 }
 
+# if you do not have both interfaces active, comment-out the "Card"
+# line that you don't need. But leave both "sleep" lines in place.
+# The idea is that each interface is probed at two-second intervals.
+# That should not change, even if you reduce to one interface.
 while true; do
     Card eth0
     sleep 1
