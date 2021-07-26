@@ -35,7 +35,7 @@ LOCALTZ="Australia/Sydney"
 
 echo "Adding Debian Buster Backports support (for libseccomp2)"
 sudo apt-key adv \
-   --keyserver keyserver.ubuntu.com \
+   --keyserver hkps://keyserver.ubuntu.com:443 \
    --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
 SOURCE="$SUPPORT/debian-backports.list"
 TARGET="/etc/apt/sources.list.d/debian-backports.list"
