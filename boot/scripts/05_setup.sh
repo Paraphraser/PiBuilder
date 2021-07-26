@@ -16,7 +16,7 @@ set -ex
 
 # this should be kept up-to-date
 SQLITEYEAR="2021"
-SQLITEVERSION="sqlite-autoconf-3350000"
+SQLITEVERSION="sqlite-autoconf-3360000"
 SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITEVERSION.tar.gz"
 
 echo "Using $SQLITEURL"
