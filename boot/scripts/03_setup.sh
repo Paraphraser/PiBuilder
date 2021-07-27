@@ -128,10 +128,15 @@ else
    sleep 5
 fi
 
-echo "Adding known USB devices"
-sudo cp "$SUPPORT/99-usb-serial.rules" "/etc/udev/rules.d/"
-sudo chown root:root "/etc/udev/rules.d/99-usb-serial.rules"
-sudo chmod 644 "/etc/udev/rules.d/99-usb-serial.rules"
+echo "Adding USB device rules"
+SOURCE="$SUPPORT/udev-rules"
+TARGET_DIR="/etc/udev/rules.d"
+for RULE in "$SOURCE"/* ; do
+   TARGET="$TARGET_DIR/$(basename "$RULE")"
+   sudo cp "$RULE" "$TARGET"
+   sudo chown root:root "$TARGET"
+   sudo chmod 644 "$TARGET"
+done
 
 echo "Setting up ~/.local/bin"
 mkdir -p ~/.local/bin
