@@ -20,7 +20,7 @@ I am putting this material on GitHub in response to several requests to share my
 
 	- [Script `01_setup.sh`](#script01)
 	- [Script `02_setup.sh`](#script02)
-	- [Script `03_setup.sh`](#script03)
+	- [Script `03_setup.sh`](#script03) – ***now with hass.io option***
 	- [Script `04_setup.sh`](#script04)
 	- [Script `05_setup.sh`](#script05)
 
@@ -63,14 +63,14 @@ My design goals were:
 
 	- It can be as simple as changing the right hand side of environment variables. For example (from `01_setup.sh`):
 
-		```
+		```bash
 		LOCALCC="AU"
 		LOCALTZ="Australia/Sydney"
 		```
 
 	- In other cases, you will need to edit more carefully. The text below (also from `01_setup.sh`) is building a temporary file in RAM which is creating editing **instructions** for later use:
 	
-		```
+		```bash
 		LOCALE_EDITS="$(mktemp -p /dev/shm/)"
 		cat <<-LOCALE_EDITS >"$LOCALE_EDITS"
 		s/^#.*en_AU ISO-8859-1/en_AU ISO-8859-1/
@@ -89,13 +89,13 @@ My design goals were:
 		
 		The script line **after** that uses the temporary file:
 		
-		```
+		```bash
 		$ sudo sed -i.bak -f "$LOCALE_EDITS" /etc/locale.gen
 		```
 		
 		The `-i.bak` tells `sed` to edit the file in-situ but save the original file with a `.bak` extension. To test, you can create the "LOCALE_EDITS" as above but then run the `sed` command like this:
 		
-		```
+		```bash
 		$ sed -f "$LOCALE_EDITS" /etc/locale.gen >edited-locale.gen
 		$ diff /etc/locale.gen edited-locale.gen
 		```
@@ -189,6 +189,25 @@ My design goals were:
 * Copies support files for `rclone` and IOTstackBackup into `~/.config`
 * Reboots
 
+#### <a name="script03hassio"> hass.io option </a>
+
+In its default form, `03_setup.sh` assumes `hass.io` is not to be installed. However, if you edit the script to enable **one** of the following lines:
+
+```bash
+#HASSIO_ARCHITECTURE="raspberrypi4-64"
+#HASSIO_ARCHITECTURE="raspberrypi4"
+#HASSIO_ARCHITECTURE="raspberrypi3-64"
+#HASSIO_ARCHITECTURE="raspberrypi3"
+``` 
+
+before running the script then `hass.io` will be installed. Note, however, that the installer script will wait for you to respond to the following prompt:
+
+```
+Changes are needed to the /etc/network/interfaces file
+```
+
+Press <kbd>y</kbd> then <kbd>enter</kbd>.
+
 ### <a name="script04"> Script `04_setup.sh` (optional but recommended) </a>
 
 * Sets up git scaffolding.
@@ -196,7 +215,7 @@ My design goals were:
 * Sets up ssh (if you supply a script to do it).
 * Adds `mkdocs` support. With that in place, you can do:
 
-	```
+	```bash
 	$ cd ~/IOTstack
 	$ mkdocs serve -a «ipaddress»:«port»
 	```
@@ -229,7 +248,7 @@ Assuming you have done all the necessary customisation…
 4. Dismount the `/boot` volume. Insert (SD) or connect (SSD) the media to the RPi, apply power, and wait for it to boot up.
 5. Connect to the Raspberry Pi:
 
-	```
+	```bash
 	$ ssh pi@raspberrypi.local
 	```
 
@@ -247,13 +266,13 @@ Assuming you have done all the necessary customisation…
 
 	- Supply both the hostname and password as parameters
 
-		```
+		```bash
 		$ /boot/scripts/01_setup.sh «hostname» «password»
 		```
 		
 	- Supply the hostname as a parameter and be prompted for the password:
 
-		```
+		```bash
 		$ /boot/scripts/01_setup.sh «hostname»
 		```
 		
@@ -266,7 +285,7 @@ Assuming you have done all the necessary customisation…
 	
 8. Back on your support host (Mac, PC, whatever) erase the TOFU evidence:
 
-	```
+	```bash
 	$ ssh-keygen -R raspberrypi.local
 	```
 	
@@ -274,7 +293,7 @@ Assuming you have done all the necessary customisation…
 	
 9. When the Pi comes back from the reboot:
 
-	```
+	```bash
 	$ ssh pi@«hostname»
 	```
 	
@@ -288,7 +307,7 @@ Assuming you have done all the necessary customisation…
 	
 10. Run the second script:
 
-	```
+	```bash
 	$ /boot/scripts/02_setup.sh
 	```
 	
@@ -296,7 +315,10 @@ Assuming you have done all the necessary customisation…
 
 11. Run the third script:
 
-	```
+	See also the notes above about [enabling hass.io](#script03hassio) as an installation optional.
+
+
+	```bash
 	$ /boot/scripts/03_setup.sh
 	```
 	
@@ -306,6 +328,10 @@ Assuming you have done all the necessary customisation…
 	- invites you to try running the failed installations by hand; and
 	- asks you to re-run 03_setup.sh (which will skip over any packages that are already installed).
 
+	Remember:
+	
+	* if you [enable hass.io](#script03hassio) then the script will pause waiting for you to confirm that it is OK to overwrite `/etc/network/interfaces`.
+
 	This script also ends in a reboot. Wait for the Pi to come back from the reboot and login as above.
 	
 	At this point, the RPi should be ready to run an `iotstack_restore`. If you don't have a backup ready to be reloaded, you can just run the IOTstack menu and choose your containers.
@@ -314,13 +340,13 @@ Assuming you have done all the necessary customisation…
 
 	This is optional. It is mainly about user-side customisation like git scaffolding, GnuPG and ssh client (ie if the Pi is the client in an SSH session connecting to another host). 
 
-	```
+	```bash
 	$ /boot/scripts/04_setup.sh
 	```
 	
 	The script finishes off by clearing the `bash` history, which goes some way to removing the password supplied as an argument to the first script. If you don't want to run this script, you might still want to think about running:
 	
-	```
+	```bash
 	$ history -c
 	```
 
@@ -328,7 +354,7 @@ Assuming you have done all the necessary customisation…
 
 	This is *completely* optional. It just installs SQLite from source code. It has a high level of interdependence on decisions taken by the folks at SQLite. In particular, these variables:
 	
-	```
+	```bash
 	SQLITEYEAR="2021"
 	SQLITEVERSION="sqlite-autoconf-3350000"
 	SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITEVERSION.tar.gz"
@@ -338,7 +364,7 @@ Assuming you have done all the necessary customisation…
 	
 	If you want to build SQLite:
 	
-	```
+	```bash
 	$ /boot/scripts/05_setup.sh
 	```
 
@@ -381,7 +407,7 @@ Whenever you start from a clean Raspberry Pi OS image (BalenaEtcher), the very f
 
 The contents of that folder can be thought of as a unique identity for the SSH service on your Raspberry Pi. That "identity" can be captured by running the following script in the `helpers` folder:
 
-```
+```bash
 $ ./etc_ssh_backup.sh
 ```
 
@@ -395,7 +421,7 @@ If you copy that file into the `support` folder **before** you run `setup_boot_v
 
 Then, when it comes time to run the first script and you do:
 
-```
+```bash
 $ /boot/scripts/01_setup.sh fred «password»
 ``` 
 
@@ -409,7 +435,7 @@ Whether you do this for any or all of your hosts is entirely up to you. I have g
 
 The *practical* effect of this is that my build sequence begins with:
 
-```
+```bash
 $ ssh pi@raspberrypi.local
 raspberry
 $ /boot/scripts/01_setup.sh previousname «password»
@@ -426,7 +452,7 @@ The contents of `~/.ssh` carry the client identity (how "pi" authenticates to ta
 
 Personally, I use a different approach to maintain and manage `~/.ssh` but it is still perfectly valid to run the supplied:
 
-```
+```bash
 $ user_ssh_backup.sh
 ``` 
 

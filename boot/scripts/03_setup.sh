@@ -13,6 +13,15 @@ fi
 
 set -x
 
+# assume supervised home assistant not to be installed
+HASSIO_ARCHITECTURE=""
+
+# if you want supervised home assistant, uncomment ONE of the following
+#HASSIO_ARCHITECTURE="raspberrypi4-64"
+#HASSIO_ARCHITECTURE="raspberrypi4"
+#HASSIO_ARCHITECTURE="raspberrypi3-64"
+#HASSIO_ARCHITECTURE="raspberrypi3"
+
 SUPPORT="/boot/scripts/support"
 
 # a function to handle installation of a list of packages done ONE AT
@@ -114,6 +123,22 @@ CRYPTO_PACKAGES
 
 install_packages "$PACKAGES"
 
+cat <<-HASSIO_PACKAGES >"$PACKAGES"
+apparmor
+apparmor-profiles
+apparmor-utils
+software-properties-common
+apt-transport-https
+ca-certificates
+dbus
+avahi-daemon
+network-manager
+HASSIO_PACKAGES
+
+if [ -n "$HASSIO_ARCHITECTURE" ] ; then
+   install_packages "$PACKAGES"
+fi
+
 SOURCE="/etc/systemd/timesyncd.conf"
 PATCH="$SUPPORT/timesyncd.conf.patch"
 MATCH="^\[Time\]"
@@ -153,10 +178,10 @@ echo "Setting up crontab"
 mkdir ~/Logs
 crontab $SUPPORT/User.crontab
 
-echo "Cloning IOTstack old menu"
-git clone -b old-menu https://github.com/SensorsIot/IOTstack.git ~/IOTstack 
+echo "Cloning IOTstack"
+git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack 
 
-echo "Mimicking old-menu installation of docker and docker-compose"
+echo "Installing docker and docker-compose"
 curl -fsSL https://get.docker.com | sh
 sudo usermod -G docker -a $USER
 sudo usermod -G bluetooth -a $USER
@@ -194,6 +219,28 @@ if [ -e "$SOURCE" ] ; then
    echo "Installing configuration file for iotstack_backup"
    mkdir -p "$TARGET_DIR"
    cp "$SOURCE" "$TARGET_DIR/$TARGET"
+fi
+
+if [ -n "$HASSIO_ARCHITECTURE" ] ; then
+
+
+   echo -e "\n\n\n\n"
+   echo "=============================================================="
+   echo "Installing hass.io - note that this WILL stop this script"
+   echo "from completing automatically because you WILL be required"
+   echo "to respond to a prompt."
+   echo "=============================================================="
+   echo -e "\n\n\n\n"
+
+   sudo systemctl disable ModemManager
+   sudo systemctl stop ModemManager
+   curl -sL "https://raw.githubusercontent.com/Kanga-Who/home-assistant/master/supervised-installer.sh" | sudo bash -s -- -m "$HASSIO_ARCHITECTURE"
+
+   echo "Disabling Network Manager random Wifi MAC"
+   SOURCE="$SUPPORT/NetworkManager.conf.patch"
+   TARGET="/etc/NetworkManager/NetworkManager.conf"
+   cat "$SOURCE" | sudo tee -a "$TARGET" >/dev/null
+   systemctl restart NetworkManager.service
 fi
 
 echo "$SCRIPT complete. Rebooting..."
