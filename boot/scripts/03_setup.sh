@@ -223,7 +223,6 @@ fi
 
 if [ -n "$HASSIO_ARCHITECTURE" ] ; then
 
-
    echo -e "\n\n\n\n"
    echo "=============================================================="
    echo "Installing hass.io - note that this WILL stop this script"
@@ -240,7 +239,8 @@ if [ -n "$HASSIO_ARCHITECTURE" ] ; then
    SOURCE="$SUPPORT/NetworkManager.conf.patch"
    TARGET="/etc/NetworkManager/NetworkManager.conf"
    cat "$SOURCE" | sudo tee -a "$TARGET" >/dev/null
-   systemctl restart NetworkManager.service
+   sudo systemctl restart NetworkManager.service
+
 fi
 
 echo "$SCRIPT complete. Rebooting..."
