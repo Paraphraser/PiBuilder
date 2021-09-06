@@ -27,8 +27,6 @@ case "$#" in
 
 esac
 
-set -x
-
 SUPPORT="/boot/scripts/support"
 LOCALCC="AU"
 LOCALTZ="Australia/Sydney"
@@ -84,9 +82,7 @@ sudo rm $SUPPORT/*.etc-ssh-backup.tar.gz
 
 # change the login password
 echo "Setting the user password"
-set +x
 echo -e "$NEW_PASSWORD\n$NEW_PASSWORD" | sudo passwd $USER
-set -x
 
 # make the VNC password the same
 VNCSOURCE="$SUPPORT/common.custom"
@@ -94,9 +90,7 @@ VNCTARGET="/etc/vnc/config.d/common.custom"
 if [ -e "$VNCSOURCE" ] ; then
    echo "Setting up VNC (even though it is not activated)"
    sudo cp "$VNCSOURCE" "$VNCTARGET"
-   set +x
    echo -e "$NEW_PASSWORD\n$NEW_PASSWORD" | sudo vncpasswd -file "$VNCTARGET"
-   set -x
    sudo chown root:root "$VNCTARGET"
    sudo chmod 644 "$VNCTARGET"
 fi

@@ -11,8 +11,6 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
-set -x
-
 # assume supervised home assistant not to be installed
 HASSIO_ARCHITECTURE=""
 
