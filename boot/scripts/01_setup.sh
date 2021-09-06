@@ -34,7 +34,9 @@ LOCALCC="AU"
 LOCALTZ="Australia/Sydney"
 
 echo "Initialising empty user directories for SSH and GnuPG"
-mkdir -m 700 "$HOME/.gnupg" "$HOME/.ssh"
+[ ! -d "$HOME/.gnupg" ] && mkdir -p "$HOME/.gnupg"
+[ ! -d "$HOME/.ssh" ] && mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.gnupg" "$HOME/.ssh"
 
 echo "Adding Debian Buster Backports support (for libseccomp2)"
 sudo apt-key adv \
