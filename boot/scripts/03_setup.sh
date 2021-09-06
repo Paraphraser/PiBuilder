@@ -186,6 +186,7 @@ curl -fsSL https://get.docker.com | sh
 sudo usermod -G docker -a $USER
 sudo usermod -G bluetooth -a $USER
 sudo apt install -y python3-pip python3-dev
+[ "$(uname -m)" = "aarch64" ] && sudo apt install libffi-dev
 sudo pip3 install -U docker-compose
 sudo pip3 install -U ruamel.yaml==0.16.12 blessed
 
