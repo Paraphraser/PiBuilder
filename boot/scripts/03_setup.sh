@@ -82,6 +82,7 @@ PACKAGES="$(mktemp -p /dev/shm/)"
 cat <<-BASE_PACKAGES >"$PACKAGES"
 acl
 curl
+bridge-utils
 dnsutils
 git
 iotop
