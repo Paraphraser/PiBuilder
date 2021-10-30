@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# no user options
+
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -11,6 +13,7 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
+# declare path to support directory
 SUPPORT="/boot/scripts/support"
 
 # clean-up any /etc/ssh.old from the previous step

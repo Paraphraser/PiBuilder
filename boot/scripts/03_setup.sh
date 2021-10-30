@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# user options
+# - uncomment ONE of the following if you want supervised home assistant
+#HASSIO_ARCHITECTURE="raspberrypi4-64"
+#HASSIO_ARCHITECTURE="raspberrypi4"
+#HASSIO_ARCHITECTURE="raspberrypi3-64"
+#HASSIO_ARCHITECTURE="raspberrypi3"
+
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -11,15 +18,7 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
-# assume supervised home assistant not to be installed
-HASSIO_ARCHITECTURE=""
-
-# if you want supervised home assistant, uncomment ONE of the following
-#HASSIO_ARCHITECTURE="raspberrypi4-64"
-#HASSIO_ARCHITECTURE="raspberrypi4"
-#HASSIO_ARCHITECTURE="raspberrypi3-64"
-#HASSIO_ARCHITECTURE="raspberrypi3"
-
+# declare path to support directory
 SUPPORT="/boot/scripts/support"
 
 # a function to handle installation of a list of packages done ONE AT

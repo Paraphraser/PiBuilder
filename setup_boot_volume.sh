@@ -1,4 +1,23 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+# the name of this script is
+SCRIPT=$(basename "$0")
+
+echo "================================================================="
+echo "Hint: $SCRIPT {key=value ...}"
+echo "      kernel=32-bit|64-bit"
+echo "================================================================="
+
+# handle key=value parameters (only one at the moment
+while [ $# -gt 0 ] ; do
+
+  eval "$1" 2>/dev/null
+  shift
+
+done
+
+# set defaults
+kernel="${kernel:-32-bit}"
 
 # work out where this tool is running
 WHERE=$(realpath "$0")
@@ -35,6 +54,12 @@ fi
 if [ ! -d "$BOOTTARGET" ] ; then
    report "boot volume not mounted."
    exit 0
+fi
+
+# enable 64-bit kernel if requested
+if [ "$kernel" = "64-bit" ] ; then
+   cp "$BOOTTARGET/config.txt" "$BOOTTARGET/config.txt.bak"
+   echo "arm_64bit=1" >>"$BOOTTARGET/config.txt"
 fi
 
 # copy the **contents** of the boot directory to the boot target
@@ -77,4 +102,4 @@ else
 fi
 
 # declare complete
-report "boot volume set up - safe to remove."
+report "boot volume set up with $kernel kernel - safe to remove."

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# user options
+# - these should be kept up-to-date (https://www.sqlite.org/download.html)
+SQLITEYEAR="2021"
+SQLITEVERSION="sqlite-autoconf-3360000"
+
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -14,11 +19,8 @@ fi
 # this script should terminate on errors
 set -e
 
-# this should be kept up-to-date
-SQLITEYEAR="2021"
-SQLITEVERSION="sqlite-autoconf-3360000"
+# construct download URL
 SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITEVERSION.tar.gz"
-
 echo "Using $SQLITEURL"
 echo "check https://www.sqlite.org/download.html for updates"
 

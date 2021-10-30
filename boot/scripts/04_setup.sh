@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# user options
+# - un-comment and replace the right hand side if you have a GPG Key ID
+#   available from keyserver.ubuntu.com
+#GPGKEYID=04B9CD3D381B574D
+
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -11,15 +16,12 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
+# declare path to support directory
 SUPPORT="/boot/scripts/support"
 
 echo "Setting up git (config and ignores)"
 cp "$SUPPORT/dot-gitconfig" ~/.gitconfig
 cp "$SUPPORT/dot-gitignore_global" ~/.gitignore_global
-
-# un-comment and replace the right hand side if you have a GPG Key ID
-# available from keyserver.ubuntu.com
-# GPGKEYID=04B9CD3D381B574D
 
 if [ -n "$GPGKEYID" ] ; then
 

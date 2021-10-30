@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# user options
+LOCALCC="AU"
+LOCALTZ="Australia/Sydney"
+
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -27,9 +31,8 @@ case "$#" in
 
 esac
 
+# declare path to support directory
 SUPPORT="/boot/scripts/support"
-LOCALCC="AU"
-LOCALTZ="Australia/Sydney"
 
 echo "Initialising empty user directories for SSH and GnuPG"
 [ ! -d "$HOME/.gnupg" ] && mkdir -p "$HOME/.gnupg"
@@ -49,6 +52,7 @@ sudo apt update
 
 echo "Running sudo apt full-upgrade -y"
 sudo apt full-upgrade -y
+sudo apt autoremove -y
 
 # copy etc
 echo "Taking a baseline copy of /etc"
