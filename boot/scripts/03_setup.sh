@@ -112,7 +112,7 @@ gnupg2
 hopenpgp-tools
 openssl
 pcscd
-python-gnupg
+python3-gnupg
 rng-tools
 scdaemon
 secure-delete
