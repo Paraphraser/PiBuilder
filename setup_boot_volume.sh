@@ -3,73 +3,66 @@
 # the name of this script is
 SCRIPT=$(basename "$0")
 
-echo "================================================================="
-echo "Hint: $SCRIPT {key=value ...}"
-echo "      kernel=32-bit|64-bit"
-echo "================================================================="
-
-# handle key=value parameters (only one at the moment
-while [ $# -gt 0 ] ; do
-
-  eval "$1" 2>/dev/null
-  shift
-
-done
-
-# set defaults
-kernel="${kernel:-32-bit}"
-
-# work out where this tool is running
+# work out where this tool is running. Logic:
+# 1. $0 is the path to the script.
+# 2. realpath converts $0 to absolute path
+# 3. dirname removes last path component (ie the script name), leaving
+#    the path to the folder containing the script.
 WHERE=$(realpath "$0")
 WHERE=$(dirname "$WHERE")
+
+# define the source directory
+BOOTSOURCE="$WHERE/boot"
+
+# assume no need to display usage statement
+USAGE=0
 
 # sense running on macOS
 [ "$(uname -s)" == "Darwin" ] && isMacOS=true
 
-# the volume name is
-BOOTVOLUME="boot"
+# how many script arguments?
+case "$#" in
 
-# define the source directory
-BOOTSOURCE="$WHERE/$BOOTVOLUME"
+  0 )
+    if [ $isMacOS ] ; then
+       BOOTTARGET="/Volumes/boot"
+    else
+       USAGE=1
+    fi
+    ;;
 
-# this is where the boot volume mounts on macOS
-BOOTTARGET="/Volumes/$BOOTVOLUME"
+  1 )
+    BOOTTARGET="$1"
+    ;;
 
-# a general-purpose reporting function
-report () {
-   if [ $isMacOS ] ; then
-      osascript -e "display notification \"$1\" with title \"RPi setup\""
-   else
-      echo "RPi setup: $1"
-   fi
-}
+  *)
+    USAGE=1
+    ;;
+
+esac
+
+if [ $USAGE -ne 0 ] ; then
+   echo "Usage: $SCRIPT path_to_mountpoint_of_raspbian_boot_partition"
+   exit -1
+fi
 
 # does the boot source exist?
 if [ ! -d "$BOOTSOURCE" ] ; then
-   report "boot directory not found."
+   echo "boot directory not found in same folder as $SCRIPT."
    exit 0
 fi
 
 # does the target exist?
 if [ ! -d "$BOOTTARGET" ] ; then
-   report "boot volume not mounted."
+   echo "boot volume not mounted."
    exit 0
 fi
 
-# enable 64-bit kernel if requested
-if [ "$kernel" = "64-bit" ] ; then
-   cp "$BOOTTARGET/config.txt" "$BOOTTARGET/config.txt.bak"
-   echo "arm_64bit=1" >>"$BOOTTARGET/config.txt"
-fi
-
 # copy the **contents** of the boot directory to the boot target
-cp -aX "$BOOTSOURCE"/* "$BOOTTARGET"
+cp -RX "$BOOTSOURCE"/* "$BOOTTARGET"
 
 # running macOS ?
 if [ $isMacOS ] ; then
-
-   # yes make sure we are not in this volume (it's about to be ejected)
-   cd
 
    # tell spotlight to ignore the volume
    touch "$BOOTTARGET/.metadata_never_index"
@@ -92,14 +85,24 @@ if [ $isMacOS ] ; then
       "$BOOTTARGET/.fseventsd/" \
       "$BOOTTARGET.Spotlight-V100/"
 
-   # eject the volume
-   /usr/sbin/diskutil eject "$BOOTTARGET"
+   # try to unmount the volume
+   umount "$BOOTTARGET"
+
+   # did the unmount succeed?
+   if [ $? -eq 0 ] ; then
+
+      #yes! all done
+      echo "boot volume set up - safe to remove."
+   else
+
+      #no! warning
+      echo "unable to unmount boot volume."
+
+   fi
 
 else
 
-   report "If you have OS-specific cleanup and ejection routines, put them here"
+   # If you have OS-specific cleanup and ejection routines, put them here
+   echo "boot volume set up - you can eject it now."
 
 fi
-
-# declare complete
-report "boot volume set up with $kernel kernel - safe to remove."

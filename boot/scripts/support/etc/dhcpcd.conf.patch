@@ -1,0 +1,7 @@
+59a60,65
+> 
+> # patch needed for IOTstack - stops RPi freezing during boot.
+> # see https://github.com/SensorsIot/IOTstack/issues/219
+> # see https://github.com/SensorsIot/IOTstack/issues/253
+> allowinterfaces eth*,wlan*
+> 

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# no user options
-
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -13,8 +11,12 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
-# declare path to support directory
+# declare path to support directory and import common functions
 SUPPORT="/boot/scripts/support"
+. "$SUPPORT/pibuilder/functions.sh"
+
+# import user options and run the script prolog - if they exist
+run_pibuilder_prolog
 
 # clean-up any /etc/ssh.old from the previous step
 if [ -d "/etc/ssh.old" ] ; then
@@ -23,58 +25,29 @@ if [ -d "/etc/ssh.old" ] ; then
 fi
 
 # tell dhcpcd and docker not to fight
-echo "Adding allowinterfaces eth*,wlan* to /etc/dhcpcd.conf"
-sudo sed -i.bak "\$r $SUPPORT/dhcpcd.conf.patch" /etc/dhcpcd.conf
-sudo systemctl daemon-reload
-sudo systemctl restart dhcpcd
+try_patch "/etc/dhcpcd.conf" "allowinterfaces eth*,wlan*"
 
 # install mechanism to auto-reset physical interfaces
-echo "Installing /usr/bin/isc-dhcp-fix.sh"
-sudo cp "$SUPPORT/isc-dhcp-fix.sh" "/usr/bin/isc-dhcp-fix.sh"
-sudo chown root:root "/usr/bin/isc-dhcp-fix.sh"
-sudo chmod 555 "/usr/bin/isc-dhcp-fix.sh"
+TARGET="/usr/bin/isc-dhcp-fix.sh"
+if SOURCE="$(supporting_file "$TARGET")" ; then
 
-# patch rc.local to launch isc-dhcpfix.sh
-SOURCE="/etc/rc.local"
-PATCH="$SUPPORT/rc.local.patch"
-MATCH="^# By default this script does nothing." 
-if [ $(egrep -c "$MATCH" "$SOURCE") -eq 1 ] ; then
-   echo "Patching /etc/rc.local to launch isc-dhcp-fix.sh at boot time"
-   sudo sed -i.bak "/$MATCH/r $PATCH" "$SOURCE"
-else
-   echo "Warning: could not patch $SOURCE"
-   sleep 5
+   echo "Installing $TARGET"
+   sudo cp "$SOURCE" "$TARGET"
+   sudo chown root:root "$TARGET"
+   sudo chmod 555 "$TARGET"
+
+   try_patch "/etc/rc.local" "launch isc-dhcp-fix.sh at boot"
+
 fi
 
 # patch resolvconf.conf for local DNS and domain name
-SOURCE="/etc/resolvconf.conf"
-PATCH="$SUPPORT/resolvconf.conf.patch"
-MATCH="^#name_servers=127.0.0.1"
-if [ $(egrep -c "$MATCH" "$SOURCE") -eq 1 ] ; then
-   echo "Patching /etc/resolvconf.conf for local name servers"
-   sudo sed -i.bak "/$MATCH/r $PATCH" "$SOURCE"
-   sudo service dhcpcd reload
-   sudo dhclient
-else
-   echo "Warning: could not patch $SOURCE"
-   sleep 5
-fi
+try_patch "/etc/resolvconf.conf" "local name servers"
 
 # patch sysctl.conf to disable IPv6
-# note that there is no call to sudo sysctl -p to activate this change.
-# If the current session was initiated via IPv6 (eg from Termius) we
-# don't want to pull the rug out while is actually being used. 
-SOURCE="/etc/sysctl.conf"
-PATCH="$SUPPORT/sysctl.conf.patch"
-MATCH="^#net.ipv6.conf.all.forwarding=1"
-if [ $(egrep -c "$MATCH" "$SOURCE") -eq 1 ] ; then
-   echo "Patching /etc/sysctl.conf to disable IPv6"
-   sudo sed -i.bak "/$MATCH/r $PATCH" "$SOURCE"
-   # will be implemented on next reboot
-else
-   echo "Warning: could not patch $SOURCE"
-   sleep 5
-fi
+try_patch "/etc/sysctl.conf" "disable IPv6"
+
+# run the script epilog if it exists
+run_pibuilder_epilog
 
 echo "$SCRIPT complete - rebooting..."
 sudo reboot

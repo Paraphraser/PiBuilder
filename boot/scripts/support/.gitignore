@@ -1,0 +1,4 @@
+# In this directory or below, the assumption is that anything with an
+# @hostname suffix is specific to a specific host belonging to a unique
+# user and should never be a candidate for adding to GitHub.
+*@*

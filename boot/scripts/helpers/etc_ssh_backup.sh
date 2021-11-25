@@ -8,6 +8,9 @@ case "$(uname -s)" in
 
   "Darwin")
     THISHOST="${HOSTNAME%%.*}"
+    if [ -z "$THISHOST" ] ; then
+       echo "Running macOS (Darwin) but FQDN may not be set"
+    fi
     ;;
 
   *)
@@ -29,8 +32,8 @@ if [ -z "$RUNTAG" ] ; then
    
 fi
 
-BACKUPSOURCE="$HOME/.ssh"
-SSHBACKUPTARGZ="$HOME/$USER@$RUNTAG.ssh-backup.tar.gz"
+BACKUPSOURCE="/etc/ssh"
+SSHBACKUPTARGZ="./etc-ssh-backup.tar.gz@$RUNTAG"
 
 if [ -d "$BACKUPSOURCE" ] ; then
 
@@ -38,7 +41,8 @@ if [ -d "$BACKUPSOURCE" ] ; then
    touch "$SSHBACKUPTARGZ"
 
    # run the backup
-   tar -czf "$SSHBACKUPTARGZ" -C "$BACKUPSOURCE" .
+   echo "Supply admin password if requested"
+   sudo tar -czf "$SSHBACKUPTARGZ" -C "$BACKUPSOURCE" .
 
 else
 

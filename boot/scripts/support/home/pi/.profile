@@ -32,9 +32,6 @@ fi
 #
 # the lines below are optional
 
-# omit if you don't have a GPG Key ID
-GPGKEYID=04B9CD3D381B574D
-
 # clone IOTstackAliases repo if not present already
 IOTSTACK_ALIASES="$HOME/.local/IOTstackAliases/dot_iotstack_aliases"
 # source the aliases - if installed
@@ -42,3 +39,10 @@ if [ -e "$IOTSTACK_ALIASES" ] ; then
     . "$IOTSTACK_ALIASES"
 fi
 unset IOTSTACK_ALIASES
+
+# https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/
+# https://docs.docker.com/compose/reference/build/#native-build-using-the-docker-cli
+# https://docs.docker.com/compose/reference/envvars/#compose_docker_cli_build
+export COMPOSE_DOCKER_CLI_BUILD=1
+export DOCKER_BUILDKIT=1
+echo "Note: COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD, DOCKER_BUILDKIT=$DOCKER_BUILDKIT"

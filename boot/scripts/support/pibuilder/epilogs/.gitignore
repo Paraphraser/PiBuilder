@@ -1,0 +1,5 @@
+# we want this folder to exist but only as a placeholder. Nothing in
+# here should ever be a candidate for being committed to GitHub:
+*
+# except, of course, this .gitignore file
+!.gitignore

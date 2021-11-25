@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# user options
-# - these should be kept up-to-date (https://www.sqlite.org/download.html)
-SQLITEYEAR="2021"
-SQLITEVERSION="sqlite-autoconf-3360000"
-
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -16,49 +11,38 @@ if [ "$#" -gt 0 ]; then
     exit -1
 fi
 
-# this script should terminate on errors
-set -e
+# declare path to support directory and import common functions
+SUPPORT="/boot/scripts/support"
+. "$SUPPORT/pibuilder/functions.sh"
 
-# construct download URL
-SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITEVERSION.tar.gz"
-echo "Using $SQLITEURL"
-echo "check https://www.sqlite.org/download.html for updates"
+# import user options and run the script prolog - if they exist
+run_pibuilder_prolog
 
-# create a directory to download into
-DOWNLOAD=$HOME/$(mktemp -d sqlite.download.XXXXX)
+TARGET="$HOME/.gitconfig"
+if SOURCE="$(supporting_file "$TARGET")" ; then
+   echo "Installing $TARGET from $SOURCE"
+   cp "$SOURCE" "$TARGET"
+fi
 
-echo "Note: this script terminates on errors. If the script succeeds"
-echo "      it will install SQLite3, clean up and print 'Success!'"
-echo "      If you do NOT see that message then the intermediate files"
-echo "      will be found in $DOWNLOAD. A 'make clean' may help."
+TARGET="$HOME/.gitignore_global"
+if SOURCE="$(supporting_file "$TARGET")" ; then
+   echo "Installing $TARGET from $SOURCE"
+   cp "$SOURCE" "$TARGET"
+fi
 
-# move into that directory
-cd "$DOWNLOAD"
+echo "Adding mkdocs support"
+pip install -U mkdocs
+pip install -U mkdocs-awesome-pages-plugin
+pip install -U mkdocs-material
 
-# define the download name
-LFN="sqlite.source.tar.gz"
+# run the script epilog if it exists
+run_pibuilder_epilog
 
-# fetch the source code
-wget -O "$LFN" "$SQLITEURL"
+echo "Resetting bash history"
+history -c
 
-# unpack
-tar -xzf "$LFN"
+echo "Should now be ready to run IOTstack menu or restore IOTstack backup."
 
-# move into the versioned directory
-cd "$SQLITEVERSION"
-
-# make the bastard!
-echo "Configuring $SQLITEVERSION"
-./configure
-
-echo "Building $SQLITEVERSION"
-make
-
-echo "Installing $SQLITEVERSION"
-sudo make install
-
-echo "Cleaning up"
-cd $HOME
-rm -rf $DOWNLOAD
-
-echo "Success!"
+# kill the parent process
+echo "$SCRIPT complete. Logging-out..."
+kill -HUP "$PPID"

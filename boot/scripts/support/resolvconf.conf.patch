@@ -1,5 +1,0 @@
-# If you have a local upstream DNS server, uncomment the following
-# and set appropriate values on the right hand side
-#
-#name_servers=192.168.132.65
-#search_domains=my.domain.com

@@ -1,0 +1,5 @@
+13a14,17
+> logger "EVENT MARK - running /etc/rc.local"
+> 
+> /usr/bin/isc-dhcp-fix.sh eth0 wlan0 &
+> 
