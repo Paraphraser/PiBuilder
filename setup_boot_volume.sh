@@ -86,7 +86,7 @@ if [ $isMacOS ] ; then
       "$BOOTTARGET.Spotlight-V100/"
 
    # try to unmount the volume
-   umount "$BOOTTARGET"
+   /usr/sbin/diskutil eject "$BOOTTARGET"
 
    # did the unmount succeed?
    if [ $? -eq 0 ] ; then
