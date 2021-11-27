@@ -6,7 +6,7 @@
 # the name of this script is
 SCRIPT=$(basename "$0")
 
-if [ $# -eq 1 ] then
+if [ $# -eq 1 ] ; then
 
    HOSTNAME="$1"
    read -s -p "New password for $USER@$HOSTNAME: " NEW_PASSWORD
