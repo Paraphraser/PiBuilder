@@ -40,7 +40,8 @@ HASSIO_PACKAGES
 # has the user asked for home assistant?
 if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
 
-   # yes! use a default release if not otherwise provided
+   # yes! use a default release if not otherwise provided in options.sh
+   # https://github.com/home-assistant/os-agent/releases/latest
    HOME_ASSISTANT_AGENT_RELEASE="${HOME_ASSISTANT_AGENT_RELEASE:-"1.2.2"}"
 
    # check how the hardware describes itself
@@ -162,8 +163,70 @@ echo "Setting groups required for docker and bluetooth"
 sudo usermod -G docker -a $USER
 sudo usermod -G bluetooth -a $USER
 
-echo "Installing docker-compose and IOTstack dependencies"
-sudo pip3 install -U docker-compose
+echo "Installing docker-compose"
+
+# apply defaults for docker-compose (can be overridden in options.sh)
+# https://github.com/docker/compose/releases
+DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.1.1"}"
+DOCKER_COMPOSE_ARCHITECTURE="${DOCKER_COMPOSE_ARCHITECTURE:-"armv7"}"
+
+# construct the URL
+COMPOSE_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-$DOCKER_COMPOSE_ARCHITECTURE"
+
+# download defaults to user-space
+PLUGINS="$HOME/.docker/cli-plugins"
+
+# where sudo is not required
+unset SUDO
+
+# iterate system-wide candidates
+for CANDIDATE in \
+  "/usr/libexec/docker/cli-plugins" \
+  "/usr/local/libexec/docker/cli-plugins" \
+  "/usr/lib/docker/cli-plugins" \
+  "/usr/local/lib/docker/cli-plugins"
+do
+  if [ -d "$CANDIDATE" ] ; then
+     PLUGINS="$CANDIDATE"
+     SUDO="sudo"
+     break
+  fi
+done
+
+# ensure the download directory exists
+$SUDO mkdir -p "$PLUGINS"
+
+# the target is
+TARGET="$PLUGINS/docker-compose"
+
+# try to fetch
+$SUDO curl -L "$COMPOSE_URL" -o "$TARGET"
+
+# did the download succeed?
+if [ $? -eq 0 ] ; then
+
+   # yes! set execute permission on the target
+   $SUDO chmod +x "$TARGET"
+
+   # and also copy to /usr/local/bin/ (sudo always required)
+   sudo cp "$TARGET" "/usr/local/bin/"
+
+   # yes! report success
+   echo "Modern docker-compose installed as $TARGET - also copied to /usr/local/bin/"
+
+else
+
+   # no! failed. That means TARGET is useless
+   $SUDO rm -f "$TARGET"
+
+   echo "Attempt to download docker-compose failed"
+   echo "   URL=$COMPOSE_URL"
+   echo "Falling back to using pip method"
+   sudo pip3 install -U docker-compose
+
+fi
+
+echo "Installing IOTstack dependencies"
 sudo pip3 install -U ruamel.yaml==0.16.12 blessed
 
 # run the script epilog if it exists
