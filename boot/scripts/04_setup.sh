@@ -12,8 +12,11 @@
 # the name of this script is
 SCRIPT=$(basename "$0")
 
-if [ "$#" -gt 0 ]; then
-    echo "Usage: $SCRIPT"
+if [ "$#" -gt 1 ]; then
+    echo "Usage: $SCRIPT" {false|true}
+    echo "  if optional argument is:"
+    echo "      true = forces Supervised Home Assistant installation"
+    echo "     false = forbids Supervised Home Assistant installation"
     exit -1
 fi
 
@@ -147,7 +150,7 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
             if [ $? -ne 0 ] ; then
                echo "Unable to install Home Assistant package $DEB. Try running:"
                echo "   gdbus introspect --system --dest io.hass.os --object-path /io/hass/os"
-               break
+               exit 1
             fi
          done
 
@@ -162,6 +165,7 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
 
          # no! did not succeed in downloading package
          echo "Unable to download Home Assistant package from $PACKAGE_URL"
+         exit 1
 
       fi
 
@@ -174,6 +178,7 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
       echo "   https://github.com/home-assistant/os-agent/releases/latest"
       echo "then set HOME_ASSISTANT_AGENT_RELEASE in $USEROPTIONS"
       echo "and retry $SCRIPT."
+      exit 1
 
    fi
 
