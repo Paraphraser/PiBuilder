@@ -499,22 +499,53 @@ Connect and login:
 $ ssh pi@iot-hub.local
 ```
 
-What you do next depends on your [configuration options](#configOptions). If you set
+Whether Supervised Home Assistant is installed depends on two things:
 
-* `HOME_ASSISTANT_SUPERVISED_INSTALL=false` then proceed to [Docker only](#runScript04NoHA).
-* `HOME_ASSISTANT_SUPERVISED_INSTALL=true` then proceed to [Docker + Home Assistant](#runScript04HA).
+* The value of the `HOME_ASSISTANT_SUPERVISED_INSTALL` variable set in your [configuration options](#configOptions); and
+* The value of an **optional** argument that you can pass to the `04_setup.sh` script.
 
-#### <a name="runScript04NoHA"> Docker only </a>
+The table below explains the relationships:
 
-Run:
+`HOME_ASSISTANT_SUPERVISED_INSTALL`      | Command (argument is optional)    | HA Installed?
+:---------------------------------------:|-----------------------------------|:-------------:
+*undefined* **or** `false`               | `/boot/scripts/04_setup.sh`       | no
+`true`                                   | `/boot/scripts/04_setup.sh`       | yes
+*undefined* **or** `false` **or** `true` | `/boot/scripts/04_setup.sh false` | no
+*undefined* **or** `false` **or** `true` | `/boot/scripts/04_setup.sh true`  | yes
 
-```bash
-$ /boot/scripts/04_setup.sh
-```
+In other words:
 
+* if you do **not** pass an argument to the `04_setup.sh` script, Supervised Home Assistant will only be installed if `HOME_ASSISTANT_SUPERVISED_INSTALL=true`.
+* if you **do** pass an argument to the `04_setup.sh` script, Supervised Home Assistant will only be installed if the value of that argument is the literal string `true`.
+
+The optional argument gives you the ability to override the installation of Supervised Home Assistant without forcing you to edit the [configuration options](#configOptions) file if you forgot to set `HOME_ASSISTANT_SUPERVISED_INSTALL` before copying the PiBuilder files to your boot volume.
+
+What you do next depends on whether you want to install Supervised Home Assistant:
+
+* If you do **not** want to install Supervised Home Assistant, proceed to [install Docker only](#runScript04NoHA).
+* If you **do** want to install Supervised Home Assistant, proceed to [install Docker + Home Assistant](#runScript04HA).
+
+#### <a name="runScript04NoHA"> install Docker only </a>
+
+This section assumes that you do **not** want to install Supervised Home Assistant. Run **ONE** of the following commands: 
+
+1. This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=false`:
+
+	```bash
+	$ /boot/scripts/04_setup.sh
+	```
+
+2. This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=true` but you want to override it:
+
+	```bash
+	$ /boot/scripts/04_setup.sh false
+	```
+	
 The 04 script installs Docker and ends with a reboot. Go to [Script 05](#runScript05).
 
-#### <a name="runScript04HA"> Docker + Home Assistant </a>
+#### <a name="runScript04HA"> install Docker + Home Assistant </a>
+
+This section assumes that you **do** want to install Supervised Home Assistant. 
 
 One of Supervised Home Assistant's dependencies is Network Manager. Network Manager makes serious changes to your operating system, with side-effects you may not expect such as giving your Raspberry Pi's WiFi interface a random MAC address.
 
@@ -538,7 +569,7 @@ You are in for a world of pain if you do not understand what is going to happen 
 	```
 
 	In the above, the IP address assigned to the Ethernet interface is on the second line of output, to the right of "inet": 192.168.132.9.
-3. Disconnect from your Raspberry Pi by pressing <kbd>Control</kbd>+<kbd>d</kbd>.
+3. Disconnect from your Raspberry Pi by pressing <kbd>control</kbd>+<kbd>d</kbd>.
 4. Re-connect to your Raspberry Pi using its IP address. For example:
 
 	```bash
@@ -552,12 +583,20 @@ You are in for a world of pain if you do not understand what is going to happen 
 5. 	Shortly after you trigger the 04 script, you will see a hint advising you to choose either "raspberrypi3" or "raspberrypi4" when you are subsequently prompted to do that by the Home Assistant installation process.
 
 	Please take that hint seriously. Please do **not** make the mistake of choosing either "raspberrypi3-64" or "raspberrypi4-64". During testing, those options sometimes caused the installer to hang. If that happens to you, the safest course is to start again from a clean image.
+	
+6. Run **ONE** of the following commands:
 
-6. Trigger the 04 script via:
-
-	```bash
-	$ /boot/scripts/04_setup.sh
-	```
+	* This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=true`:
+	
+		```bash
+		$ /boot/scripts/04_setup.sh
+		```
+	
+	* This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=false` but you want to override it:
+	
+		```bash
+		$ /boot/scripts/04_setup.sh true
+		```
 
 As well as installing Home Assistant and Docker, the 04 script:
 

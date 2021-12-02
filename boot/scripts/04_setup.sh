@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# takes an optional argument. If the value of that argument is "true" (the literal
+# string minus the quotes) then Supervised Home Assistant will be installed. Any other
+# value results in Supervised Home Assistant not being installed. If the argument is
+# omitted then Supervised Home Assistant will only be installed if the value of the
+# HOME_ASSISTANT_SUPERVISED_INSTALL variable in the options file is "true".
+
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
@@ -18,7 +24,16 @@ SUPPORT="/boot/scripts/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
-# pre-load list of supporting packages for Home Assistant
+# pre-load list of supporting packages for Home Assistant.
+#
+# Note https://github.com/home-assistant/supervised-installer lists
+# dependencies as:
+#   jq wget curl udisks2 libglib2.0-bin network-manager dbus
+# which means:
+#   apparmor apparmor-profiles apparmor-utils apt-transport-https
+#   avahi-daemon ca-certificates software-properties-common
+# are probably no longer necessary. This needs testing.
+#
 PACKAGES="$(mktemp -p /dev/shm/)"
 cat <<-HASSIO_PACKAGES >"$PACKAGES"
 apparmor
@@ -37,11 +52,25 @@ wget
 network-manager
 HASSIO_PACKAGES
 
+# we expect HOME_ASSISTANT_SUPERVISED_INSTALL to be set in the options file
+# which is imported above. If HOME_ASSISTANT_SUPERVISED_INSTALL is not defined
+# in the options file then we set it here with a default of false (do not install)
+HOME_ASSISTANT_SUPERVISED_INSTALL=${HOME_ASSISTANT_SUPERVISED_INSTALL:-false}
+
+# we support an argument to this script. If it is present then its value
+# overrides HOME_ASSISTANT_SUPERVISED_INSTALL. If that value is "true" then
+# Supervised Home Assistant will be installed.
+HOME_ASSISTANT_SUPERVISED_INSTALL=${1:-$HOME_ASSISTANT_SUPERVISED_INSTALL}
+
 # has the user asked for home assistant?
 if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
 
+   # yes! references:
+   #   https://github.com/home-assistant/supervised-installer
+   #   https://github.com/home-assistant/supervised-installer/releases
+   #   https://github.com/home-assistant/os-agent/releases/latest
+
    # yes! use a default release if not otherwise provided in options.sh
-   # https://github.com/home-assistant/os-agent/releases/latest
    HOME_ASSISTANT_AGENT_RELEASE="${HOME_ASSISTANT_AGENT_RELEASE:-"1.2.2"}"
 
    # check how the hardware describes itself
