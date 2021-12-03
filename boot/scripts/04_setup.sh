@@ -77,7 +77,8 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
    HOME_ASSISTANT_AGENT_RELEASE="${HOME_ASSISTANT_AGENT_RELEASE:-"1.2.2"}"
 
    # check how the hardware describes itself
-   case "$(grep "^Model[ :]*" /proc/cpuinfo | cut -c 10-23)" in
+   HARDWARE_IDENTITY=$(grep "^Model[ :]*" /proc/cpuinfo | cut -c 10-23)
+   case "$HARDWARE_IDENTITY" in
 
      "Raspberry Pi 3" )
        HINT="raspberrypi3"
@@ -87,12 +88,15 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
        HINT="raspberrypi4"
        ;;
 
+     "Raspberry Pi Z" )
+       HINT="raspberrypi"
+       ;;
+
      *)
-       echo "Home Assistant Supervised Install is enabled but this hardware does not"
-       echo "identify as either Raspberry Pi 3 or 4. Either this configuration is not"
-       echo "supported by Home Assistant or has not been tested for PiBuilder. If you"
-       echo "wish to try anyway, modify this script to include your hardware in this"
-       echo "case statement."
+       echo "Home Assistant Supervised Install is enabled but this hardware identifies"
+       echo "as \"$HARDWARE_IDENTITY\". Either this configuration is not supported by"
+       echo "Home Assistant or has not been tested for PiBuilder. If you wish to try"
+       echo "anyway, modify this script to include your hardware in this case statement."
        exit 1
        ;;
 
