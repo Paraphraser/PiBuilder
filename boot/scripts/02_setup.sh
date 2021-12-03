@@ -38,6 +38,30 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
 
    try_patch "/etc/rc.local" "launch isc-dhcp-fix.sh at boot"
 
+   # in the non-host-specific case, that patch puts the following line
+   # into /etc/rc.local. It is commented-out but even if it is made
+   # active, it still evaluates to a no-op
+   INACTIVE="# /usr/bin/isc-dhcp-fix.sh"
+
+   # we are going to build a replacement for that
+   ACTIVE="/usr/bin/isc-dhcp-fix.sh"
+
+   # iterate the candidate interfaces. We are looking for interfaces
+   # which are defined, up, and using DHCP
+   for I in eth0 wlan0 ; do
+     if ip r | grep -q "dev $I proto dhcp src" ; then
+        ACTIVE="$ACTIVE $I"
+     fi
+   done
+
+   # try to replace the inactive form with the active form just built
+   # the edit will not occur if the INACTIVE form is not present (the
+   # most likely reason being that there was a host-specific patch).
+   # Also note no .bak file is produced. We want .bak to be the baseline
+   echo "If /etc/rc.local contains \"$INACTIVE\","
+   echo "it will be replaced with \"$ACTIVE\"."
+   sudo sed -i "s+$INACTIVE+$ACTIVE+" "/etc/rc.local"
+
 fi
 
 # patch resolvconf.conf for local DNS and domain name
