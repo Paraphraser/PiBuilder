@@ -97,9 +97,10 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
 fi
 
 # try to establish locales
-if try_patch "/etc/locale.gen" "setting-up locales" ; then
-   sudo locale-gen
-fi
+echo "skipping patching /etc/locale.gen - seems to be broken"
+# if try_patch "/etc/locale.gen" "setting-up locales" ; then
+#    sudo locale-gen
+# fi
 
 # run the script epilog if it exists (best to run before rasp-config)
 run_pibuilder_epilog
