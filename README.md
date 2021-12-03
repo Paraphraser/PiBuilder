@@ -1,5 +1,11 @@
 # PiBuilder
 
+* 2021-12-03
+
+	- disable locales patching - locales_2.31-13 is incompatible with previous approach.
+	- better default handling of `isc-dhcp-fix.sh` - `/etc/rc.local` now only includes interfaces that are defined, active, and obtained their IP addresses via DHCP.
+	- added support for Raspberry Pi Zero W2 + Supervised Home Assistant. 
+
 * 2021-11-25
 	- major overhaul
 	- tested for Raspbian Buster and Bullseye
@@ -545,7 +551,9 @@ The 04 script installs Docker and ends with a reboot. Go to [Script 05](#runScri
 
 #### <a name="runScript04HA"> install Docker + Home Assistant </a>
 
-This section assumes that you **do** want to install Supervised Home Assistant. 
+This section assumes that you **do** want to install Supervised Home Assistant.
+
+> *The discussion below recommends that you connect your Raspberry Pi to Ethernet. I have installed Supervised Home Assistant, successfully, on a Raspberry Pi Zero W2. There is no Ethernet interface so, clearly, it works. A logical conclusion is that Supervised Home Assistant installer is now able to work around the problems that previously gave rise to the "use Ethernet" recommendation. What is unknown at this point is whether this new behaviour generalises to all Raspberry Pis. The Zero did hang but it was at the end of the 05 script. It's possible it was busy trying to get HA going and I was far too impatient. It came back OK after a power-cycle.* 
 
 One of Supervised Home Assistant's dependencies is Network Manager. Network Manager makes serious changes to your operating system, with side-effects you may not expect such as giving your Raspberry Pi's WiFi interface a random MAC address.
 
@@ -668,7 +676,7 @@ The script:
 * Optionally replaces `/etc/ssh` with a preset.
 * Sets the user password.
 * Sets up VNC with the same password (but does NOT activate VNC)
-* Optionally sets up locale(s).
+* Optionally sets up locale(s). ***currently disabled***
 * Sets raspi-config options:
 
 	- boot to console
@@ -684,11 +692,7 @@ The script:
 
 * Cleans up any leftovers from `/etc/ssh` replacement.
 * Applies the recommended `allowinterfaces eth*,wlan*` patch.
-* Applies [Does your Raspberry Pi's Wireless Interface freeze?](https://gist.github.com/Paraphraser/305f7c70e798a844d25293d496916e77). If your Raspberry Pi does not have both Ethernet and WiFi interfaces active, you may need to:
-
-	1. Edit `/etc/rc.local` to remove the missing interface; and
-	2. Consider [preparing a host-specific](#patchPreparation) `rc.local.patch` to specify the correct interfaces automatically on any subsequent rebuilds.
- 
+* Applies [Does your Raspberry Pi's Wireless Interface freeze?](https://gist.github.com/Paraphraser/305f7c70e798a844d25293d496916e77). Only probes interfaces that are defined, are active, and obtain their IP addresses via DHCP.
 * Optionally sets up local DNS.
 * Disables IPv6
 * Reboots
@@ -716,7 +720,7 @@ The script:
 
 The `HOME_ASSISTANT_SUPERVISED_INSTALL` variable is set in the [installation options](#configOptions).
 
-* If `true`, the script:
+* If `true` (or overridden to be `true`), the script:
 
 	- Displays a hint to choose either "raspberrypi3" or "raspberrypi4" when prompted by the Home Assistant installation process.
 	- Installs Home Assistant dependencies.
@@ -724,7 +728,7 @@ The `HOME_ASSISTANT_SUPERVISED_INSTALL` variable is set in the [installation opt
 	- Installs the Home Assistant agent and package.
 	- Turns off random WiFi MAC address generation imposed by NetworkManager.
 
-* If `false', the script only installs Docker.
+* If `false' (or overridden to be `false`), the script only installs Docker.
 
 The script then continues and:
 
