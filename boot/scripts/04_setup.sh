@@ -268,4 +268,5 @@ run_pibuilder_epilog
 
 # reboot (applies usermods and any network manager change)
 echo "$SCRIPT complete - rebooting..."
+sudo touch /boot/ssh
 sudo reboot

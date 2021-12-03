@@ -50,4 +50,5 @@ try_patch "/etc/sysctl.conf" "disable IPv6"
 run_pibuilder_epilog
 
 echo "$SCRIPT complete - rebooting..."
+sudo touch /boot/ssh
 sudo reboot

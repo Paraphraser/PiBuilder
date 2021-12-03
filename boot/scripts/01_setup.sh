@@ -96,10 +96,9 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
    sudo chmod 644 "$TARGET"
 fi
 
-if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
+# try to establish locales
+if try_patch "/etc/locale.gen" "setting-up locales" ; then
    sudo locale-gen
-   # this produces an error - but it seems to work anyway (after reboot)
-   sudo update-locale LANG=en_US.UTF-8
 fi
 
 # run the script epilog if it exists (best to run before rasp-config)
@@ -123,4 +122,5 @@ sudo raspi-config nonint do_hostname "$HOSTNAME"
 echo "Remember to do ssh-keygen -R raspberrypi.local then re-connect"
 echo "to this machine under the name $HOSTNAME."
 echo "$SCRIPT complete - rebooting..."
+sudo touch /boot/ssh
 sudo reboot
