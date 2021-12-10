@@ -5,7 +5,7 @@ One of the changes introduced by Bullseye affects `/var/log/syslog` rotation:
 * Buster rotates the syslog every 24 hours and keeps the current day plus the preceding 7 days (max 8 days).
 * Bullseye rotates the syslog every week and keeps the current week plus the preceding 4 weeks (max 35 days).
 
-Whether this is a good thing or not depends on your perspective. For example, you may have a daily cron job which saves "yesterday's" log to another host. If your Pi emits magic smoke, the most you will lose is "today's" log. Bullseye-style rotation implies the potential for losing all logging for "this week". Sure, you can still save "this week's" log every day as it continues to grow but its less clean.
+Whether this is a good thing or not depends on your perspective. For example, you may have a daily cron job which saves "yesterday's" log to another host. If your Pi emits magic smoke, the most you will lose is "today's" log. Bullseye-style rotation implies the potential for losing all logging for "this week". Sure, you can still save "this week's" log every day as it continues to grow but it's less clean.
 
 Anyway, make the assumption that you want to go back to Buster-style log rotation.
 
