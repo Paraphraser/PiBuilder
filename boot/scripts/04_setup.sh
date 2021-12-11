@@ -205,7 +205,7 @@ echo "Installing docker-compose"
 
 # apply defaults for docker-compose (can be overridden in options.sh)
 # https://github.com/docker/compose/releases
-DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.1.1"}"
+DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.2.2"}"
 DOCKER_COMPOSE_ARCHITECTURE="${DOCKER_COMPOSE_ARCHITECTURE:-"armv7"}"
 
 # construct the URL
