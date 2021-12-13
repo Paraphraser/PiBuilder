@@ -46,10 +46,9 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
    # we are going to build a replacement for that
    ACTIVE="/usr/bin/isc-dhcp-fix.sh"
 
-   # iterate the candidate interfaces. We are looking for interfaces
-   # which are defined, up, and using DHCP
+   # iterate the candidate interfaces
    for I in eth0 wlan0 ; do
-     if ip r | grep -q "dev $I proto dhcp src" ; then
+     if ip r | grep -q "dev $I proto" ; then
         ACTIVE="$ACTIVE $I"
      fi
    done
