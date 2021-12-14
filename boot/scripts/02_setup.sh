@@ -24,6 +24,12 @@ if [ -d "/etc/ssh.old" ] ; then
    sudo rm -rf /etc/ssh.old
 fi
 
+# try to set the default language
+if [ -n "$LOCALE_LANG" ] ; then
+   echo "Setting default language to $LOCALE_LANG"
+   sudo update-locale "LANG=$LOCALE_LANG"
+fi
+
 # tell dhcpcd and docker not to fight
 try_patch "/etc/dhcpcd.conf" "allowinterfaces eth*,wlan*"
 

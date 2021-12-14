@@ -22,13 +22,13 @@ This is probably the most straightforward patch. The only assumption is that you
 	$ sudo raspi-config
 	```
 
-4. Choose your locale options. For example, I enable:
+4. Choose your locale options. **Always** include the default "en_GB.UTF-8 UTF-8". For example, I enable:
 
 	* en_AU ISO-8859-1
 	* en_AU.UTF-8 UTF-8
 	* en_US.UTF-8 UTF-8
 
-	and disable:
+	in addition to the default:
 
 	* en_GB.UTF-8 UTF-8
 
@@ -41,7 +41,7 @@ This is probably the most straightforward patch. The only assumption is that you
 	$ diff locale.gen.bak locale.gen >~/locale.gen.patch
 	```
 
-	In my case, the differences file looks like this:
+	In my case, the patch file looks like this:
 
 	```
 	$ cat ~/locale.gen.patch
@@ -51,10 +51,6 @@ This is probably the most straightforward patch. The only assumption is that you
 	---
 	> en_AU ISO-8859-1
 	> en_AU.UTF-8 UTF-8
-	145c145
-	< en_GB.UTF-8 UTF-8
-	---
-	> # en_GB.UTF-8 UTF-8
 	163c163
 	< # en_US.UTF-8 UTF-8
 	---
@@ -67,5 +63,7 @@ This is probably the most straightforward patch. The only assumption is that you
 	~/PiBuilder/boot/scripts/support/etc/
 	```
 
-	The next time you build a Raspberry Pi using PiBuilder, your locale will be set automatically.
+	The next time you build a Raspberry Pi using PiBuilder, your locales will be set automatically.
+	
+See also the `LOCALE_LANG` environment variable in the PiBuilder options file.
 

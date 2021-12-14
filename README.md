@@ -3,6 +3,7 @@
 * 2021-12-14
 
 	- 04 script now fully automated - does not pause during Home Assistant installation to ask for architecture.
+	- re-enable locale patching - now split across 01 and 02 scripts.
 
 * 2021-12-03
 
@@ -247,6 +248,11 @@ LOCALCC="AU"
 # - local time-zone
 LOCALTZ="Etc/UTC"
 
+# - default language
+#   Whatever you change this to must be in your list of active locales
+#   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
+#LOCALE_LANG="en_GB.UTF-8"
+
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
 #DOCKER_COMPOSE_VERSION="v2.1.1"
@@ -273,7 +279,8 @@ You should change:
 
 1. The right hand side of `LOCALCC` to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
 2. The right hand side of `LOCALTZ` to be a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
-3. If you want the "supervised" version of Home Assistant to be installed, set the right hand side of `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true`.
+3. "en_GB.UTF-8" is the default language. You can change it but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial.
+4. If you want the "supervised" version of Home Assistant to be installed, set the right hand side of `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true`.
 
 On the subject of Home Assistant, you have the choice of:
 
@@ -676,7 +683,7 @@ The script:
 * Optionally replaces `/etc/ssh` with a preset.
 * Sets the user password.
 * Sets up VNC with the same password (but does NOT activate VNC)
-* Optionally sets up locale(s). ***currently disabled***
+* Optionally sets up locale(s).
 * Sets raspi-config options:
 
 	- boot to console
@@ -691,6 +698,7 @@ The script:
 The script:
 
 * Cleans up any leftovers from `/etc/ssh` replacement.
+* Optionally sets up default language for your locale.
 * Applies the recommended `allowinterfaces eth*,wlan*` patch.
 * Applies [Does your Raspberry Pi's Wireless Interface freeze?](https://gist.github.com/Paraphraser/305f7c70e798a844d25293d496916e77). Only probes interfaces that are defined, are active, and obtain their IP addresses via DHCP.
 * Optionally sets up local DNS.
@@ -866,8 +874,7 @@ The `try_patch()` function has two common use patterns:
 
 	```bash
 	if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
-	   sudo locale-gen
-	   sudo update-locale LANG=en_US.UTF-8
+		sudo dpkg-reconfigure -f noninteractive locales
 	fi
 	```
 
