@@ -81,15 +81,15 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
    case "$HARDWARE_IDENTITY" in
 
      "Raspberry Pi 3" )
-       HINT="raspberrypi3"
+       PLATFORM_CHOICE="raspberrypi3"
        ;;
 
      "Raspberry Pi 4" )
-       HINT="raspberrypi4"
+       PLATFORM_CHOICE="raspberrypi4"
        ;;
 
      "Raspberry Pi Z" )
-       HINT="raspberrypi"
+       PLATFORM_CHOICE="raspberrypi"
        ;;
 
      *)
@@ -102,19 +102,14 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
 
    esac
 
-   # the agent is ALWAYS armv7 - aarch64 does not work
-   #    dpkg: error processing archive /tmp/Imx1h-DOWNLOADS/os-agent_1.2.2_linux_aarch64.deb (--install):
-   #          package architecture (arm64) does not match system (armhf)
+   # the agent architecture is ALWAYS "armv7":
+   # 1. aarch64 does not work
+   #      dpkg: error processing archive /tmp/Imx1h-DOWNLOADS/os-agent_1.2.2_linux_aarch64.deb (--install):
+   #            package architecture (arm64) does not match system (armhf)
+   # 2. on 32-bit, "uname -m" returns "armv7l" but the agent repo only knows about "armv7"
+   HOME_ASSISTANT_ARCHITECTURE="armv7"
 
-   AGENT="os-agent_${HOME_ASSISTANT_AGENT_RELEASE}_linux_armv7.deb"
-
-   echo -e "\n\n\n========================================================================\n"
-   echo "Hint: during Home Assistant installation, please choose:"
-   echo "           \"$HINT\""
-   echo "      at the \"Select machine type\" prompt"
-   echo -e "\n========================================================================\n"
-
-   sleep 5
+   AGENT="os-agent_${HOME_ASSISTANT_AGENT_RELEASE}_linux_${HOME_ASSISTANT_ARCHITECTURE}.deb"
 
    # construct a temporary directory to download into
    DOWNLOADS=$(mktemp -d /tmp/XXXXX-DOWNLOADS)
@@ -126,6 +121,13 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
    # define what we will be downloading
    AGENT_DEB="$DOWNLOADS/$AGENT"
    PACKAGE_DEB="$DOWNLOADS/homeassistant-supervised.deb"
+   
+   # create a pre-seed file. To revert to a menu:
+   # 1. comment-out the next three lines
+   # 2. remove the DEBIAN_FRONTEND=noninteractive further down
+   PRESEED="$DOWNLOADS/preseed.cfg"
+   echo -e "homeassistant-supervised\tha/machine-type\tselect\t${PLATFORM_CHOICE}" >"$PRESEED"
+   sudo debconf-set-selections "$PRESEED"
 
    # try to download the agent
    wget -O "$AGENT_DEB" "$AGENT_URL"
@@ -150,7 +152,7 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
          # iterate home assistant components
          echo "Installing Home Assistant"
          for DEB in "$AGENT_DEB" "$PACKAGE_DEB" ; do
-            sudo dpkg -i "$DEB"
+            DEBIAN_FRONTEND=noninteractive sudo dpkg -i "$DEB"
             if [ $? -ne 0 ] ; then
                echo "Unable to install Home Assistant package $DEB. Try running:"
                echo "   gdbus introspect --system --dest io.hass.os --object-path /io/hass/os"

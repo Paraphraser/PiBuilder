@@ -1,5 +1,9 @@
 # PiBuilder
 
+* 2021-12-14
+
+	- 04 script now fully automated - does not pause during Home Assistant installation to ask for architecture.
+
 * 2021-12-03
 
 	- disable locales patching - locales_2.31-13 is incompatible with previous approach.
@@ -392,7 +396,7 @@ ED25519 key fingerprint is SHA256:gobbledegook/gobbledegook.
 Are you sure you want to continue connecting (yes/no)? 
 ```
 
-This is sometimes referred to as the TOFU (Trust On First Use) pattern. Respond with:
+This is sometimes referred to as <a name="tofudef">the TOFU (Trust On First Use) pattern</a>. Respond with:
 
 ```
 yes
@@ -431,7 +435,7 @@ Re-enter new password:
 
 The 01 script runs to completion and reboots your Raspberry Pi. Rebooting disconnects your SSH session, returning you to your support host.
 
-Changing the name of your Raspberry Pi to something other than `raspberrypi` invalidates the associated SSH fingerprint that was set up earlier (the TOFU pattern). You should remove it from your "known hosts" file by typing:
+Changing the name of your Raspberry Pi to something other than `raspberrypi` invalidates the associated SSH fingerprint that was set up earlier (the [TOFU pattern](#tofudef)). You should remove it from your "known hosts" file by typing:
 
 ```bash
 $ ssh-keygen -R raspberrypi.local
@@ -465,7 +469,7 @@ Note:
 
 * The `ssh-keygen` is a protective command in case you had another host with the same name but a different fingerprint. Ignore any errors.
 
-You can expect to see the TOFU pattern again. Respond with "yes". Then run:
+You can expect to see the [TOFU pattern](#tofudef) again. Respond with "yes". Then run:
 
 ```bash
 $ /boot/scripts/02_setup.sh
@@ -586,13 +590,9 @@ You are in for a world of pain if you do not understand what is going to happen 
 
 	Connecting via IP address guarantees you are connected to your Raspberry Pi's Ethernet interface, whereas a multicast DNS address like `iot-hub.local` can connect to any available interface.
 
-	If you are challenged with the TOFU pattern, respond with "yes". 
-
-5. 	Shortly after you trigger the 04 script, you will see a hint advising you to choose either "raspberrypi3" or "raspberrypi4" when you are subsequently prompted to do that by the Home Assistant installation process.
-
-	Please take that hint seriously. Please do **not** make the mistake of choosing either "raspberrypi3-64" or "raspberrypi4-64". During testing, those options sometimes caused the installer to hang. If that happens to you, the safest course is to start again from a clean image.
+	If you are challenged with the [TOFU pattern](#tofudef), respond with "yes". 
 	
-6. Run **ONE** of the following commands:
+5. Run **ONE** of the following commands:
 
 	* This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=true`:
 	
@@ -1228,7 +1228,7 @@ $ ssh previousname
 …
 ```
 
-No `pi@` on the front. No `.local` or domain name on the end. No TOFU pattern. No password prompt. Just logged-in.
+No `pi@` on the front. No `.local` or domain name on the end. No [TOFU pattern](#tofudef). No password prompt. Just logged-in.
 
 If you want to learn how to set up password-less SSH access, see [IOTstackBackup SSH tutorial](https://github.com/Paraphraser/IOTstackBackup/blob/master/ssh_tutorial.md). Google is your friend if you want to go the next step and set up SSH certificates.
 
