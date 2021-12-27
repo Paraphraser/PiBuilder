@@ -37,6 +37,7 @@ jq
 libffi-dev
 libreadline-dev
 mosquitto-clients
+netcat
 nmap
 python3-pip
 python3-dev
