@@ -169,7 +169,7 @@ The most recent Raspberry Pi OS can always be found at the link below. Currently
 
 * [https://www.raspberrypi.com/software/operating-systems/](https://www.raspberrypi.com/software/operating-systems/)
 
-I always start from "Raspberry Pi OS with desktop" so that is what I recommend. You can either download the `.zip` *directly* by clicking on the <button>Download</button> button, or *indirectly* as a Torrent by clicking on the "Download torrent" link.
+I always start from "Raspberry Pi OS with desktop" so that is what I recommend. You can either download the `.zip` *directly* by clicking on the <kbd>Download</kbd> button, or *indirectly* as a Torrent by clicking on the "Download torrent" link.
 
 At the time of writing (November 2021), this is the initial release of "Raspbian Bullseye". It was made available on 2021-10-30 and is not necessarily "proven" or "stable" or "well understood". In particular, if you need camera support, you might be better advised to wait.
 
@@ -197,12 +197,12 @@ The steps are:
 
 1. Connect your media (SD or SSD) to your support platform (eg Mac/PC). 
 2. Launch Raspberry Pi Imager.
-3. Click <button>CHOOSE OS</button>.
+3. Click <kbd>CHOOSE OS</kbd>.
 4. Scroll down and choose "Use custom".
 5. Select the `.img` (or `.zip`) you downloaded earlier.
-6. Click <button>CHOOSE STORAGE</button>
+6. Click <kbd>CHOOSE STORAGE</kbd>
 7. Select the media connected in step 1. *Be careful with this step!*
-8. Click <button>WRITE</button>.
+8. Click <kbd>WRITE</kbd>.
 
 At the end of the process, Raspberry Pi Imager ejects your media (BalenaEtcher does the same).
 
