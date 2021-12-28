@@ -72,6 +72,22 @@ is_running_OS_release() {
 }
 
 
+# a function to check whether the system as a whole is 64-bit.
+# That means both a 64-bit kernel and 64-bit-capable user space.
+# Example:
+#   is_running_OS_64bit
+# returns true if and only if:
+# 1. the kernel identifies as aarch64
+# 2. lscpu suggests the capability to run in both 32- and 64-bit modes
+
+is_running_OS_64bit() {
+   if [ "$(uname -m)" = "aarch64" -a $(lscpu | grep -c "32-bit, 64-bit") -eq 1 ] ; then
+      return 0
+   fi
+   return 1
+}
+
+
 # a function to find a supporting file or folder proposed in the $1
 # parameter.
 #
