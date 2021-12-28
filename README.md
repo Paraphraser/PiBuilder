@@ -3,6 +3,9 @@
 * 2021-12-28
 
 	- Rename `is_running_raspbian()` function to `is_running_OS_release()`. The full 64-bit OS identifies as "Debian". That part of the test removed as unnecessary.
+	- Add `is_running_OS_64bit()` function to return true if a full 64-bit OS is running.
+	- Install 64-bit `docker-compose` where appropriate.
+	- Install 64-bit Supervised Home Assistant where appropriate.
 
 * 2021-12-14
 

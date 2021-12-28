@@ -81,15 +81,28 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
    case "$HARDWARE_IDENTITY" in
 
      "Raspberry Pi 3" )
-       PLATFORM_CHOICE="raspberrypi3"
+       if is_running_OS_64bit ; then
+          PLATFORM_CHOICE="raspberrypi3-64"
+          HOME_ASSISTANT_ARCHITECTURE="aarch64"
+       else
+          PLATFORM_CHOICE="raspberrypi3"
+          HOME_ASSISTANT_ARCHITECTURE="armv7"
+       fi
        ;;
 
      "Raspberry Pi 4" )
-       PLATFORM_CHOICE="raspberrypi4"
+       if is_running_OS_64bit ; then
+          PLATFORM_CHOICE="raspberrypi4-64"
+          HOME_ASSISTANT_ARCHITECTURE="aarch64"
+       else
+          PLATFORM_CHOICE="raspberrypi4"
+          HOME_ASSISTANT_ARCHITECTURE="armv7"
+       fi
        ;;
 
      "Raspberry Pi Z" )
        PLATFORM_CHOICE="raspberrypi"
+       HOME_ASSISTANT_ARCHITECTURE="armv7"
        ;;
 
      *)
@@ -102,13 +115,6 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
 
    esac
 
-   # the agent architecture is ALWAYS "armv7":
-   # 1. aarch64 does not work
-   #      dpkg: error processing archive /tmp/Imx1h-DOWNLOADS/os-agent_1.2.2_linux_aarch64.deb (--install):
-   #            package architecture (arm64) does not match system (armhf)
-   # 2. on 32-bit, "uname -m" returns "armv7l" but the agent repo only knows about "armv7"
-   HOME_ASSISTANT_ARCHITECTURE="armv7"
-
    AGENT="os-agent_${HOME_ASSISTANT_AGENT_RELEASE}_linux_${HOME_ASSISTANT_ARCHITECTURE}.deb"
 
    # construct a temporary directory to download into
@@ -117,6 +123,10 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
    # construct the URLs to download from
    AGENT_URL="https://github.com/home-assistant/os-agent/releases/download/$HOME_ASSISTANT_AGENT_RELEASE/$AGENT"
    PACKAGE_URL="https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb"
+   
+   echo "Supervised Home Assistant installation will be based on:"
+   echo "    Agent URL: $AGENT_URL"
+   echo "  Package URL: $PACKAGE_URL"
 
    # define what we will be downloading
    AGENT_DEB="$DOWNLOADS/$AGENT"
@@ -125,6 +135,12 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
    # create a pre-seed file. To revert to a menu:
    # 1. comment-out the next three lines
    # 2. remove the DEBIAN_FRONTEND=noninteractive further down
+   # valid platform choices are:
+   #    generic-x86-64, odroid-c2, odroid-n2, odroid-xu, qemuarm,
+   #    qemuarm-64, qemux86, qemux86-64, raspberrypi, raspberrypi2,
+   #    raspberrypi3, raspberrypi4, raspberrypi3-64, raspberrypi4-64,
+   #    tinker, khadas-vim3
+
    PRESEED="$DOWNLOADS/preseed.cfg"
    echo -e "homeassistant-supervised\tha/machine-type\tselect\t${PLATFORM_CHOICE}" >"$PRESEED"
    sudo debconf-set-selections "$PRESEED"
