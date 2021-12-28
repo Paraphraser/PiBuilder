@@ -56,16 +56,14 @@ install_packages() {
 
 # a function to check whether OS version conditions apply.
 # Example:
-#   is_running_raspbian buster
+#   is_running_OS_release buster
 # returns true if and only if:
 # 1. /etc/os-release exists
-# 2. the OS identifies as "raspbian"
-# 3. the version codename matches the expected argument in $1
+# 2. the version codename matches the expected argument in $1
 
-is_running_raspbian() {
+is_running_OS_release() {
    if [ \
       -e "/etc/os-release" \
-      -a $(grep -c "^ID=raspbian" /etc/os-release) -gt 0 \
       -a $(grep -c "^VERSION_CODENAME=$1" /etc/os-release) -gt 0 \
    ] ; then
       return 0

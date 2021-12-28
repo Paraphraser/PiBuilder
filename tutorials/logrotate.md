@@ -59,14 +59,14 @@ Let's assume you have obtained those files and have given them the names:
 6. Use your favourite text editor to open `05_setup.sh` and add the following lines:
 
 	```
-	if is_running_raspbian bullseye ; then
+	if is_running_OS_release bullseye ; then
 	   try_patch "/etc/logrotate.d/rsyslog" "restore buster behaviour"
 	fi
 	```
 
 	Note:
 
-	* Both the `is_running_raspbian` and `try_patch` functions are part of PiBuilder.
+	* Both the `is_running_OS_release` and `try_patch` functions are part of PiBuilder.
 
 7. Unfortunately, this creates a problem of its own. `try_patch` calls the `patch` command and a side-effect of the patch command is to create a `.bak` file. In other words, you wind up with:
 
@@ -80,7 +80,7 @@ Let's assume you have obtained those files and have given them the names:
 	One possibility is to just remove the `.bak` file after it has been generated:
 
 	```
-	if is_running_raspbian bullseye ; then
+	if is_running_OS_release bullseye ; then
 	   try_patch "/etc/logrotate.d/rsyslog" "restore buster behaviour"
 	   sudo rm -f /etc/logrotate.d/rsyslog.bak
 	fi
@@ -143,7 +143,7 @@ Let's assume you have obtained those files and have given them the names:
 	and make its contents look like this:
 
 	```
-	if is_running_raspbian bullseye ; then
+	if is_running_OS_release bullseye ; then
 	   try_patch "/etc/logrotate.conf" "logrotate should ignore .bak"
 	   try_patch "/etc/logrotate.d/rsyslog" "restore buster behaviour"
 	fi

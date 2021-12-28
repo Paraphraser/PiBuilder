@@ -18,7 +18,7 @@ SUPPORT="/boot/scripts/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
-if $(is_running_raspbian buster) ; then
+if is_running_OS_release buster ; then
    echo "Installing updated libseccomp2 (for Alpine images)"
    sudo apt install libseccomp2 -t buster-backports
 fi

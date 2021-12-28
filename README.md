@@ -1,5 +1,9 @@
 # PiBuilder
 
+* 2021-12-28
+
+	- Rename `is_running_raspbian()` function to `is_running_OS_release()`. The full 64-bit OS identifies as "Debian". That part of the test removed as unnecessary.
+
 * 2021-12-14
 
 	- 04 script now fully automated - does not pause during Home Assistant installation to ask for architecture.

@@ -42,7 +42,7 @@ echo "Initialising empty user directories for SSH and GnuPG"
 [ ! -d "$HOME/.ssh" ] && mkdir -p "$HOME/.ssh"
 chmod 700 "$HOME/.gnupg" "$HOME/.ssh"
 
-if is_running_raspbian buster ; then
+if is_running_OS_release buster ; then
    echo "Adding Debian Buster Backports support (for libseccomp2)"
    sudo apt-key adv \
       --keyserver hkps://keyserver.ubuntu.com:443 \
