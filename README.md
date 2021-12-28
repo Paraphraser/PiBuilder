@@ -6,6 +6,7 @@
 	- Add `is_running_OS_64bit()` function to return true if a full 64-bit OS is running.
 	- Install 64-bit `docker-compose` where appropriate.
 	- Install 64-bit Supervised Home Assistant where appropriate.
+	- Automatically enable `docker stats` (changes `/boot/cmdline.txt`)
 
 * 2021-12-14
 

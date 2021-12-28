@@ -289,6 +289,16 @@ fi
 echo "Installing IOTstack dependencies"
 sudo pip3 install -U ruamel.yaml==0.16.12 blessed
 
+# try to add support for docker stats - applies from next reboot
+TARGET="/boot/cmdline.txt"
+APPEND="cgroup_memory=1 cgroup_enable=memory"
+if [ -e "$TARGET" ] ; then
+   if [ $(grep -c "$APPEND" "$TARGET") -eq 0 ] ; then
+      echo "Adding support for \"docker stats\""
+      sudo sed -i.bak "s/$/ $APPEND/" "$TARGET"
+   fi
+fi
+
 # run the script epilog if it exists
 run_pibuilder_epilog
 
