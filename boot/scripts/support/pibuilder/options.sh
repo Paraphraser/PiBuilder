@@ -13,7 +13,7 @@ LOCALTZ="Etc/UTC"
 
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.1.1"
+#DOCKER_COMPOSE_VERSION="v2.2.2"
 # - override for docker-compose architecture. Options are:
 #     armv7
 #     aarch64
@@ -30,4 +30,4 @@ HOME_ASSISTANT_SUPERVISED_INSTALL=false
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2021"
-SQLITEVERSION="sqlite-autoconf-3360000"
+SQLITEVERSION="sqlite-autoconf-3370000"
