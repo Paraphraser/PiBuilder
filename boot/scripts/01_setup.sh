@@ -96,6 +96,18 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
    sudo chmod 644 "$TARGET"
 fi
 
+# see if 64-bit kernel should be enabled
+TARGET="/boot/config.txt"
+APPEND="arm_64bit=1"
+# is the kernel already 64-bit?
+if [ ! "$(uname -m)" = "aarch64" ] ; then
+  # no! is the 64-bit kernel preferred?
+  if [ "$PREFER_64BIT_KERNEL" = "true" ] ; then
+     echo "Enabling 64-bit kernel"
+     sudo sed -i.bak "$ a $APPEND" "$TARGET"
+  fi
+fi
+
 # run the script epilog if it exists (best to run before rasp-config)
 run_pibuilder_epilog
 

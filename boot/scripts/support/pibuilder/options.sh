@@ -6,6 +6,10 @@ LOCALCC="AU"
 # - local time-zone
 LOCALTZ="Etc/UTC"
 
+# - preference for kernel. Only applies to 32-bit installations. If
+#   true, adds "arm_64bit=1" to /boot/config.txt
+PREFER_64BIT_KERNEL=false
+
 # - default language
 #   Whatever you change this to must be in your list of active locales
 #   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)

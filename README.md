@@ -8,6 +8,7 @@
 	- Install 64-bit Supervised Home Assistant where appropriate.
 	- Automatically enable `docker stats` (changes `/boot/cmdline.txt`).
 	- Update default version numbers in `options.sh`.
+	- Add `PREFER_64BIT_KERNEL` option, defaults to false.
 
 * 2021-12-14
 
@@ -257,6 +258,10 @@ LOCALCC="AU"
 # - local time-zone
 LOCALTZ="Etc/UTC"
 
+# - preference for kernel. Only applies to 32-bit installations. If
+#   true, adds "arm_64bit=1" to /boot/config.txt
+PREFER_64BIT_KERNEL=false
+
 # - default language
 #   Whatever you change this to must be in your list of active locales
 #   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
@@ -264,7 +269,7 @@ LOCALTZ="Etc/UTC"
 
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.1.1"
+#DOCKER_COMPOSE_VERSION="v2.2.2"
 # - override for docker-compose architecture. Options are:
 #     armv7
 #     aarch64
@@ -281,15 +286,30 @@ HOME_ASSISTANT_SUPERVISED_INSTALL=false
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2021"
-SQLITEVERSION="sqlite-autoconf-3360000"
+SQLITEVERSION="sqlite-autoconf-3370000"
 ```
 
-You should change:
+You **should** change:
 
 1. The right hand side of `LOCALCC` to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
 2. The right hand side of `LOCALTZ` to be a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
 3. "en_GB.UTF-8" is the default language. You can change it but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial.
-4. If you want the "supervised" version of Home Assistant to be installed, set the right hand side of `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true`.
+
+You **can** change:
+
+1. The right hand side of `PREFER_64BIT_KERNEL` to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
+
+	* [OctoPrint Docker](https://github.com/OctoPrint/octoprint-docker) seems to not like the 64-bit kernel but it is not clear whether the problem is the kernel, that I'm running it on a Raspberry Pi 3B+, or something intrinsic to the way the container is built.
+
+	If you enable the 64-bit kernel by setting `PREFER_64BIT_KERNEL` to `true`, but you later decide to revert to the 32-bit kernel:
+	
+	```
+	$ cd /boot
+	$ sudo mv config.txt.bak config.txt
+	$ sudo reboot
+	```  
+
+2. If you want the "supervised" version of Home Assistant to be installed, set the right hand side of `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true`.
 
 On the subject of Home Assistant, you have the choice of:
 
