@@ -281,6 +281,10 @@ LOCALTZ="Etc/UTC"
 #   true, adds "arm_64bit=1" to /boot/config.txt
 PREFER_64BIT_KERNEL=false
 
+# - preference for disabling swap. You should consider this on any Pi
+#   that boots from SD.
+DISABLE_VM_SWAP=false
+
 # - default language
 #   Whatever you change this to must be in your list of active locales
 #   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
@@ -308,15 +312,15 @@ SQLITEYEAR="2021"
 SQLITEVERSION="sqlite-autoconf-3370000"
 ```
 
-You **should** set:
+You **should** set the right hand side of:
 
-1. The right hand side of `LOCALCC` to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
-2. The right hand side of `LOCALTZ` to a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
+1. `LOCALCC` to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
+2. `LOCALTZ` to a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
 
-You **can** set:
+You **can** set the right hand side of:
 
-1. The right hand side of `LOCALE_LANG` to a valid language descriptor but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial. "en_GB.UTF-8" is the default language and I recommend leaving that enabled in any locale patch that you create.
-2. The right hand side of <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
+1. `LOCALE_LANG` to a valid language descriptor but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial. "en_GB.UTF-8" is the default language and I recommend leaving that enabled in any locale patch that you create.
+2. <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
 
 	* [OctoPrint Docker](https://github.com/OctoPrint/octoprint-docker) seems to not like the 64-bit kernel but it is not clear whether the problem is the kernel, that I'm running it on a Raspberry Pi 3B+, or something intrinsic to the way the container is built.
 
@@ -328,16 +332,34 @@ You **can** set:
 	$ sudo reboot
 	```  
 
-3. If you want the "supervised" version of Home Assistant to be installed, set the right hand side of `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true`.
+3. <a name="disableVMswap">`DISABLE_VM_SWAP`</a> to `true` to disable virtual memory (VM) swapping to mass storage. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
 
-##### *on the subject of Home Assistant …*
+	Running out of RAM causes swapping to occur and that, in turn, has both a performance penalty (because SD cards are quite slow) and increases the wear and tear on the SD card (leading to a heightened risk of failure). There are two main causes of limited RAM:
 
-You have the choice of:
+	- Insufficient physical memory. A good example is a Raspberry Pi Zero W2 which only has 512MB to start with; and/or
+	- Expecting your Raspberry Pi to do too much work, such as running a significant number of containers which either have large memory footprints, or cause a lot of I/O and consume cache buffers, or both.
 
-1. The supervised installation (a set of Docker containers managed outside of IOTstack); or
-2. A standalone `home_assistant` container selectable from the IOTstack menu.
+	If you disable VM swapping by setting `DISABLE_VM_SWAP` to `true`, but you later decide to re-enable swapping, run these commands:
 
-You can't have both. The standalone container can be installed at any point in your IOTstack journey. Conversely, the supervised installation must be installed at system build time. You can't (easily) change your mind later so please make the decision now and choose wisely.
+	```bash
+	$ sudo systemctl enable dphys-swapfile.service
+	$ sudo reboot
+	```
+
+	You can always check if swapping is enabled using the `swapon -s` command. Silence means swapping is disabled.
+
+	It is important to appreciate that VM swapping is not **bad**. Please don't disable swapping without giving it some thought. If you can afford to add an SSD, you'll get a better result with swapping enabled than if you stick with the SD and disable swapping.
+ 
+4. `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true` if you want the "supervised" version of Home Assistant to be installed. With PiBuilder+IOTstack you have the choice of:
+
+	* The supervised installation (a set of Docker containers managed outside of IOTstack); or
+	* A standalone `home_assistant` container selectable from the IOTstack menu "Build Stack" option.
+
+	You can't have both. The standalone container can be installed at any point in your IOTstack journey. Conversely, the supervised installation must be installed at system build time. You can't (easily) change your mind later so please make the decision now and choose wisely.
+
+	Note:
+
+	* The IOTstack menu also has a "native install" for hass.io. The script that option relies upon is currently broken (upstream of IOTstack). PiBuilder is the replacement.
 
 ##### <a name="perHostConfigOptions"> per-host PiBuilder installation options </a>
 
@@ -754,6 +776,7 @@ The script:
 * Applies [Does your Raspberry Pi's Wireless Interface freeze?](https://gist.github.com/Paraphraser/305f7c70e798a844d25293d496916e77). Only probes interfaces that are defined, are active, and obtain their IP addresses via DHCP.
 * Optionally sets up local DNS.
 * Disables IPv6
+* Optionally disables virtual memory swapping (see [`DISABLE_VM_SWAP`](#disableVMswap)).
 * Reboots
 
 ### <a name="docScript03"> Script 03 </a>
@@ -1319,9 +1342,10 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 	- Add instructions for checking SHA256 signatures.
 	- Split `options.sh` instructions into "should" and "can" categories.
 	- Document `cmdline.txt` and `config.txt` script changes made yesterday.
+	- Add support for disabling VM swapping.
 	- Rewrite some sections of DNS tutorial.
 	- Fix typos etc.
-	- Change summary to the end of the readme.
+	- Change-summary to the end of the readme.
 
 * 2021-12-28
 

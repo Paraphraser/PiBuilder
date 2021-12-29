@@ -75,6 +75,13 @@ try_patch "/etc/resolvconf.conf" "local name servers"
 # patch sysctl.conf to disable IPv6
 try_patch "/etc/sysctl.conf" "disable IPv6"
 
+# turn off VM swapping if requested
+if [ "$DISABLE_VM_SWAP" = "true" ] && [ -n "$(swapon -s)" ] ; then
+   echo "Disabling virtual memory swapping"
+   sudo swapoff -a
+   sudo systemctl disable dphys-swapfile.service
+fi
+
 # run the script epilog if it exists
 run_pibuilder_epilog
 
