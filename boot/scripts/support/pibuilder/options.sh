@@ -10,6 +10,10 @@ LOCALTZ="Etc/UTC"
 #   true, adds "arm_64bit=1" to /boot/config.txt
 PREFER_64BIT_KERNEL=false
 
+# - preference for disabling swap. You should consider this on any Pi
+#   that boots from SD.
+DISABLE_VM_SWAP=false
+
 # - default language
 #   Whatever you change this to must be in your list of active locales
 #   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
