@@ -1,32 +1,5 @@
 # PiBuilder
 
-* 2021-12-28
-
-	- Rename `is_running_raspbian()` function to `is_running_OS_release()`. The full 64-bit OS identifies as "Debian". That part of the test removed as unnecessary.
-	- Add `is_running_OS_64bit()` function to return true if a full 64-bit OS is running.
-	- Install 64-bit `docker-compose` where appropriate.
-	- Install 64-bit Supervised Home Assistant where appropriate.
-	- Automatically enable `docker stats` (changes `/boot/cmdline.txt`).
-	- Update default version numbers in `options.sh`.
-	- Add `PREFER_64BIT_KERNEL` option, defaults to false.
-
-* 2021-12-14
-
-	- 04 script now fully automated - does not pause during Home Assistant installation to ask for architecture.
-	- re-enable locale patching - now split across 01 and 02 scripts.
-
-* 2021-12-03
-
-	- disable locales patching - locales_2.31-13 is incompatible with previous approach.
-	- better default handling of `isc-dhcp-fix.sh` - `/etc/rc.local` now only includes interfaces that are defined, active, and obtained their IP addresses via DHCP.
-	- added support for Raspberry Pi Zero W2 + Supervised Home Assistant. 
-
-* 2021-11-25
-	- major overhaul
-	- tested for Raspbian Buster and Bullseye
-	- can install Supervised Home Assistant
-	- documentation rewritten
-
 ## <a name="introduction"> Introduction </a>
 
 This project documents my approach to building Raspberry Pi operating systems to support [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack).
@@ -41,8 +14,9 @@ PiBuilder can't possibly be a "one size fits all" for all possible Raspberry Pi 
 
 I have tested PiBuilder on:
 
-* Raspberry Pi 3B+, 4B and Zero W2 hardware; and
-* Raspberry Pi OS (aka Raspbian) "Buster" and "Bullseye".
+* Raspberry Pi 3B+, 4B and Zero W2 hardware
+* 32-bit versions of Raspberry Pi OS (aka Raspbian) "Buster" and "Bullseye"
+* 64-bit version of "Bullseye".
 
 The scripts will *probably* work on other Raspberry Pi hardware but I have no idea about other hardware platforms (eg Nuc) or operating systems (eg Debian). I have nothing against either non- Raspberry Pi hardware or operating systems. I can only test with what I have.
 
@@ -54,10 +28,11 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 	- [Download this repository](#downloadRepo)
 	- [Choose an imaging tool](#chooseTool)
-	- [Choose a Raspberry Pi OS (Raspbian) image](#chooseImage)
+	- [Choose and download a base image](#chooseImage)
 
-		- [option 1 – Bullseye](#chooseBullseye)
-		- [option 2 – Buster](#chooseBuster)
+		- [option 1 – Raspbian Bullseye (32-bit)](#chooseRaspbianBullseye)
+		- [option 2 – Raspbian Buster (32-bit)](#chooseRaspbianBuster)
+		- [option 3 – Debian Bullseye (64-bit)](#chooseDebianBullseye)
 
 	- [Transfer Raspbian image to SD or SSD](#burnImage)
 	- [PiBuilder configuration](#configPiBuilder)
@@ -105,6 +80,8 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [About `/etc/ssh`](#aboutEtcSSH)
 	- [About `~/.ssh`](#aboutDotSSH)
 	- [Security of snapshots](#snapshotSecurity)
+
+- [Change Summary](#changeLog)
 
 ## <a name="definitions"> Definitions </a>
 
@@ -159,37 +136,79 @@ I use and recommend [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
 
 > [BalenaEtcher](https://www.balena.io/etcher/) is an alternative that does a similar job.
 
-### <a name="chooseImage"> Choose a Raspberry Pi OS (Raspbian) image </a>
+### <a name="chooseImage"> Choose and download a base image </a>
 
-Raspberry Pi OS images are downloaded as `.zip` files. I recommend unpacking the `.zip` to a `.img`. While it is true that the imaging tools can use the `.zip` files, it takes a bit longer because the `.zip` still has to be unpacked each time.
+Images for the Raspberry Pi are downloaded as `.zip` files. In all cases, you always have the choice of:
 
-#### <a name="chooseBullseye"> option 1 – Bullseye </a>
+1. downloading the `.zip` *directly;* or
+2. downloading the `.zip` *indirectly* by starting with the `.torrent`.
 
-The most recent Raspberry Pi OS can always be found at the link below. Currently, this leads to Raspbian Bullseye:
+It is always a good idea to check the SHA256 signature on each zip. It gives you assurance that the image has not been tampered with and wasn't corrupted during download. The magic incantation is:
+
+```bash
+$ SIGNATURE=«hash»
+$ IMAGE=«pathToZip»
+$ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
+```
+
+You get the «hash» either by clicking the `Show SHA256 file integrity hash` link or by downloading and inspecting the `.zip.sha256` associated with the `.zip`. Here's an example:
+
+```bash
+$ SIGNATURE=6e9faca69564c47702d4564b2b15997b87d60483aceef7905ef20ba63b9c6b2b
+$ IMAGE=./2021-10-30-raspios-bullseye-armhf.zip
+$ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
+./2021-10-30-raspios-bullseye-armhf.zip: OK
+```
+
+If you don't see "OK", start over!
+
+> If your first attempt was a *direct* download of the `.zip`, consider trying the *indirect* method using a torrent.
+
+I recommend unpacking each `.zip` to a `.img`. While it is true that the imaging tools can use the `.zip` files, it takes a bit longer because the `.zip` still has to be unpacked each time.
+
+##### *on the topic of 32- vs 64-bit …*
+
+* "32-bit" systems:
+
+	- Are capable of running both 32-bit and 64-bit kernels. See also the PiBuilder option: [`PREFER_64BIT_KERNEL`](#prefer64BitKernel).
+	- User mode is fixed to 32-bit.
+	- Docker will pull images built for "arm" architecture.
+
+	The ability to switch kernel modes can come in handy if you find a container misbehaving under a 64-bit kernel.
+
+* "64-bit" systems:
+
+	- Run 64-bit in both kernel and user modes.
+	- Docker will pull images built for "arm64" architecture.
+
+	Once you are running full 64-bit, you have no ability to chop and change.
+
+#### <a name="chooseRaspbianBullseye"> option 1 – Raspbian Bullseye (32-bit) </a>
+
+The most recent Raspberry Pi OS can always be found at the link below. Currently, this leads to the 32-bit version of Raspbian Bullseye:
 
 * [https://www.raspberrypi.com/software/operating-systems/](https://www.raspberrypi.com/software/operating-systems/)
 
-I always start from "Raspberry Pi OS with desktop" so that is what I recommend. You can either download the `.zip` *directly* by clicking on the <kbd>Download</kbd> button, or *indirectly* as a Torrent by clicking on the "Download torrent" link.
+I always start from "Raspberry Pi OS with desktop" so that is what I recommend.
 
-At the time of writing (November 2021), this is the initial release of "Raspbian Bullseye". It was made available on 2021-10-30 and is not necessarily "proven" or "stable" or "well understood". In particular, if you need camera support, you might be better advised to wait.
+At the time of writing (November 2021), this is the initial release of "Raspbian Bullseye". It was made available on 2021-10-30 and is not necessarily "proven" or "stable" or "well understood". In particular, if you need camera support, you might be better advised to stick with [Raspbian Buster (32-bit)](#chooseRaspbianBuster).
 
-#### <a name="chooseBuster"> option 2 – Buster </a>
+#### <a name="chooseRaspbianBuster"> option 2 – Raspbian Buster (32-bit) </a>
 
-If you would prefer to base all your work on a system that **can** be considered proven, stable and well-understood, you should consider "Raspbian Buster" which can be downloaded from:
+If you would prefer to base all your work on a system that **can** be considered proven, stable and well-understood, you should consider "Raspbian Buster". It is a 32-bit system which can be downloaded from:
 
 * [http://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-05-28/](http://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-05-28/)
 
-You can either download the `.zip` *directly* by clicking on:
+#### <a name="chooseDebianBullseye"> option 3 – Debian Bullseye (64-bit) </a>
 
-```
-2021-05-07-raspios-buster-armhf.zip
-```
+This is a full 64-bit alternative to [Raspbian Bullseye (32-bit)](#chooseRaspbianBullseye). It installs, looks, feels and behaves like Raspbian but it self-identifies as "Debian". You can download it from:
 
-or *indirectly* as a Torrent by starting with:
+* [http://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2021-11-08/](http://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2021-11-08/)
 
-```
-2021-05-07-raspios-buster-armhf.zip.torrent
-```
+Key points:
+
+* Please be **cautious** when using this image. PiBuilder will install 64-bit versions of everything, including docker, docker-compose and Supervised Home Assistant, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you decide to upgrade from a 32-bit system, you will need to assure yourself that all your containers still work as expected. Please don't pick this image as your starting point for no better reason than "64-bit must be better than 32-bit" because your mileage may vary.
+* It is not clear why this image self-identifies as "Debian" rather than "Raspbian" or "Raspberry Pi OS". It might be a subtle hint that it isn't fully supported by the Raspberry Pi Foundation.
 
 ### <a name="burnImage"> Transfer Raspbian image to SD or SSD </a>
 
@@ -289,32 +308,34 @@ SQLITEYEAR="2021"
 SQLITEVERSION="sqlite-autoconf-3370000"
 ```
 
-You **should** change:
+You **should** set:
 
 1. The right hand side of `LOCALCC` to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
-2. The right hand side of `LOCALTZ` to be a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
-3. "en_GB.UTF-8" is the default language. You can change it but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial.
+2. The right hand side of `LOCALTZ` to a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
 
-You **can** change:
+You **can** set:
 
-1. The right hand side of `PREFER_64BIT_KERNEL` to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
+1. The right hand side of `LOCALE_LANG` to a valid language descriptor but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial. "en_GB.UTF-8" is the default language and I recommend leaving that enabled in any locale patch that you create.
+2. The right hand side of <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
 
 	* [OctoPrint Docker](https://github.com/OctoPrint/octoprint-docker) seems to not like the 64-bit kernel but it is not clear whether the problem is the kernel, that I'm running it on a Raspberry Pi 3B+, or something intrinsic to the way the container is built.
 
 	If you enable the 64-bit kernel by setting `PREFER_64BIT_KERNEL` to `true`, but you later decide to revert to the 32-bit kernel:
-	
-	```
+
+	```bash
 	$ cd /boot
 	$ sudo mv config.txt.bak config.txt
 	$ sudo reboot
 	```  
 
-2. If you want the "supervised" version of Home Assistant to be installed, set the right hand side of `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true`.
+3. If you want the "supervised" version of Home Assistant to be installed, set the right hand side of `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true`.
 
-On the subject of Home Assistant, you have the choice of:
+##### *on the subject of Home Assistant …*
+
+You have the choice of:
 
 1. The supervised installation (a set of Docker containers managed outside of IOTstack); or
-2. A standalone HomeAssistant container selectable from the IOTstack menu.
+2. A standalone `home_assistant` container selectable from the IOTstack menu.
 
 You can't have both. The standalone container can be installed at any point in your IOTstack journey. Conversely, the supervised installation must be installed at system build time. You can't (easily) change your mind later so please make the decision now and choose wisely.
 
@@ -586,7 +607,7 @@ This section assumes that you do **not** want to install Supervised Home Assista
 	```bash
 	$ /boot/scripts/04_setup.sh false
 	```
-	
+
 The 04 script installs Docker and ends with a reboot. Go to [Script 05](#runScript05).
 
 #### <a name="runScript04HA"> install Docker + Home Assistant </a>
@@ -627,17 +648,17 @@ You are in for a world of pain if you do not understand what is going to happen 
 	Connecting via IP address guarantees you are connected to your Raspberry Pi's Ethernet interface, whereas a multicast DNS address like `iot-hub.local` can connect to any available interface.
 
 	If you are challenged with the [TOFU pattern](#tofudef), respond with "yes". 
-	
+
 5. Run **ONE** of the following commands:
 
 	* This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=true`:
-	
+
 		```bash
 		$ /boot/scripts/04_setup.sh
 		```
-	
+
 	* This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=false` but you want to override it:
-	
+
 		```bash
 		$ /boot/scripts/04_setup.sh true
 		```
@@ -713,6 +734,7 @@ The script:
 * Sets the user password.
 * Sets up VNC with the same password (but does NOT activate VNC)
 * Optionally sets up locale(s).
+* Optionally enables the 64-bit kernel (see [`PREFER_64BIT_KERNEL`](#prefer64BitKernel)).
 * Sets raspi-config options:
 
 	- boot to console
@@ -772,6 +794,7 @@ The script then continues and:
 * Sets up the `docker` and `bluetooth` group memberships assumed by IOTstack.
 * Installs Docker-Compose.
 * Installs the `ruamel.yaml` and `blessed` Python dependencies assumed by IOTstack.
+* Appends `cgroup_memory=1 cgroup_enable=memory` to `/boot/cmdline.txt`. This change means that `docker stats` will report memory utilisation.
 * Reboots.
 
 ### <a name="docScript05"> Script 05 </a>
@@ -1242,7 +1265,7 @@ and then run `setup_boot_volume.sh`, the `etc-ssh-backup.tar.gz@iot-hub` will be
 When you boot your Raspberry Pi and run:
 
 ```bash
-$ /boot/scripts/01_setup.sh fred
+$ /boot/scripts/01_setup.sh iot-hub
 ``` 
 
 the script will search for `etc-ssh-backup.tar.gz@iot-hub` and, if found, will use it to restore `/etc/ssh` as it was at the time the snapshot was taken. In effect, you have given the machine its original SSH identity.
@@ -1287,3 +1310,43 @@ There is an assumption that it is "hard" for an unauthorised person to gain acce
 Nevertheless, it is important to be aware that the snapshots do contain sufficient information to allow a third party to impersonate your hosts so it is probably worthwhile making some attempt to keep them reasonably secure.
 
 I keep my snapshots on an encrypted volume. You may wish to do the same.
+
+## <a name="changeLog"> Change Summary </a>
+
+* 2021-12-29
+
+	- Improve documentation on OS versions tested with PiBuilder and how to choose between them.
+	- Add instructions for checking SHA256 signatures.
+	- Split `options.sh` instructions into "should" and "can" categories.
+	- Document `cmdline.txt` and `config.txt` script changes made yesterday.
+	- Rewrite some sections of DNS tutorial.
+	- Fix typos etc.
+	- Change summary to the end of the readme.
+
+* 2021-12-28
+
+	- Rename `is_running_raspbian()` function to `is_running_OS_release()`. The full 64-bit OS identifies as "Debian". That part of the test removed as unnecessary.
+	- Add `is_running_OS_64bit()` function to return true if a full 64-bit OS is running.
+	- Install 64-bit `docker-compose` where appropriate.
+	- Install 64-bit Supervised Home Assistant where appropriate.
+	- Automatically enable `docker stats` (changes `/boot/cmdline.txt`).
+	- Update default version numbers in `options.sh`.
+	- Add `PREFER_64BIT_KERNEL` option, defaults to false.
+
+* 2021-12-14
+
+	- 04 script now fully automated - does not pause during Home Assistant installation to ask for architecture.
+	- re-enable locale patching - now split across 01 and 02 scripts.
+
+* 2021-12-03
+
+	- disable locales patching - locales_2.31-13 is incompatible with previous approach.
+	- better default handling of `isc-dhcp-fix.sh` - `/etc/rc.local` now only includes interfaces that are defined, active, and obtained their IP addresses via DHCP.
+	- added support for Raspberry Pi Zero W2 + Supervised Home Assistant. 
+
+* 2021-11-25
+	- major overhaul
+	- tested for Raspbian Buster and Bullseye
+	- can install Supervised Home Assistant
+	- documentation rewritten
+

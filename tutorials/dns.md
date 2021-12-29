@@ -25,7 +25,7 @@ The simplest way to achieve this is through a static binding in your DHCP server
 
 To set up static bindings you need the Media Access Control (MAC) address of each network interface. Depending on whether you want to set up your Ethernet or WiFi interfaces, or both, you will need either or both of the following:
 
-```
+```bash
 $ ifconfig eth0
 $ ifconfig wlan0
 ```
@@ -36,7 +36,7 @@ Once you have set up the static binding in your DHCP server, reboot your Raspber
 
 You can confirm that your Raspberry Pi is using the expected DNS server(s) by running:
 
-```
+```bash
 $ cat /etc/resolv.conf
 ```
 
@@ -54,13 +54,13 @@ Proceed like this:
  
 1. Move to the correct directory:
 
-	```
+	```bash
 	$ cd /etc
 	```
 
 2. Make a backup copy of `resolvconf.conf`:
 
-	```
+	```bash
 	$ sudo cp resolvconf.conf resolvconf.conf.bak
 	```
 
@@ -81,18 +81,29 @@ Proceed like this:
 	Notes:
 
 	* If you do **not** have a local domain, omit the `search_domains=` line.
-	* If you **do** have a local domain but your DHCP server only supplies 192.168.203.50 and is incapable of supplying a local domain name, omit the `name_servers=` line. This is a common problem with many home routers.
+	* If you **do** have a local domain, you may find that your DHCP server:
+
+		- *can* supply the IP address(es) of your DNS servers (eg 192.168.203.50), but
+		- *can't* supply your local domain name.
+
+		This is a common pattern with many home routers. Just omit the `name_servers=` line (so the DNS servers come from DHCP) while retaining the `search_domains=` line (so the domain is configured statically).
+
+	* If you need to configure multiple static DNS servers, use space-separated notation and encapsulate the right hand side in quotes. For example:
+
+		```
+		name_servers="192.168.203.50 192.168.203.51"
+		```
 
 5. Save your work and restart the DHCP client service:
 
-	```
+	```bash
 	$ sudo service dhcpcd reload
 	$ sudo resolvconf -u
 	```
 
 6. Check the result (the file in the following is not a typo):
 
-	```
+	```bash
 	$ cat resolv.conf
 	```
 
@@ -108,13 +119,13 @@ Proceed like this:
 
 	* If the configuration embedded in `resolvconf.conf` is sufficiently *general* to be useful for all of your Raspberry Pi hosts, run:
 
-		```
+		```bash
 		$ diff resolvconf.conf.bak resolvconf.conf >~/resolvconf.conf.patch
 		```
-	
+
 	* If the configuration embedded in `resolvconf.conf` is unique to **this** particular Raspberry Pi, run:
 
-		```
+		```bash
 		$ diff resolvconf.conf.bak resolvconf.conf >~/resolvconf.conf.patch@$HOSTNAME
 		```
 
