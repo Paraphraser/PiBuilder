@@ -58,11 +58,12 @@ if [ ! -d "$BOOTTARGET" ] ; then
    exit 0
 fi
 
-# copy the **contents** of the boot directory to the boot target
-cp -RX "$BOOTSOURCE"/* "$BOOTTARGET"
-
 # running macOS ?
 if [ $isMacOS ] ; then
+
+   # copy the **contents** of the boot directory to the boot target
+   # -R is recursive, -X excludes extended attributes (resource forks)
+   cp -RX "$BOOTSOURCE"/* "$BOOTTARGET"
 
    # tell spotlight to ignore the volume
    touch "$BOOTTARGET/.metadata_never_index"
@@ -93,6 +94,7 @@ if [ $isMacOS ] ; then
 
       #yes! all done
       echo "boot volume set up - safe to remove."
+
    else
 
       #no! warning
@@ -101,6 +103,10 @@ if [ $isMacOS ] ; then
    fi
 
 else
+
+   # copy the **contents** of the boot directory to the boot target
+   # -R is recursive
+   cp -R "$BOOTSOURCE"/* "$BOOTTARGET"
 
    # If you have OS-specific cleanup and ejection routines, put them here
    echo "boot volume set up - you can eject it now."
