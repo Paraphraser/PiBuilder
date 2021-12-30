@@ -1,0 +1,8 @@
+# all files in this repo should use LF line-endings because Linux is their intended use
+* text eol=lf
+
+# archives are an exception (eg etc-ssh-backup.tar.gz@iot-hub)
+*.tar*    binary
+*.gz*     binary
+*.zip*    binary
+*.tar.gz* binary
