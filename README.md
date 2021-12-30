@@ -229,6 +229,16 @@ At the end of the process, Raspberry Pi Imager ejects your media (BalenaEtcher d
 
 #### <a name="configWiFi"> Configure WiFi </a>
 
+Decide whether you want your Raspberry Pi's WiFi interface to be enabled. On a Raspberry Pi which has both Ethernet and WiFi interfaces, you may not wish to have both enabled.
+
+The Raspberry Pi does not care. It will happily activate both interfaces. The two interfaces can be in the same or different broadcast domains (subnets). If both interfaces are active, the Raspberry Pi will advertise its multicast DNS name (eg "iot-hub.local") on each, will respond to pings and accept connections on each, and will treat the interfaces as viable alternate paths for the traffic it transmits.
+
+In the case of Ethernet, the physical interface will not be enabled unless a cable is connected and the proper electrical signals are present. You can always control Ethernet by connecting and disconnecting cables.
+
+WiFi is different. You need to make the decision up front.
+
+##### <a name="enableWiFi"> *if you want WiFi enabled …* </a>
+
 Use a text editor to open the following file:
 
 ```
@@ -257,7 +267,41 @@ You should replace three values:
 3. `«PSK»` with your Pre-Shared Key (otherwise known as the join password for your WiFi network).
 
 Unless you change your WiFi password frequently, you should only need to edit this file once. The configuration can be re-used for all of your Raspberry Pis.
+
+That's all you have to do. Skip down to [Configure PiBuilder installation options](#configOptions).
  
+##### <a name="disableWiFi"> *if you want WiFi disabled …* </a>
+
+If you don't want to enable WiFi then either delete or rename the `wpa_supplicant.conf` file. For example:
+
+```
+$ mv ~/PiBuilder/boot/wpa_supplicant.conf ~/PiBuilder/boot/wpa_supplicant.conf.off
+```
+
+If `/boot/wpa_supplicant.conf` does not exist when you first boot your Raspberry Pi then the WiFi interface will not be enabled and you can expect to see the following message when you first login:
+
+```
+Wi-Fi is currently blocked by rfkill.
+Use raspi-config to set the country before use.
+``` 
+
+PiBuilder will still set the WiFi country code (see [`LOCALCC`](#localCC)) even though the WiFi interface is disabled, so you can ignore the instruction to use `raspi-config`.
+
+##### <a name="changeWiFi"> *if you change your mind about WiFi …* </a>
+
+If you change your mind after your system is up and running, and decide to activate WiFi:
+
+1. Follow the [*if you want WiFi enabled …*](#enableWiFi) instructions to edit `wpa_supplicant.conf`.
+2. Copy the file onto your Raspberry Pi at the path (you will need `sudo`):
+
+	```
+	/boot/wpa_supplicant.conf
+	```
+
+3. Reboot your Raspberry Pi.
+
+After the reboot, your WiFi interface will be enabled and the `wpa_supplicant.conf` will have disappeared from your `/boot` directory.
+
 #### <a name="configOptions"> Configure PiBuilder installation options </a>
 
 Use a text editor to open:
@@ -314,7 +358,7 @@ SQLITEVERSION="sqlite-autoconf-3370000"
 
 You **should** set the right hand side of:
 
-1. `LOCALCC` to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
+1. <a name="localCC">`LOCALCC`</a> to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
 2. `LOCALTZ` to a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
 
 You **can** set the right hand side of:
@@ -1335,6 +1379,10 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
+
+* 2021-12-30
+
+	- Explain how to disable WiFi
 
 * 2021-12-29
 
