@@ -122,10 +122,6 @@ sudo raspi-config nonint do_wifi_country "$LOCALCC"
 echo "Setting time-zone to $LOCALTZ"
 sudo raspi-config nonint do_change_timezone "$LOCALTZ"
 
-# set the host name (produces errors)
-echo "Setting machine name to $HOSTNAME"
-sudo raspi-config nonint do_hostname "$HOSTNAME"
-
 # try to establish locales - seems best to do this last. Note the patch
 # should always retain "en_GB.UTF-8" so we don't pull the rug out from
 # beneath anything (like Python) that already knows the default language
@@ -133,6 +129,10 @@ sudo raspi-config nonint do_hostname "$HOSTNAME"
 if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
    sudo dpkg-reconfigure -f noninteractive locales
 fi
+
+# set the host name (produces errors)
+echo "Setting machine name to $HOSTNAME"
+sudo raspi-config nonint do_hostname "$HOSTNAME"
 
 echo "Remember to do ssh-keygen -R raspberrypi.local then re-connect"
 echo "to this machine under the name $HOSTNAME."
