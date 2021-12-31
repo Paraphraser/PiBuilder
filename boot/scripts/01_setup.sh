@@ -88,7 +88,7 @@ echo -e "$NEW_PASSWORD\n$NEW_PASSWORD" | sudo passwd $USER
 
 # make the VNC password the same
 TARGET="/etc/vnc/config.d/common.custom"
-if SOURCE="$(supporting_file "$TARGET")" ; then
+if [ -d $(dirname "$TARGET") ] && SOURCE="$(supporting_file "$TARGET")" ; then
    echo "Setting up VNC (even though it is not activated)"
    sudo cp "$SOURCE" "$TARGET"
    echo -e "$NEW_PASSWORD\n$NEW_PASSWORD" | sudo vncpasswd -file "$TARGET"

@@ -1380,6 +1380,10 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
 
+* 2021-12-31
+
+	- Setting of VNC password conditional on presence of parent directory (for "lite" base image).
+
 * 2021-12-30
 
 	- Explain how to disable WiFi
@@ -1417,6 +1421,7 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 	- added support for Raspberry Pi Zero W2 + Supervised Home Assistant. 
 
 * 2021-11-25
+
 	- major overhaul
 	- tested for Raspbian Buster and Bullseye
 	- can install Supervised Home Assistant
