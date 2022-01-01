@@ -27,6 +27,9 @@ SUPPORT="/boot/scripts/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
+# add these to /boot/cmdline.txt
+CMDLINE_OPTIONS="cgroup_memory=1 cgroup_enable=memory"
+
 # pre-load list of supporting packages for Home Assistant.
 #
 # Note https://github.com/home-assistant/supervised-installer lists
@@ -145,14 +148,18 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
    echo -e "homeassistant-supervised\tha/machine-type\tselect\t${PLATFORM_CHOICE}" >"$PRESEED"
    sudo debconf-set-selections "$PRESEED"
 
+   WGET_OUTPUT="$DOWNLOADS/wget_output.txt"
+
    # try to download the agent
-   wget -O "$AGENT_DEB" "$AGENT_URL"
+   echo "Downloading $AGENT_URL"
+   wget -O "$AGENT_DEB" -o "$WGET_OUTPUT" "$AGENT_URL"
 
    # did the agent download succeed?
    if [ $? -eq 0 -a -e "$AGENT_DEB" ] ; then
 
       # yes! attempt to download the package
-      wget -O "$PACKAGE_DEB" "$PACKAGE_URL"
+      echo "Downloading $PACKAGE_URL"
+      wget -O "$PACKAGE_DEB" -o "$WGET_OUTPUT" "$PACKAGE_URL"
 
       # did the package download succeed?
       if [ $? -eq 0 -a -e "$PACKAGE_DEB" ] ; then
@@ -176,17 +183,24 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
             fi
          done
 
-        # patch network manager to prevent random WiFi MAC. IOTstack
-        # implies a SERVER which MAY be WiFi-only. Servers need
-        # predictable IP addresses, either from static assignment or
-        # static binding in DHCP. The latter depends on a predictable
-        # MAC address. Will take effect on next reboot.
-        try_patch "/etc/NetworkManager/NetworkManager.conf" "disable random Wifi MAC"
+         # patch network manager to prevent random WiFi MAC. IOTstack
+         # implies a SERVER which MAY be WiFi-only. Servers need
+         # predictable IP addresses, either from static assignment or
+         # static binding in DHCP. The latter depends on a predictable
+         # MAC address. Will take effect on next reboot.
+         try_patch "/etc/NetworkManager/NetworkManager.conf" "disable random Wifi MAC"
+
+         # activate apparmor at boot
+         CMDLINE_OPTIONS="$CMDLINE_OPTIONS apparmor=1 security=apparmor"
 
       else
 
          # no! did not succeed in downloading package
          echo "Unable to download Home Assistant package from $PACKAGE_URL"
+         echo "Is that still correct? Check:"
+         echo "   https://github.com/home-assistant/supervised-installer/releases/latest"
+         echo "and retry $SCRIPT. Output from wget command follows:"
+         cat "$WGET_OUTPUT"
          exit 1
 
       fi
@@ -199,7 +213,8 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
       echo "Is that still correct? Check:"
       echo "   https://github.com/home-assistant/os-agent/releases/latest"
       echo "then set HOME_ASSISTANT_AGENT_RELEASE in $USEROPTIONS"
-      echo "and retry $SCRIPT."
+      echo "and retry $SCRIPT. Output from wget command follows:"
+      cat "$WGET_OUTPUT"
       exit 1
 
    fi
@@ -289,13 +304,18 @@ fi
 echo "Installing IOTstack dependencies"
 sudo pip3 install -U ruamel.yaml==0.16.12 blessed
 
-# try to add support for docker stats - applies from next reboot
+# set cmdline options if possible
 TARGET="/boot/cmdline.txt"
-APPEND="cgroup_memory=1 cgroup_enable=memory"
 if [ -e "$TARGET" ] ; then
-   if [ $(grep -c "$APPEND" "$TARGET") -eq 0 ] ; then
-      echo "Adding support for \"docker stats\""
-      sudo sed -i.bak "s/$/ $APPEND/" "$TARGET"
+   unset APPEND
+   for OPTION in $CMDLINE_OPTIONS ; do
+      if [ $(grep -c "$OPTION" "$TARGET") -eq 0 ] ; then
+         APPEND="$APPEND $OPTION"
+      fi
+   done
+   if [ -n "$APPEND" ] ; then
+      echo "Appending$APPEND to $TARGET"
+      sudo sed -i.bak "s/$/$APPEND/" "$TARGET"
    fi
 fi
 
