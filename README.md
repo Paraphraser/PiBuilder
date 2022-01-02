@@ -861,8 +861,13 @@ The script then continues and:
 * Sets up the `docker` and `bluetooth` group memberships assumed by IOTstack.
 * Installs Docker-Compose.
 * Installs the `ruamel.yaml` and `blessed` Python dependencies assumed by IOTstack.
-* Appends `cgroup_memory=1 cgroup_enable=memory` to `/boot/cmdline.txt`. This change means that `docker stats` will report memory utilisation.
+* Appends directives to `/boot/cmdline.txt`:
+
+	- `cgroup_memory=1 cgroup_enable=memory` (so `docker stats` will report memory utilisation)
+	- `apparmor=1 security=apparmor` (if Supervised Home Assistant is installed; so AppArmor will be enabled).
+
 * Reboots.
+
 
 ### <a name="docScript05"> Script 05 </a>
 
@@ -1379,6 +1384,13 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
+
+* 2022-02-02
+
+	- 04 script appends following to `/boot/cmdline.txt`:
+
+		* `cgroup_memory=1 cgroup_enable=memory` (unconditional)
+		* `apparmor=1 security=apparmor` if Supervised Home Assistant is installed
 
 * 2021-12-31
 
