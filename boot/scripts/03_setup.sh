@@ -73,6 +73,27 @@ CRYPTO_PACKAGES
 
 install_packages "$PACKAGES"
 
+# samba support
+TARGET="/etc/samba/smb.conf"
+if SOURCE="$(supporting_file "$TARGET")" ; then
+   echo "Adding SAMBA support"
+   # install dependencies
+   sudo apt install -y samba samba-common-bin
+   # replace smb.conf
+   sudo cp "$SOURCE" "$TARGET"
+   sudo chown root:root "$TARGET"
+   sudo chmod 644 "$TARGET"
+   # optional replacement of passwords and secrets
+   for C in "passdb.tdb" "secrets.tdb" ; do
+      T="/var/lib/samba/private/$C"
+      if S="$(supporting_file "$T")" ; then
+         sudo cp "$S" "$T"
+         sudo chown root:root "$T"
+         sudo chmod 600 "$T"
+      fi
+   done
+fi
+
 echo "Making python3 the default"
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
