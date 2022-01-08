@@ -880,9 +880,10 @@ The script:
 * Applies the recommended `allowinterfaces eth*,wlan*` patch.
 * Applies [Does your Raspberry Pi's Wireless Interface freeze?](https://gist.github.com/Paraphraser/305f7c70e798a844d25293d496916e77). Only probes interfaces that are defined, are active, and obtain their IP addresses via DHCP.
 * Optionally sets up local DNS.
-* Disables IPv6
+* Disables IPv6.
+* Alters `/etc/systemd/journald.conf` to reduce endless docker-runtime mount messages.
 * Optionally disables virtual memory swapping (see [`DISABLE_VM_SWAP`](#disableVMswap)).
-* Reboots
+* Reboots.
 
 ### <a name="docScript03"> Script 03 </a>
 
@@ -1447,6 +1448,14 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
 
+* 2022-01-09
+
+	- patch `journald.conf` to control excessive log messages in the following pattern ([stackoverflow](https://stackoverflow.com/questions/63622619/docker-flooding-syslog-with-run-docker-runtime-logs)):
+
+		```
+		run-docker-runtime\x2drunc-moby-«identifier»-runc.3doejt.mount: Succeeded.
+		```
+	
 * 2022-01-08
 
 	- add [SAMBA support](#sambaSupport) to 03 script.

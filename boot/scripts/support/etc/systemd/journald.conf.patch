@@ -1,0 +1,6 @@
+37,38c37,38
+< #MaxLevelStore=debug
+< #MaxLevelSyslog=debug
+---
+> MaxLevelStore=notice
+> MaxLevelSyslog=notice

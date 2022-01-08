@@ -75,6 +75,9 @@ try_patch "/etc/resolvconf.conf" "local name servers"
 # patch sysctl.conf to disable IPv6
 try_patch "/etc/sysctl.conf" "disable IPv6"
 
+# patch journald.conf to reduce endless docker-runtime mount messages
+try_patch "/etc/systemd/journald.conf" "less verbose journalctl"
+
 # turn off VM swapping if requested
 if [ "$DISABLE_VM_SWAP" = "true" ] && [ -n "$(swapon -s)" ] ; then
    echo "Disabling virtual memory swapping"
