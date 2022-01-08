@@ -92,6 +92,7 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
          sudo chmod 600 "$T"
       fi
    done
+   mkdir -p "$HOME/share"
    echo "Restarting SAMBA daemon"
    sudo service smbd restart
 fi
