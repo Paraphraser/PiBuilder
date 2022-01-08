@@ -77,8 +77,8 @@ install_packages "$PACKAGES"
 TARGET="/etc/samba/smb.conf"
 if SOURCE="$(supporting_file "$TARGET")" ; then
    echo "Adding SAMBA support"
-   # install dependencies
-   sudo apt install -y samba samba-common-bin
+   # install dependencies (samba includes samba-common samba-common-bin)
+   sudo apt install -y samba smbclient
    # replace smb.conf
    sudo cp "$SOURCE" "$TARGET"
    sudo chown root:root "$TARGET"
@@ -92,6 +92,8 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
          sudo chmod 600 "$T"
       fi
    done
+   echo "Restarting SAMBA daemon"
+   sudo service smbd restart
 fi
 
 echo "Making python3 the default"
