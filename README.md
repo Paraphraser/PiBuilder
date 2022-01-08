@@ -1455,7 +1455,7 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 		```
 		run-docker-runtime\x2drunc-moby-«identifier»-runc.3doejt.mount: Succeeded.
 		```
-	
+
 * 2022-01-08
 
 	- add [SAMBA support](#sambaSupport) to 03 script.
