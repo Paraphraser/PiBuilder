@@ -6,4 +6,8 @@
 	email = email@domain.com
 	signingkey = 04B9CD3D381B574D
 [pull]
-	rebase = false
+	rebase = true
+[fetch]
+	prune = true
+[diff]
+	colorMoved = zebra
