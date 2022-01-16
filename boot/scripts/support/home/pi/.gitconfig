@@ -4,7 +4,10 @@
 [user]
 	name = Your Name
 	email = email@domain.com
-	signingkey = 04B9CD3D381B574D
+	# find 16-character fingerprint in "gpg -k" output . Common pattern
+	# is "04B9CD3D381B574D" in "rsa4096/0x04B9CD3D381B574D". Substitute
+	# into next line and uncomment.
+#	signingkey = 04B9CD3D381B574D
 [pull]
 	rebase = true
 [fetch]
