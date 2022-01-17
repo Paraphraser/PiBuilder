@@ -74,6 +74,7 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [Tutorials](#patchTutorials)
 
 - [Keeping in sync with GitHub](#moreGit)
+- [Upgrading docker-compose](#upgradeCompose)
 - [Beware of chickens and eggs](#chickenEgg)
 
 - [Some words about SSH](#aboutSSH)
@@ -1332,6 +1333,43 @@ $ git commit -m "merged with GitHub updates"
 
 Now you are in sync with GitHub.
 
+## <a name="upgradeCompose"> Upgrading docker-compose </a>
+
+You can check the version of docker-compose installed on your system by running:
+
+```bash
+$ docker-compose version
+```
+
+You can find out if a later version of modern docker-compose is available by visiting the [releases page](https://github.com/docker/compose/releases).
+
+You can upgrade (or downgrade) to a particular version of modern docker-compose like this:
+
+```bash
+$ sudo /boot/scripts/helpers/upgrade_docker_compose.sh «version»
+```
+
+where:
+
+* «version» is the value on the [releases page](https://github.com/docker/compose/releases) and always starts with a "v". For example:
+
+	```bash
+	$ sudo /boot/scripts/helpers/upgrade_docker_compose.sh v2.2.3
+	```
+
+The `upgrade_docker_compose.sh` script:
+
+1. Checks for the old version of docker-compose installed by `apt`. If it finds that, it gives you instructions on how to proceed but it does not attempt to change your system. This is because you may have to remove and re-install docker, and that is not something you are going to want to do while your stack is running. You will also likely want to take a backup before you start.
+2. Checks for and removes the Python version of docker-compose.
+3. Checks for and removes other versions of modern docker-compose.
+4. Attempts to download and install the requested version of modern docker-compose.
+
+If the download fails (typically because you have asked for a version that does not actually exist - did you forget the "v"?), the script falls back to the Python version of docker-compose.
+
+Note:
+
+* The `upgrade_docker_compose.sh` script is *reasonably* platform-agnostic. It works on Raspberry Pi (Buster and Bullseye) full 32-bit, mixed 32-bit user with 64-bit kernel, and full 64-bit OS. It also appears to work on macOS for Docker Desktop.
+
 ## <a name="chickenEgg"> Beware of chickens and eggs </a>
 
 Installing and configuring software on a Raspberry Pi (or any computer) involves quite a few chicken-and-egg situations. For example:
@@ -1448,6 +1486,21 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
 
+* 2022-01-17
+
+	- Default `.gitconfig` options updated to include effects of running these commands:
+
+		```bash
+		$ git config --global fetch.prune true
+		$ git config --global pull.rebase true
+		$ git config --global diff.colorMoved zebra
+		$ git config --global rerere.enabled true
+		$ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+		```
+		
+	- Version of docker-compose PiBuilder installs by default bumped to v2.2.3.
+	- Script to [upgrade docker-compose](#upgradeCompose) added to helpers folder.
+	
 * 2022-01-09
 
 	- patch `journald.conf` to control excessive log messages in the following pattern ([stackoverflow](https://stackoverflow.com/questions/63622619/docker-flooding-syslog-with-run-docker-runtime-logs)):
@@ -1490,7 +1543,7 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 	- Rename `is_running_raspbian()` function to `is_running_OS_release()`. The full 64-bit OS identifies as "Debian". That part of the test removed as unnecessary.
 	- Add `is_running_OS_64bit()` function to return true if a full 64-bit OS is running.
-	- Install 64-bit `docker-compose` where appropriate.
+	- Install 64-bit docker-compose where appropriate.
 	- Install 64-bit Supervised Home Assistant where appropriate.
 	- Automatically enable `docker stats` (changes `/boot/cmdline.txt`).
 	- Update default version numbers in `options.sh`.
