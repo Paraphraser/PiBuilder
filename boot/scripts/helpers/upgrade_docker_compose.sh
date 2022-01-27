@@ -103,10 +103,11 @@ COMPOSE_HOME="https://github.com/docker/compose/releases"
 COMPOSE_URL="$COMPOSE_HOME/download/$DOCKER_COMPOSE_VERSION/docker-compose-$DOCKER_COMPOSE_PLATFORM-$DOCKER_COMPOSE_ARCHITECTURE"
 
 # the target directories for installation are
-PLUGINS_DIR="$HOME/.docker/cli-plugins"
+CALLER_HOME=$(eval echo "~$SUDO_USER")
+PLUGINS_DIR="$CALLER_HOME/.docker/cli-plugins"
 BIN_PATH_DIR="/usr/local/bin"
 
-# ensure the plugins directory exists
+# ensure the plugins directory exists and belongs to the caller
 mkdir -p "$PLUGINS_DIR"
 
 # ordered list of candidate directories
@@ -116,6 +117,7 @@ read -r -d '' INSTALL_DIRS <<-EOF
 	/usr/local/libexec/docker/cli-plugins
 	/usr/lib/docker/cli-plugins
 	/usr/local/lib/docker/cli-plugins
+	/root/.docker/cli-plugins
 	$PLUGINS_DIR
 EOF
 
@@ -235,6 +237,9 @@ if [ -z "$WHERE" ] ; then
       # yes! set execute permission on the target
       chmod +x "$TARGET"
 
+      # assign ownership of the whole structure to the correct user
+      chown -R "$SUDO_UID:$SUDO_GID" "$PLUGINS_DIR"
+
       # and also copy to /usr/local/bin/
       cp "$TARGET" "$BIN_PATH_DIR"
 
@@ -246,21 +251,21 @@ if [ -z "$WHERE" ] ; then
       echo "or as a plugin - without the hyphen - via:"
       echo "   docker compose version"
       echo "You can check for later versions at $COMPOSE_HOME"
-
-      # check desirable environment variables
-      for VAR in COMPOSE_DOCKER_CLI_BUILD DOCKER_BUILDKIT ; do
-         if [ -z ${!VAR} ] ; then
-            echo "Adding $VAR=1 to your .profile - takes effect on next login"
-            echo "$VAR=1" >> "$HOME/.profile"
-         fi
-      done
+      echo "Docker documentation recommends adding the following to your .profile"
+      echo "   export COMPOSE_DOCKER_CLI_BUILD=1"
+      echo "   export DOCKER_BUILDKIT=1"
+      echo "References:"
+      echo "   https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/"
+      echo "   https://docs.docker.com/compose/reference/build/#native-build-using-the-docker-cli"
+      echo "   https://docs.docker.com/compose/reference/envvars/#compose_docker_cli_build"
+      echo "   https://docs.docker.com/develop/develop-images/build_enhancements/#to-enable-buildkit-builds"
 
    else
 
       # no! failed. That means TARGET is useless
       rm -f "$TARGET"
 
-      echo "Attempt to download docker-compose failed. Falling back to  pip method."
+      echo "Attempt to download docker-compose failed. Falling back to pip method."
       pip3 install -U docker-compose
 
    fi

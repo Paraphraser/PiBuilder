@@ -1335,10 +1335,19 @@ Now you are in sync with GitHub.
 
 ## <a name="upgradeCompose"> Upgrading docker-compose </a>
 
-You can check the version of docker-compose installed on your system by running:
+You can check the version of docker-compose installed on your system by running either or both of the following commands:
 
 ```bash
 $ docker-compose version
+$ docker compose version
+```
+
+The first form follows your PATH variable and executes the first executable file it finds with the name `docker-compose`. The second form uses plugin syntax (likely how "compose" will be invoked in the future).
+
+Both commands should return the same version number. If you spot any discrepancies, you can find out where `docker-compose` is installed on your system by running:
+
+```bash
+$ sudo /boot/scripts/helpers/find_docker_compose.sh
 ```
 
 You can find out if a later version of modern docker-compose is available by visiting the [releases page](https://github.com/docker/compose/releases).
@@ -1485,6 +1494,11 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
+
+* 2022-01-27
+
+	- Fix bugs in `upgrade_docker_compose.sh` script
+	- Add `find_docker_compose.sh` helper script
 
 * 2022-01-17
 
