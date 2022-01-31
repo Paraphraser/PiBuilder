@@ -65,9 +65,11 @@ hopenpgp-tools
 openssl
 pcscd
 python3-gnupg
+python3-ykman
 rng-tools
 scdaemon
 secure-delete
+yubikey-manager
 yubikey-personalization
 CRYPTO_PACKAGES
 
