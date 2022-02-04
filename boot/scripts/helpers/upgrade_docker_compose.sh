@@ -156,6 +156,7 @@ if [ -n "$WHERE" ] ; then
       echo "   \$ sudo pip3 uninstall -y docker-compose"
       echo "   \$ curl -fsSL https://get.docker.com | sudo sh"
       echo "   \$ sudo usermod -G docker -a $USER"
+      echo "   \$ sudo usermod -G bluetooth -a $USER"
       echo "   \$ sudo reboot"
       echo "and then pick up from step 5."
 
