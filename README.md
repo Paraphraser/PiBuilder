@@ -29,11 +29,6 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [Download this repository](#downloadRepo)
 	- [Choose an imaging tool](#chooseTool)
 	- [Choose and download a base image](#chooseImage)
-
-		- [option 1 – Raspbian Bullseye (32-bit)](#chooseRaspbianBullseye)
-		- [option 2 – Raspbian Buster (32-bit)](#chooseRaspbianBuster)
-		- [option 3 – Debian Bullseye (64-bit)](#chooseDebianBullseye)
-
 	- [Transfer Raspbian image to SD or SSD](#burnImage)
 	- [PiBuilder configuration](#configPiBuilder)
 
@@ -140,6 +135,14 @@ I use and recommend [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
 
 ### <a name="chooseImage"> Choose and download a base image </a>
 
+The most recent Raspberry Pi OS can always be found at:
+
+* [https://www.raspberrypi.com/software/operating-systems/](https://www.raspberrypi.com/software/operating-systems/)
+
+Currently, this leads both 64-bit and 32-bit versions of Raspbian Bullseye, plus a legacy version of 32-bit Raspbian Buster.
+ 
+I always start from "Raspberry Pi OS with desktop" so that is what I recommend.
+
 Images for the Raspberry Pi are downloaded as `.zip` files. In all cases, you always have the choice of:
 
 1. downloading the `.zip` *directly;* or
@@ -153,7 +156,7 @@ $ IMAGE=«pathToZip»
 $ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
 ```
 
-You get the «hash» either by clicking the `Show SHA256 file integrity hash` link or by downloading and inspecting the `.zip.sha256` associated with the `.zip`. Here's an example:
+You get the «hash» either by clicking the `Show SHA256 file integrity hash` link. Here's an example:
 
 ```bash
 $ SIGNATURE=6e9faca69564c47702d4564b2b15997b87d60483aceef7905ef20ba63b9c6b2b
@@ -165,8 +168,6 @@ $ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
 If you don't see "OK", start over!
 
 > If your first attempt was a *direct* download of the `.zip`, consider trying the *indirect* method using a torrent.
-
-I recommend unpacking each `.zip` to a `.img`. While it is true that the imaging tools can use the `.zip` files, it takes a bit longer because the `.zip` still has to be unpacked each time.
 
 ##### *on the topic of 32- vs 64-bit …*
 
@@ -182,35 +183,15 @@ I recommend unpacking each `.zip` to a `.img`. While it is true that the imaging
 
 	- Run 64-bit in both kernel and user modes.
 	- Docker will pull images built for "arm64" architecture.
+	- Installs, looks, feels and behaves like Raspberry Pi OS (Raspbian) but self-identifies as "Debian".
 
 	Once you are running full 64-bit, you have no ability to chop and change.
 
-#### <a name="chooseRaspbianBullseye"> option 1 – Raspbian Bullseye (32-bit) </a>
+	Please don't pick a 64-bit image as your starting point for no better reason than "64-bit must be better than 32-bit". PiBuilder will install 64-bit versions of everything, including docker, docker-compose and Supervised Home Assistant, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you are upgrading from a 32-bit system, you will need to assure yourself that all your containers still work as expected.
 
-The most recent Raspberry Pi OS can always be found at the link below. Currently, this leads to the 32-bit version of Raspbian Bullseye:
+##### *on the topic of Bullseye vs Buster …*
 
-* [https://www.raspberrypi.com/software/operating-systems/](https://www.raspberrypi.com/software/operating-systems/)
-
-I always start from "Raspberry Pi OS with desktop" so that is what I recommend.
-
-At the time of writing (November 2021), this is the initial release of "Raspbian Bullseye". It was made available on 2021-10-30 and is not necessarily "proven" or "stable" or "well understood". In particular, if you need camera support, you might be better advised to stick with [Raspbian Buster (32-bit)](#chooseRaspbianBuster).
-
-#### <a name="chooseRaspbianBuster"> option 2 – Raspbian Buster (32-bit) </a>
-
-If you would prefer to base all your work on a system that **can** be considered proven, stable and well-understood, you should consider "Raspbian Buster". It is a 32-bit system which can be downloaded from:
-
-* [http://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-05-28/](http://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-05-28/)
-
-#### <a name="chooseDebianBullseye"> option 3 – Debian Bullseye (64-bit) </a>
-
-This is a full 64-bit alternative to [Raspbian Bullseye (32-bit)](#chooseRaspbianBullseye). It installs, looks, feels and behaves like Raspbian but it self-identifies as "Debian". You can download it from:
-
-* [http://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2021-11-08/](http://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2021-11-08/)
-
-Key points:
-
-* Please be **cautious** when using this image. PiBuilder will install 64-bit versions of everything, including docker, docker-compose and Supervised Home Assistant, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you decide to upgrade from a 32-bit system, you will need to assure yourself that all your containers still work as expected. Please don't pick this image as your starting point for no better reason than "64-bit must be better than 32-bit" because your mileage may vary.
-* It is not clear why this image self-identifies as "Debian" rather than "Raspbian" or "Raspberry Pi OS". It might be a subtle hint that it isn't fully supported by the Raspberry Pi Foundation.
+At the time of writing (February 2022), this is only the second release of "Raspbian Bullseye", which was first released on 2021-10-30. It is not necessarily "proven" or "stable" or "well understood". In particular, if you need camera support, you might be better advised to stick with Raspbian Buster (32-bit).
 
 ### <a name="burnImage"> Transfer Raspbian image to SD or SSD </a>
 
@@ -338,7 +319,7 @@ DISABLE_VM_SWAP=false
 
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.2.2"
+#DOCKER_COMPOSE_VERSION="v2.2.3"
 # - override for docker-compose architecture. Options are:
 #     armv7
 #     aarch64
@@ -1494,6 +1475,10 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
+
+* 2022-02-09
+
+	- Adjust for revised layout of [Raspberry Pi OS](https://www.raspberrypi.com/software/operating-systems/) releases page.
 
 * 2022-01-27
 
