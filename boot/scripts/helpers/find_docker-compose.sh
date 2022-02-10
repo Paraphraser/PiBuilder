@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 # should not run as root
-[ "$EUID" -ne 0 ] && echo "This script should be run using sudo" && exit -1
+[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
-CALLER_HOME=$(eval echo "~$SUDO_USER")
 TARGET="docker-compose"
 
 # candidate installation directories
@@ -14,7 +13,7 @@ read -r -d '' INSTALL_DIRS <<-EOF
 	/usr/lib/docker/cli-plugins
 	/usr/local/lib/docker/cli-plugins
 	/root/.docker/cli-plugins
-	$CALLER_HOME/.docker/cli-plugins
+	$HOME/.docker/cli-plugins
 EOF
 
 echo "Candidate installation paths:"

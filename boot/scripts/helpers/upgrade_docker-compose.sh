@@ -7,9 +7,9 @@
 #
 # This script can be invoked as:
 #
-# 1. ./upgrade_docker_compose.sh
-# 2. ./upgrade_docker_compose.sh v2.2.3
-# 3. DOCKER_COMPOSE_VERSION=v2.2.3 ./upgrade_docker_compose.sh
+# 1. sudo ./upgrade_docker-compose.sh
+# 2. sudo ./upgrade_docker-compose.sh v2.2.3
+# 3. sudo DOCKER_COMPOSE_VERSION=v2.2.3 ./upgrade_docker-compose.sh
 #
 # The parameter takes precedence over the environment variable if both
 # are used.
@@ -23,7 +23,7 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_PLATFORM=linux ./upgrade_docker_compose.sh v2.2.3
+#  DOCKER_COMPOSE_PLATFORM=linux ./upgrade_docker-compose.sh v2.2.3
 #
 # -----
 #
@@ -34,7 +34,7 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./upgrade_docker_compose.sh v2.2.3
+#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./upgrade_docker-compose.sh v2.2.3
 #
 # -----
 #
@@ -43,8 +43,11 @@
 # the script will do that.
 #
 
-# should run as root
-[ "$EUID" -ne 0 ] && echo "This script should be run using sudo" && exit -1
+# SHOULD run as root - the exception to the usual rule
+[ "$EUID" -ne 0 ] && echo "This script SHOULD be run using sudo" && exit 1
+
+# support user renaming of script
+SCRIPT=$(basename "$0")
 
 # the default version of docker-compose at the moment is
 DOCKER_COMPOSE_VERSION_DEFAULT="v2.2.3"
@@ -52,10 +55,10 @@ DOCKER_COMPOSE_VERSION_DEFAULT="v2.2.3"
 # at most one argument
 if [ "$#" -gt 1 ]; then
 
-    echo "Usage: sudo $SCRIPT" {version}
+    echo "Usage: sudo $SCRIPT {version}"
     echo "   eg: sudo $SCRIPT $DOCKER_COMPOSE_VERSION_DEFAULT"
     echo " note: the 'v' is REQUIRED"
-    exit -1
+    exit 1
 
 fi
 
@@ -132,33 +135,33 @@ if [ -n "$WHERE" ] ; then
 
       # yes! we can't do anything with that
       echo "The version of docker-compose installed on your system is obsolete. It"
-      echo "was probably installed by an IOTstack script using:"
-      echo "   \$ sudo apt install docker-compose"
-      echo "It is not safe for this script to uninstall docker-compose because it"
-      echo "sometimes takes docker with it and then you have a serious mess to clean"
-      echo "up. What you should do is:"
-      echo "1. If IOTstack is running, take it down."
-      echo "2. If any other docker containers are running (eg hass.io or containers"
-      echo "   you have started yourself with docker run), stop and remove them."
-      echo "3. Run the command:"
-      echo "      \$ sudo apt remove docker-compose"
-      echo "4. If that removes docker then re-install it using its convenience"
-      echo "   script:"
-      echo "      \$ curl -fsSL https://get.docker.com | sudo sh"
-      echo "5. Re-run this script to install modern docker-compose."
-      echo "6. Start your containers."
+      echo "was probably installed by an IOTstack script using 'apt'. It is not safe"
+      echo "for this script to just uninstall docker-compose because it sometimes"
+      echo "takes docker with it and that, in turn, can take home assistant too."
+      echo "Then you have a serious mess to clean up. Assuming this is a Linux"
+      echo "system, the best thing you can do now is to use some brute force:"
       echo ""
-      echo "If step 3 doesn't remove docker but re-running this script is unable"
-      echo "to install modern docker-compose, you may need to use brute force."
-      echo "Repeat steps 1 and 2, and then run these commands:"
-      echo "   \$ sudo apt -y purge docker-ce docker-ce-cli containerd.io"
-      echo "   \$ sudo apt -y remove docker-compose"
-      echo "   \$ sudo pip3 uninstall -y docker-compose"
-      echo "   \$ curl -fsSL https://get.docker.com | sudo sh"
-      echo "   \$ sudo usermod -G docker -a $USER"
-      echo "   \$ sudo usermod -G bluetooth -a $USER"
-      echo "   \$ sudo reboot"
-      echo "and then pick up from step 5."
+      echo "1. If IOTstack is running, take it down."
+      echo "2. If any other docker containers are running (eg containers you have"
+      echo "   started yourself with 'docker run'), stop and remove them."
+      echo "3. If supervised home assistant is installed, remove it by running¹:"
+      echo "      \$ ./uninstall_homeassistant-supervised.sh"
+      echo "4. Uninstall docker by running¹:"
+      echo "      \$ ./uninstall_docker.sh"
+      echo "5. Remove all copies of docker-compose by running¹:"
+      echo "      \$ ./uninstall_docker-compose.sh"
+      echo "6. Reboot."
+      echo ""
+      echo "That gives you a clean slate. The best way to reinstall docker and"
+      echo "docker-compose is to run the '04_setup.sh' script. You have two choices:"
+      echo ""
+      echo "1. If you WANT supervised home assistant, run²:"
+      echo "   \$ /boot/scripts/04_setup.sh true"
+      echo "2. If you DON'T want supervised home assistant, run²:"
+      echo "   \$ /boot/scripts/04_setup.sh false"
+      echo ""
+      echo "¹ script is in the PiBuilder 'scripts/helpers' folder"
+      echo "² script is in the PiBuilder 'scripts' folder"
 
       exit 1
 

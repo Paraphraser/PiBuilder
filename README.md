@@ -70,6 +70,9 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 - [Keeping in sync with GitHub](#moreGit)
 - [Upgrading docker-compose](#upgradeCompose)
+
+	- [Reinstalling docker, docker-compose or home assistant](#reinstallation)
+
 - [Beware of chickens and eggs](#chickenEgg)
 
 - [Some words about SSH](#aboutSSH)
@@ -1328,7 +1331,7 @@ The first form follows your PATH variable and executes the first executable file
 Both commands should return the same version number. If you spot any discrepancies, you can find out where `docker-compose` is installed on your system by running:
 
 ```bash
-$ sudo /boot/scripts/helpers/find_docker_compose.sh
+$ /boot/scripts/helpers/find_docker-compose.sh
 ```
 
 You can find out if a later version of modern docker-compose is available by visiting the [releases page](https://github.com/docker/compose/releases).
@@ -1336,7 +1339,7 @@ You can find out if a later version of modern docker-compose is available by vis
 You can upgrade (or downgrade) to a particular version of modern docker-compose like this:
 
 ```bash
-$ sudo /boot/scripts/helpers/upgrade_docker_compose.sh «version»
+$ sudo /boot/scripts/helpers/upgrade_docker-compose.sh «version»
 ```
 
 where:
@@ -1344,10 +1347,10 @@ where:
 * «version» is the value on the [releases page](https://github.com/docker/compose/releases) and always starts with a "v". For example:
 
 	```bash
-	$ sudo /boot/scripts/helpers/upgrade_docker_compose.sh v2.2.3
+	$ sudo /boot/scripts/helpers/upgrade_docker-compose.sh v2.2.3
 	```
 
-The `upgrade_docker_compose.sh` script:
+The `upgrade_docker-compose.sh` script:
 
 1. Checks for the old version of docker-compose installed by `apt`. If it finds that, it gives you instructions on how to proceed but it does not attempt to change your system. This is because you may have to remove and re-install docker, and that is not something you are going to want to do while your stack is running. You will also likely want to take a backup before you start.
 2. Checks for and removes the Python version of docker-compose.
@@ -1358,7 +1361,11 @@ If the download fails (typically because you have asked for a version that does 
 
 Note:
 
-* The `upgrade_docker_compose.sh` script is *reasonably* platform-agnostic. It works on Raspberry Pi (Buster and Bullseye) full 32-bit, mixed 32-bit user with 64-bit kernel, and full 64-bit OS. It also appears to work on macOS for Docker Desktop.
+* The `upgrade_docker-compose.sh` script is *reasonably* platform-agnostic. It works on Raspberry Pi (Buster and Bullseye) full 32-bit, mixed 32-bit user with 64-bit kernel, and full 64-bit OS. It also appears to work on macOS for Docker Desktop.
+
+### <a name="reinstallation"> Reinstalling docker, docker-compose and home assistant</a>
+
+Read [reinstalling docker + docker-compose](reinstallation.md) if you need to reinstall docker or docker-compose or supervised home assistant.
 
 ## <a name="chickenEgg"> Beware of chickens and eggs </a>
 
@@ -1476,14 +1483,20 @@ I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
 
+* 2022-02-10
+
+	- Add scripts for uninstalling then reinstalling docker, docker-compose and supervised home assistant.
+	- Add documentation explaining the new scripts.
+	- Rename scripts with `docker_compose` in the name to use `docker-compose`.
+	
 * 2022-02-09
 
 	- Adjust for revised layout of [Raspberry Pi OS](https://www.raspberrypi.com/software/operating-systems/) releases page.
 
 * 2022-01-27
 
-	- Fix bugs in `upgrade_docker_compose.sh` script
-	- Add `find_docker_compose.sh` helper script
+	- Fix bugs in `upgrade_docker-compose.sh` script
+	- Add `find_docker-compose.sh` helper script
 
 * 2022-01-17
 
