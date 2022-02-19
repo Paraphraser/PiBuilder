@@ -46,7 +46,7 @@ In words:
 
 ### <a name="assumption2"> Assumption 2 </a>
 
-If your Raspberry Pi **was** built using PiBuilder, the `/boot/scripts` folder will exist and its contents may have been customised. The safest approach is to satisfying Assumption 2 without losing any of your customisations is to proceed like this:
+If your Raspberry Pi **was** built using PiBuilder, the `/boot/scripts` folder will exist and its contents may have been customised. The safest approach to satisfying Assumption 2 without losing any of your customisations is to proceed like this:
 
 1. Rename the existing `scripts` folder to get it out of the way:
 
