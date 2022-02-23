@@ -65,7 +65,6 @@ hopenpgp-tools
 openssl
 pcscd
 python3-gnupg
-python3-ykman
 rng-tools
 scdaemon
 secure-delete
@@ -74,6 +73,11 @@ yubikey-personalization
 CRYPTO_PACKAGES
 
 install_packages "$PACKAGES"
+
+if is_running_OS_release bullseye ; then
+   echo "Adding OS-specific python3-ykman"
+   sudo apt install -y python3-ykman
+fi
 
 # samba support
 TARGET="/etc/samba/smb.conf"
