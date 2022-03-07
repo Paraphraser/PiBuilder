@@ -56,9 +56,11 @@ fi
 echo "Running sudo apt update"
 sudo apt update
 
-echo "Running sudo apt full-upgrade -y"
-sudo apt full-upgrade -y
-sudo apt autoremove -y
+if [ "$SKIP_FULL_UPDATE" = "false" ] ; then
+   echo "Running sudo apt full-upgrade -y"
+   sudo apt full-upgrade -y
+   sudo apt autoremove -y
+fi
 
 # apply any preset for /etc/ssh
 if SOURCE="$(supporting_file "/etc/ssh/etc-ssh-backup.tar.gz")" ; then

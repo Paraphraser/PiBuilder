@@ -6,6 +6,9 @@ LOCALCC="AU"
 # - local time-zone
 LOCALTZ="Etc/UTC"
 
+# - skip full update in the 01 script.
+SKIP_FULL_UPDATE=false
+
 # - preference for kernel. Only applies to 32-bit installations. If
 #   true, adds "arm_64bit=1" to /boot/config.txt
 PREFER_64BIT_KERNEL=false
