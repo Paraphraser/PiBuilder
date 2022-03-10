@@ -37,6 +37,11 @@ run_pibuilder_prolog
 echo "Taking a baseline copy of /etc"
 sudo cp -a /etc /etc-baseline
 
+# copy important files in /boot
+echo "Taking baseline copies of cmdline.txt and config.txt"
+sudo cp /boot/cmdline.txt /boot/cmdline.txt.baseline
+sudo cp /boot/config.txt /boot/config.txt.baseline
+
 echo "Initialising empty user directories for SSH and GnuPG"
 [ ! -d "$HOME/.gnupg" ] && mkdir -p "$HOME/.gnupg"
 [ ! -d "$HOME/.ssh" ] && mkdir -p "$HOME/.ssh"
