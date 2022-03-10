@@ -192,10 +192,6 @@ If you don't see "OK", start over!
 
 	Please don't pick a 64-bit image as your starting point for no better reason than "64-bit must be better than 32-bit". PiBuilder will install 64-bit versions of everything, including docker, docker-compose and Supervised Home Assistant, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you are upgrading from a 32-bit system, you will need to assure yourself that all your containers still work as expected.
 
-##### *on the topic of Bullseye vs Buster …*
-
-At the time of writing (February 2022), this is only the second release of "Raspbian Bullseye", which was first released on 2021-10-30. It is not necessarily "proven" or "stable" or "well understood". In particular, if you need camera support, you might be better advised to stick with Raspbian Buster (32-bit).
-
 ### <a name="burnImage"> Transfer Raspbian image to SD or SSD </a>
 
 The steps are:
@@ -307,6 +303,9 @@ LOCALCC="AU"
 # - local time-zone
 LOCALTZ="Etc/UTC"
 
+# - skip full upgrade in the 01 script.
+SKIP_FULL_UPGRADE=false
+
 # - preference for kernel. Only applies to 32-bit installations. If
 #   true, adds "arm_64bit=1" to /boot/config.txt
 PREFER_64BIT_KERNEL=false
@@ -320,9 +319,13 @@ DISABLE_VM_SWAP=false
 #   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
 #LOCALE_LANG="en_GB.UTF-8"
 
+# - Raspberry Pi ribbon-cable camera control
+#   Options are: disabled, "false", "true" and "legacy"
+#ENABLE_PI_CAMERA=false
+
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.2.3"
+#DOCKER_COMPOSE_VERSION="v2.3.3"
 # - override for docker-compose architecture. Options are:
 #     armv7
 #     aarch64
@@ -336,23 +339,23 @@ HOME_ASSISTANT_SUPERVISED_INSTALL=false
 #      https://github.com/home-assistant/os-agent/releases/latest
 #HOME_ASSISTANT_AGENT_RELEASE="1.2.2"
 
-#only used if you run the script. These should be kept up-to-date:
+# only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
-SQLITEYEAR="2021"
-SQLITEVERSION="sqlite-autoconf-3370000"
+SQLITEYEAR="2022"
+SQLITEVERSION="sqlite-autoconf-3380000"
 ```
 
 You **should** set the right hand side of:
 
-1. <a name="localCC">`LOCALCC`</a> to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
-2. `LOCALTZ` to a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
+* <a name="localCC">`LOCALCC`</a> to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
+* `LOCALTZ` to a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
 
-You **can** set the right hand side of:
+You **can** set the right hand sides of the following variables:
 
-1. `LOCALE_LANG` to a valid language descriptor but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial. "en_GB.UTF-8" is the default language and I recommend leaving that enabled in any locale patch that you create.
-2. <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
+* <a name="skipFullUpgrade">`SKIP_FULL_UPGRADE`</a> to `true`. This prevents [Script 01](#docScript01) from performing a "full upgrade", which may be appropriate if you want to test against a base release of Raspberry Pi OS.
+* <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
 
-	* [OctoPrint Docker](https://github.com/OctoPrint/octoprint-docker) seems to not like the 64-bit kernel but it is not clear whether the problem is the kernel, that I'm running it on a Raspberry Pi 3B+, or something intrinsic to the way the container is built.
+	- [OctoPrint Docker](https://github.com/OctoPrint/octoprint-docker) seems to not like the 64-bit kernel but it is not clear whether the problem is the kernel, that I'm running it on a Raspberry Pi 3B+, or something intrinsic to the way the container is built.
 
 	If you enable the 64-bit kernel by setting `PREFER_64BIT_KERNEL` to `true`, but you later decide to revert to the 32-bit kernel:
 
@@ -362,7 +365,7 @@ You **can** set the right hand side of:
 	$ sudo reboot
 	```  
 
-3. <a name="disableVMswap">`DISABLE_VM_SWAP`</a> to `true` to disable virtual memory (VM) swapping to mass storage. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
+* <a name="disableVMswap">`DISABLE_VM_SWAP`</a> to `true` to disable virtual memory (VM) swapping to mass storage. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
 
 	Running out of RAM causes swapping to occur and that, in turn, has both a performance penalty (because SD cards are quite slow) and increases the wear and tear on the SD card (leading to a heightened risk of failure). There are two main causes of limited RAM:
 
@@ -379,17 +382,31 @@ You **can** set the right hand side of:
 	You can always check if swapping is enabled using the `swapon -s` command. Silence means swapping is disabled.
 
 	It is important to appreciate that VM swapping is not **bad**. Please don't disable swapping without giving it some thought. If you can afford to add an SSD, you'll get a better result with swapping enabled than if you stick with the SD and disable swapping.
- 
-4. `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true` if you want the "supervised" version of Home Assistant to be installed. With PiBuilder+IOTstack you have the choice of:
 
-	* The supervised installation (a set of Docker containers managed outside of IOTstack); or
-	* A standalone `home_assistant` container selectable from the IOTstack menu "Build Stack" option.
+* `LOCALE_LANG` to a valid language descriptor but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial. "en_GB.UTF-8" is the default language and I recommend leaving that enabled in any locale patch that you create.
+* <a name="enablePiCam">`ENABLE_PI_CAMERA`</a> controls whether the Raspberry Pi ribbon-cable camera support is enabled at boot time.
+
+	- `false` (or undefined) means "do not attempt to enable the camera".
+	- `true` means "enable the camera in the mode that is native for the version of Raspberry Pi OS that is running".
+	- `legacy`, if the Raspberry Pi is running:
+		- *Buster*, then `legacy` is identical to `true`;
+		- *Bullseye* the legacy camera system is loaded rather than the native version. In other words, Bullseye's camera system behaves like Buster and earlier. This is the setting to use if downstream applications have not been updated to use Bullseye's native camera system. 
+
+* `DOCKER_COMPOSE_VERSION` is the version of docker-compose to be installed. See the [releases page](https://github.com/docker/compose/releases) for current version numbers. Unfortunately, it is not yet possible to use a generic value like "native". Also note that version numbers begin with the letter "v". In other words, "v2.3.3" is correct while "2.3.3" will fail.
+* `DOCKER_COMPOSE_ARCHITECTURE`. Valid values are `armv7` and `aarch64`. [Script 04](#docScript04) chooses `aarch64` if the full 64-bit OS is running, `armv7` otherwise. In essence, if the Raspberry Pi is running a version of Raspberry Pi OS which is *capable* of running in 32-bit user mode, [Script 04](#docScript04) will choose `armv7` irrespective of whether the kernel is running in 32- or 64-bit mode. This variable lets you override that behaviour and force the choice.
+* `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true` if you want the "supervised" version of Home Assistant to be installed. With PiBuilder+IOTstack you have the choice of:
+
+	- The supervised installation (a set of Docker containers managed outside of IOTstack); or
+	- A standalone `home_assistant` container selectable from the IOTstack menu "Build Stack" option.
 
 	You can't have both. The standalone container can be installed at any point in your IOTstack journey. Conversely, the supervised installation must be installed at system build time. You can't (easily) change your mind later so please make the decision now and choose wisely.
 
 	Note:
 
 	* The IOTstack menu also has a "native install" for hass.io. The script that option relies upon is currently broken (upstream of IOTstack). PiBuilder is the replacement.
+
+* `HOME_ASSISTANT_AGENT_RELEASE` lets you choose the version number of the Supervised Home Assistant agent. See the [releases](https://github.com/home-assistant/os-agent/releases/latest) page.
+* `SQLITEYEAR` and `SQLITEVERSION` let you choose the values which govern the version of SQLite that is installed, if you run the optional [Script 06](#docScript06). See the [releases](https://www.sqlite.org/download.html) page.
 
 ##### <a name="perHostConfigOptions"> per-host PiBuilder installation options </a>
 
@@ -839,14 +856,17 @@ The script:
 
 * Assumes fresh install of Raspberry Pi OS.
 * Snapshots `/etc` as `/etc-baseline` (a baseline reference).
+* Snapshots `/boot/cmdline.txt` and `/boot/config.txt` (baseline references).
 * Initialises `~/.ssh` and `~/.gnupg` directories with correct permissions (700).
 * If the operating system is Raspbian Buster, adds support for fetching `libseccomp2` as a backport (needed for Alpine-based Docker images).
-* Runs full OS update/upgrade followed by an autoremove.
+* Runs an OS update.
+* Runs an OS full-upgrade followed by an autoremove unless [`SKIP_FULL_UPGRADE`](#skipFullUpgrade) is `true`.
 * Optionally replaces `/etc/ssh` with a preset.
 * Sets the user password.
 * Sets up VNC with the same password (but does NOT activate VNC)
 * Optionally sets up locale(s).
 * Optionally enables the 64-bit kernel (see [`PREFER_64BIT_KERNEL`](#prefer64BitKernel)).
+* Optionally enables the Raspberry Pi ribbon-cable camera (see [`ENABLE_PI_CAMERA`](#enablePiCam)).
 * Sets raspi-config options:
 
 	- boot to console
@@ -1482,6 +1502,15 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
 ## <a name="changeLog"> Change Summary </a>
+
+* 2022-03-10
+
+	- Bump docker-compose to v2.3.3 (this version supports `device_cgroup_rules` - see [PR9251](https://github.com/docker/compose/pull/9251))
+	- Rename `SKIP_FULL_UPDATE` to `SKIP_FULL_UPGRADE`.
+	- Document `SKIP_FULL_UPGRADE`.
+	- Add `ENABLE_PI_CAMERA` documentation.
+	- Remove recommendation to stick with Buster for camera support.
+	- Update SQLite version numbers.
 
 * 2022-02-10
 
