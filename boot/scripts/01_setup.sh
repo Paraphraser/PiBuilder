@@ -56,7 +56,7 @@ fi
 echo "Running sudo apt update"
 sudo apt update
 
-if [ "$SKIP_FULL_UPDATE" = "false" ] ; then
+if [ "$SKIP_FULL_UPGRADE" = "false" ] ; then
    echo "Running sudo apt full-upgrade -y"
    sudo apt full-upgrade -y
    sudo apt autoremove -y
