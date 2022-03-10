@@ -22,6 +22,10 @@ DISABLE_VM_SWAP=false
 #   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
 #LOCALE_LANG="en_GB.UTF-8"
 
+# - Raspberry Pi ribbon-cable camera control
+#   Options are: disabled, "false", "true" and "legacy"
+#ENABLE_PI_CAMERA=false
+
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
 #DOCKER_COMPOSE_VERSION="v2.3.3"

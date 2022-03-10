@@ -54,20 +54,38 @@ install_packages() {
 }
 
 
+# a function to return the OS version name
+# Example:
+#   running_OS_release
+# returns a string containing the OS name (eg bullseye) if and only if
+# 1. /etc/os-release exists
+# 2. /etc/os-release defines the VERSION_CODENAME variable
+# 3. VERSION_CODENAME is non-null
+# Otherwise returns "unknown" and sets exit code 1
+
+running_OS_release() {
+   if [ -e "/etc/os-release" ] ; then
+      . "/etc/os-release"
+      if [ -n "$VERSION_CODENAME" ] ; then
+         echo "$VERSION_CODENAME"
+         return 0
+      fi
+   fi
+   echo "unknown"
+   return 1
+}
+
+
 # a function to check whether OS version conditions apply.
 # Example:
 #   is_running_OS_release buster
-# returns true if and only if:
-# 1. /etc/os-release exists
-# 2. the version codename matches the expected argument in $1
+# returns true if and only if the result of running_OS_release matches
+# the expected argument in $1, otherwise returns false
 
 is_running_OS_release() {
-   if [ \
-      -e "/etc/os-release" \
-      -a $(grep -c "^VERSION_CODENAME=$1" /etc/os-release) -gt 0 \
-   ] ; then
+   if [ "$(running_OS_release)" = "$1" ] ; then
       return 0
-   fi
+   fi 
    return 1
 }
 

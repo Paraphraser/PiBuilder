@@ -110,6 +110,31 @@ if [ ! "$(uname -m)" = "aarch64" ] ; then
   fi
 fi
 
+# see if Raspberry Pi ribbon-cable camera should be enabled
+case "$(running_OS_release)+$ENABLE_PI_CAMERA" in
+
+   "buster+legacy" ) ;&
+   "buster+true" )
+      echo "Enabling Raspberry Pi ribbon-cable camera"
+      sudo raspi-config nonint do_camera 0
+      ;;
+
+   "bullseye+legacy" )
+      echo "Enabling Raspberry Pi ribbon-cable camera in legacy mode"
+      sudo raspi-config nonint do_legacy 0
+      ;;
+
+   "bullseye+true" )
+      echo "Enabling Raspberry Pi ribbon-cable camera in bullseye mode"
+      sudo raspi-config nonint do_camera 0
+      ;;
+
+   *)
+      echo "Raspberry Pi ribbon-cable camera not enabled"
+      ;;
+
+esac
+
 # run the script epilog if it exists (best to run before rasp-config)
 run_pibuilder_epilog
 
