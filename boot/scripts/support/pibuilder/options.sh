@@ -6,8 +6,8 @@ LOCALCC="AU"
 # - local time-zone
 LOCALTZ="Etc/UTC"
 
-# - skip full update in the 01 script.
-SKIP_FULL_UPDATE=false
+# - skip full upgrade in the 01 script.
+SKIP_FULL_UPGRADE=false
 
 # - preference for kernel. Only applies to 32-bit installations. If
 #   true, adds "arm_64bit=1" to /boot/config.txt
@@ -40,5 +40,5 @@ HOME_ASSISTANT_SUPERVISED_INSTALL=false
 
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
-SQLITEYEAR="2021"
-SQLITEVERSION="sqlite-autoconf-3370000"
+SQLITEYEAR="2022"
+SQLITEVERSION="sqlite-autoconf-3380000"
