@@ -58,6 +58,20 @@ wget
 network-manager
 HASSIO_PACKAGES
 
+# canned general advisory if docker install script returns an error
+read -r -d '' DOCKERFAIL <<-EOM
+========================================================================
+The docker installation script stopped because of an error. This is not
+a problem in the PiBuilder $SCRIPT script. It is a problem in the script
+supplied by Docker that is downloaded from https://get.docker.com. You
+will need to examine the output above to determine why the installation
+failed. Best case is that the problem is transient so waiting a while
+and re-running $SCRIPT might let you proceed. Worst case is that the
+problem is persistent which MAY indicate that the cause is something
+about your networking arrangements or your ISP.
+========================================================================
+EOM
+
 # we expect HOME_ASSISTANT_SUPERVISED_INSTALL to be set in the options file
 # which is imported above. If HOME_ASSISTANT_SUPERVISED_INSTALL is not defined
 # in the options file then we set it here with a default of false (do not install)
@@ -169,8 +183,12 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
          install_packages "$PACKAGES"
 
          # install Docker
-         echo "Installing docker"
+         echo "Installing docker (pre HA)"
          curl -fsSL https://get.docker.com | sudo sh
+         if [ $? -ne 0 ] ; then
+            echo "$DOCKERFAIL"
+            exit 1
+         fi
 
          # iterate home assistant components
          echo "Installing Home Assistant"
@@ -227,6 +245,10 @@ else
    # otherwise just install Docker
    echo "Installing docker"
    curl -fsSL https://get.docker.com | sudo sh
+   if [ $? -ne 0 ] ; then
+      echo "$DOCKERFAIL"
+      exit 1
+   fi
 
 fi
 
