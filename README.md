@@ -81,6 +81,8 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [About `~/.ssh`](#aboutDotSSH)
 	- [Security of snapshots](#snapshotSecurity)
 
+- [Some words about VNC](#aboutVNC)
+
 - [Change Summary](#changeLog)
 
 ## <a name="definitions"> Definitions </a>
@@ -1501,7 +1503,17 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
+## <a name="aboutVNC"> Some words about VNC </a>
+
+PiBuilder disables VNC. To understand why, and to find instructions on how to enable VNC, please see:
+
+* [VNC + PiBuilder](tutorials/vnc.md)
+
 ## <a name="changeLog"> Change Summary </a>
+
+* 2022-03-15
+
+	- Add instructions for enabling VNC
 
 * 2022-03-10
 

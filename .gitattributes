@@ -6,3 +6,6 @@
 *.gz*     binary
 *.zip*    binary
 *.tar.gz* binary
+*.png     binary
+*.jpg     binary
+*.pdf     binary
