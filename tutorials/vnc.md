@@ -173,7 +173,7 @@ $ sudo systemctl restart vncserver-x11-serviced
 
 The `vncpasswd` command prompts twice for a new password. The `restart` causes the change to take effect.
 
-## <a name="aboutlxpanel"> one more thing – `lxpanel` </a>
+## <a name="aboutlxpanel"> about `lxpanel` </a>
 
 As well as avoiding hangs on reboot, setting the Raspberry Pi boot mode to "Console" stops the `lxpanel` daemon from launching at boot time.
 
