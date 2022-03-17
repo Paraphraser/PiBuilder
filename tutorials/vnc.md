@@ -189,5 +189,5 @@ $ sudo killall lxpanel
 $ sudo reboot
 ```
 
-I took the view that Raspberry Pi's running IOTstack were there to provide reliable services for IoT devices, that VNC was a nice-to-have, but that the occasional misbehaviour by `lxpanel` leading to service interruption meant that I should do without VNC.
+I took the view that Raspberry Pis running IOTstack were there to provide reliable services for IoT devices, that VNC was a nice-to-have, but that the occasional misbehaviour by `lxpanel` leading to service interruption meant that I should do without VNC.
 
