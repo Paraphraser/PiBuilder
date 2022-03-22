@@ -30,10 +30,11 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
    cp "$SOURCE" "$TARGET"
 fi
 
-echo "Adding mkdocs support"
-pip install -U mkdocs
-pip install -U mkdocs-awesome-pages-plugin
-pip install -U mkdocs-material
+TARGET="$HOME/IOTstack/requirements-mkdocs.txt"
+if [ -e "$TARGET" ] ; then
+   echo "Adding mkdocs support (eg mkdocs serve -a 0.0.0.0:8765)" 
+   pip3 install -r "$TARGET"
+fi
 
 # run the script epilog if it exists
 run_pibuilder_epilog
