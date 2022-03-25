@@ -327,7 +327,7 @@ DISABLE_VM_SWAP=false
 
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.3.3"
+#DOCKER_COMPOSE_VERSION="v2.3.4"
 # - override for docker-compose architecture. Options are:
 #     armv7
 #     aarch64
@@ -394,7 +394,7 @@ You **can** set the right hand sides of the following variables:
 		- *Buster*, then `legacy` is identical to `true`;
 		- *Bullseye* the legacy camera system is loaded rather than the native version. In other words, Bullseye's camera system behaves like Buster and earlier. This is the setting to use if downstream applications have not been updated to use Bullseye's native camera system. 
 
-* `DOCKER_COMPOSE_VERSION` is the version of docker-compose to be installed. See the [releases page](https://github.com/docker/compose/releases) for current version numbers. Unfortunately, it is not yet possible to use a generic value like "native". Also note that version numbers begin with the letter "v". In other words, "v2.3.3" is correct while "2.3.3" will fail.
+* `DOCKER_COMPOSE_VERSION` is the version of docker-compose to be installed. See the [releases page](https://github.com/docker/compose/releases) for current version numbers. Unfortunately, it is not yet possible to use a generic value like "native". Also note that version numbers begin with the letter "v". In other words, "v2.3.4" is correct while "2.3.4" will fail.
 * `DOCKER_COMPOSE_ARCHITECTURE`. Valid values are `armv7` and `aarch64`. [Script 04](#docScript04) chooses `aarch64` if the full 64-bit OS is running, `armv7` otherwise. In essence, if the Raspberry Pi is running a version of Raspberry Pi OS which is *capable* of running in 32-bit user mode, [Script 04](#docScript04) will choose `armv7` irrespective of whether the kernel is running in 32- or 64-bit mode. This variable lets you override that behaviour and force the choice.
 * `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true` if you want the "supervised" version of Home Assistant to be installed. With PiBuilder+IOTstack you have the choice of:
 
@@ -1517,7 +1517,7 @@ PiBuilder disables VNC. To understand why, and to find instructions on how to en
 
 * 2022-03-10
 
-	- Bump docker-compose to v2.3.3 (this version supports `device_cgroup_rules` - see [PR9251](https://github.com/docker/compose/pull/9251))
+	- Bump docker-compose to v2.3.4 (this version supports `device_cgroup_rules` - see [PR9251](https://github.com/docker/compose/pull/9251))
 	- Rename `SKIP_FULL_UPDATE` to `SKIP_FULL_UPGRADE`.
 	- Document `SKIP_FULL_UPGRADE`.
 	- Add `ENABLE_PI_CAMERA` documentation.

@@ -260,7 +260,7 @@ echo "Installing docker-compose"
 
 # apply defaults for docker-compose (can be overridden in options.sh)
 # https://github.com/docker/compose/releases
-DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.3.3"}"
+DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.3.4"}"
 if is_running_OS_64bit ; then
    DOCKER_COMPOSE_ARCHITECTURE="${DOCKER_COMPOSE_ARCHITECTURE:-"aarch64"}"
 else

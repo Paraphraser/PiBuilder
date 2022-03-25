@@ -28,7 +28,7 @@ DISABLE_VM_SWAP=false
 
 # - override for docker-compose version number. See:
 #     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.3.3"
+#DOCKER_COMPOSE_VERSION="v2.3.4"
 # - override for docker-compose architecture. Options are:
 #     armv7
 #     aarch64

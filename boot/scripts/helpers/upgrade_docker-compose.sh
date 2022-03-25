@@ -8,8 +8,8 @@
 # This script can be invoked as:
 #
 # 1. sudo ./upgrade_docker-compose.sh
-# 2. sudo ./upgrade_docker-compose.sh v2.3.3
-# 3. sudo DOCKER_COMPOSE_VERSION=v2.3.3 ./upgrade_docker-compose.sh
+# 2. sudo ./upgrade_docker-compose.sh v2.3.4
+# 3. sudo DOCKER_COMPOSE_VERSION=v2.3.4 ./upgrade_docker-compose.sh
 #
 # The parameter takes precedence over the environment variable if both
 # are used.
@@ -23,7 +23,7 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_PLATFORM=linux ./upgrade_docker-compose.sh v2.3.3
+#  DOCKER_COMPOSE_PLATFORM=linux ./upgrade_docker-compose.sh v2.3.4
 #
 # -----
 #
@@ -34,12 +34,12 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./upgrade_docker-compose.sh v2.3.3
+#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./upgrade_docker-compose.sh v2.3.4
 #
 # -----
 #
 # Despite the name, this script will also downgrade. If, for example,
-# you are running docker-compose v2.3.3 and want to revert to v2.2.2
+# you are running docker-compose v2.3.4 and want to revert to v2.3.4
 # the script will do that.
 #
 
@@ -50,7 +50,7 @@
 SCRIPT=$(basename "$0")
 
 # the default version of docker-compose at the moment is
-DOCKER_COMPOSE_VERSION_DEFAULT="v2.3.3"
+DOCKER_COMPOSE_VERSION_DEFAULT="v2.3.4"
 
 # at most one argument
 if [ "$#" -gt 1 ]; then
