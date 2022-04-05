@@ -1511,6 +1511,21 @@ PiBuilder disables VNC. To understand why, and to find instructions on how to en
 
 ## <a name="changeLog"> Change Summary </a>
 
+* 2022-04-05
+
+	- Workaround for [PiBuilder issue 4](https://github.com/Paraphraser/PiBuilder/issues/4) / [HA issue 207](https://github.com/home-assistant/supervised-installer/issues/207). Manifests in 04 script as:
+
+		```
+		cp: cannot stat '/etc/default/grub': No such file or directory
+		```
+		
+		Related info:
+		 
+		* [HA issue 3444](https://github.com/home-assistant/supervisor/issues/3444)
+		* [HA PR 201](https://github.com/home-assistant/supervised-installer/pull/201)
+		* [HA PR 206](https://github.com/home-assistant/supervised-installer/pull/206)
+
+
 * 2022-03-15
 
 	- Add instructions for enabling VNC

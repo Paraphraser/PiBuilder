@@ -190,6 +190,15 @@ if [ "$HOME_ASSISTANT_SUPERVISED_INSTALL" = "true" ] ; then
             exit 1
          fi
 
+         # workaround a bug in the HA installer. References:
+         #  https://github.com/Paraphraser/PiBuilder/issues/4
+         #  https://github.com/home-assistant/supervisor/issues/3444
+         #  https://github.com/home-assistant/supervised-installer/pull/201
+         #  https://github.com/home-assistant/supervised-installer/pull/206
+         #  https://github.com/home-assistant/supervised-installer/issues/207
+         echo "Installing workaround for HA issue 207"
+         echo "systemd.unified_cgroup_hierarchy=false" | sudo tee /etc/default/grub
+
          # iterate home assistant components
          echo "Installing Home Assistant"
          for DEB in "$AGENT_DEB" "$PACKAGE_DEB" ; do
