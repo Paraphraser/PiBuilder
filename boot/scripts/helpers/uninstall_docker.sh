@@ -30,20 +30,6 @@ if [ "$(uname -s)" !=  "Linux" -o -z "$(which apt)" ] ; then
 
 fi
 
-# check for supervised home assistant
-if apt list homeassistant-supervised 2>/dev/null | grep -q "installed" ; then
-
-   echo "homeassistant-supervised appears to be installed. Removing docker will"
-   echo "take homeassistant-supervised with it but the auto-removal also leaves"
-   echo "a mess. If you really want to proceed with removing docker, you should"
-   echo "run these commands first:"
-   echo "   \$ ./uninstall_homeassistant-supervised.sh"
-   echo "   \$ sudo reboot"
-   echo "and then re-run this script to remove docker."
-   exit 1
-
-fi
-
 # no containers should be running
 if [ -n "$(docker ps -a -q)" ] ; then
 

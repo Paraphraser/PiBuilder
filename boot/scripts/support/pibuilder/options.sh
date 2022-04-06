@@ -36,12 +36,6 @@ DISABLE_VM_SWAP=false
 #   default) while aarch64 will only work on a 64-bit kernel.
 #DOCKER_COMPOSE_ARCHITECTURE="armv7"
 
-# set true to install Home Assistant supervised
-HOME_ASSISTANT_SUPERVISED_INSTALL=false
-# - override for Home Assistant agent version number. See:
-#      https://github.com/home-assistant/os-agent/releases/latest
-#HOME_ASSISTANT_AGENT_RELEASE="1.2.2"
-
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"

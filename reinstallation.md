@@ -8,8 +8,8 @@ A lot of issues raised on [SensorsIot/IOTstack](https://github.com/SensorsIot/IO
 	- [Assumption 1 – if you didn't use PiBuilder](#assumption1)
 	- [Assumption 2 – if you did use PiBuilder](#assumption2)
 
-- [Uninstalling docker, docker-compose and home assistant](#uninstalling)
-- [Re-installing docker, docker-compose and home assistant](#reinstalling)
+- [Uninstalling docker and docker-compose](#uninstalling)
+- [Re-installing docker and docker-compose](#reinstalling)
 
 <hr>
 
@@ -74,23 +74,14 @@ On balance, it just seemed simpler to assume `/boot/scripts` for everything.
 
 ## <a name="uninstalling"> Uninstalling – getting a clean slate </a>
 
-1. Is supervised home assistant installed? If it is, run:
-
-	```bash
-	$ /boot/scripts/helpers/uninstall_homeassistant-supervised.sh
-	$ sudo reboot
-	```
-
-	It is safe to run this command even if you are not sure whether supervised home assistant is installed.
-
-2. Is any part of IOTstack running? If yes, run:
+1. Is any part of IOTstack running? If yes, run:
 
 	```bash
 	$ cd ~/IOTstack
 	$ docker-compose down
 	```
 
-3. Are any other containers running, such as might have been started with `docker run`? If yes, you need to terminate each one. Here's an example:
+2. Are any other containers running, such as might have been started with `docker run`? If yes, you need to terminate each one. Here's an example:
 
 	* List any running containers:
 
@@ -113,7 +104,7 @@ On balance, it just seemed simpler to assume `/boot/scripts` for everything.
 
 	Repeat this process until there are no more running containers.
 
-4. Uninstall docker and docker-compose:
+3. Uninstall docker and docker-compose:
 
 	```bash
 	$ /boot/scripts/helpers/uninstall_docker.sh
@@ -125,23 +116,15 @@ On balance, it just seemed simpler to assume `/boot/scripts` for everything.
 
 ## <a name="reinstalling"> Re-installing docker, docker-compose</a>
 
-PiBuilder's `04_setup.sh` script installs docker and docker-compose, and can install supervised home assistant as an option. You need to make the decision:
+PiBuilder's `04_setup.sh` script installs docker and docker-compose:
 
-* Option 1 - if you **don't** want supervised home assistant to be installed:
-
-	```bash
-	$ /boot/scripts/04_setup.sh false
-	```
-
-* Option 2 - if you **do** want supervised home assistant to be installed:
-
-	```bash
-	$ /boot/scripts/04_setup.sh true
-	``` 
+```bash
+$ /boot/scripts/04_setup.sh
+```
 
 It is **not** appropriate to run `04_setup.sh` unless you have just gone through all the steps in [Uninstalling – getting a clean slate](#uninstalling).
 
-The `04_setup.sh` script ends with a reboot. If you passed "true" to then supervised home assistant will start automatically after the reboot. To restart your IOTstack:
+The `04_setup.sh` script ends with a reboot. To restart your IOTstack:
 
 ```bash
 $ cd ~/IOTstack

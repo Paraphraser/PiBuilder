@@ -71,7 +71,7 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 - [Keeping in sync with GitHub](#moreGit)
 - [Upgrading docker-compose](#upgradeCompose)
 
-	- [Reinstalling docker, docker-compose or home assistant](#reinstallation)
+	- [Reinstalling docker or docker-compose](#reinstallation)
 
 - [Beware of chickens and eggs](#chickenEgg)
 
@@ -82,6 +82,8 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [Security of snapshots](#snapshotSecurity)
 
 - [Some words about VNC](#aboutVNC)
+
+- [About Supervised Home Assistant](#hassioBackground)
 
 - [Change Summary](#changeLog)
 
@@ -192,7 +194,7 @@ If you don't see "OK", start over!
 
 	Once you are running full 64-bit, you have no ability to chop and change.
 
-	Please don't pick a 64-bit image as your starting point for no better reason than "64-bit must be better than 32-bit". PiBuilder will install 64-bit versions of everything, including docker, docker-compose and Supervised Home Assistant, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you are upgrading from a 32-bit system, you will need to assure yourself that all your containers still work as expected.
+	Please don't pick a 64-bit image as your starting point for no better reason than "64-bit must be better than 32-bit". PiBuilder will install 64-bit versions of everything, including docker and docker-compose, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you are upgrading from a 32-bit system, you will need to assure yourself that all your containers still work as expected.
 
 ### <a name="burnImage"> Transfer Raspbian image to SD or SSD </a>
 
@@ -335,12 +337,6 @@ DISABLE_VM_SWAP=false
 #   default) while aarch64 will only work on a 64-bit kernel.
 #DOCKER_COMPOSE_ARCHITECTURE="armv7"
 
-# set true to install Home Assistant supervised
-HOME_ASSISTANT_SUPERVISED_INSTALL=false
-# - override for Home Assistant agent version number. See:
-#      https://github.com/home-assistant/os-agent/releases/latest
-#HOME_ASSISTANT_AGENT_RELEASE="1.2.2"
-
 # only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
@@ -396,18 +392,6 @@ You **can** set the right hand sides of the following variables:
 
 * `DOCKER_COMPOSE_VERSION` is the version of docker-compose to be installed. See the [releases page](https://github.com/docker/compose/releases) for current version numbers. Unfortunately, it is not yet possible to use a generic value like "native". Also note that version numbers begin with the letter "v". In other words, "v2.4.1" is correct while "2.4.1" will fail.
 * `DOCKER_COMPOSE_ARCHITECTURE`. Valid values are `armv7` and `aarch64`. [Script 04](#docScript04) chooses `aarch64` if the full 64-bit OS is running, `armv7` otherwise. In essence, if the Raspberry Pi is running a version of Raspberry Pi OS which is *capable* of running in 32-bit user mode, [Script 04](#docScript04) will choose `armv7` irrespective of whether the kernel is running in 32- or 64-bit mode. This variable lets you override that behaviour and force the choice.
-* `HOME_ASSISTANT_SUPERVISED_INSTALL` to `true` if you want the "supervised" version of Home Assistant to be installed. With PiBuilder+IOTstack you have the choice of:
-
-	- The supervised installation (a set of Docker containers managed outside of IOTstack); or
-	- A standalone `home_assistant` container selectable from the IOTstack menu "Build Stack" option.
-
-	You can't have both. The standalone container can be installed at any point in your IOTstack journey. Conversely, the supervised installation must be installed at system build time. You can't (easily) change your mind later so please make the decision now and choose wisely.
-
-	Note:
-
-	* The IOTstack menu also has a "native install" for hass.io. The script that option relies upon is currently broken (upstream of IOTstack). PiBuilder is the replacement.
-
-* `HOME_ASSISTANT_AGENT_RELEASE` lets you choose the version number of the Supervised Home Assistant agent. See the [releases](https://github.com/home-assistant/os-agent/releases/latest) page.
 * `SQLITEYEAR` and `SQLITEVERSION` let you choose the values which govern the version of SQLite that is installed, if you run the optional [Script 06](#docScript06). See the [releases](https://www.sqlite.org/download.html) page.
 
 ##### <a name="perHostConfigOptions"> per-host PiBuilder installation options </a>
@@ -697,107 +681,11 @@ Connect and login:
 $ ssh pi@iot-hub.local
 ```
 
-Whether Supervised Home Assistant is installed depends on two things:
+Run:
 
-* The value of the `HOME_ASSISTANT_SUPERVISED_INSTALL` variable set in your [configuration options](#configOptions); and
-* The value of an **optional** argument that you can pass to the `04_setup.sh` script.
-
-The table below explains the relationships:
-
-`HOME_ASSISTANT_SUPERVISED_INSTALL`      | Command (argument is optional)    | HA Installed?
-:---------------------------------------:|-----------------------------------|:-------------:
-*undefined* **or** `false`               | `/boot/scripts/04_setup.sh`       | no
-`true`                                   | `/boot/scripts/04_setup.sh`       | yes
-*undefined* **or** `false` **or** `true` | `/boot/scripts/04_setup.sh false` | no
-*undefined* **or** `false` **or** `true` | `/boot/scripts/04_setup.sh true`  | yes
-
-In other words:
-
-* if you do **not** pass an argument to the `04_setup.sh` script, Supervised Home Assistant will only be installed if `HOME_ASSISTANT_SUPERVISED_INSTALL=true`.
-* if you **do** pass an argument to the `04_setup.sh` script, Supervised Home Assistant will only be installed if the value of that argument is the literal string `true`.
-
-The optional argument gives you the ability to override the installation of Supervised Home Assistant without forcing you to edit the [configuration options](#configOptions) file if you forgot to set `HOME_ASSISTANT_SUPERVISED_INSTALL` before copying the PiBuilder files to your boot volume.
-
-What you do next depends on whether you want to install Supervised Home Assistant:
-
-* If you do **not** want to install Supervised Home Assistant, proceed to [install Docker only](#runScript04NoHA).
-* If you **do** want to install Supervised Home Assistant, proceed to [install Docker + Home Assistant](#runScript04HA).
-
-#### <a name="runScript04NoHA"> install Docker only </a>
-
-This section assumes that you do **not** want to install Supervised Home Assistant. Run **ONE** of the following commands: 
-
-1. This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=false`:
-
-	```bash
-	$ /boot/scripts/04_setup.sh
-	```
-
-2. This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=true` but you want to override it:
-
-	```bash
-	$ /boot/scripts/04_setup.sh false
-	```
-
-The 04 script installs Docker and ends with a reboot. Go to [Script 05](#runScript05).
-
-#### <a name="runScript04HA"> install Docker + Home Assistant </a>
-
-This section assumes that you **do** want to install Supervised Home Assistant.
-
-> *The discussion below recommends that you connect your Raspberry Pi to Ethernet. I have installed Supervised Home Assistant, successfully, on a Raspberry Pi Zero W2. There is no Ethernet interface so, clearly, it works. A logical conclusion is that Supervised Home Assistant installer is now able to work around the problems that previously gave rise to the "use Ethernet" recommendation. What is unknown at this point is whether this new behaviour generalises to all Raspberry Pis. The Zero did hang but it was at the end of the 05 script. It's possible it was busy trying to get HA going and I was far too impatient. It came back OK after a power-cycle.* 
-
-One of Supervised Home Assistant's dependencies is Network Manager. Network Manager makes serious changes to your operating system, with side-effects you may not expect such as giving your Raspberry Pi's WiFi interface a random MAC address.
-
-> See [Why random MACs are such a hassle](https://sensorsiot.github.io/IOTstack/Containers/Home-Assistant/#why-random-macs-are-such-a-hassle) if you want a deeper understanding.
-
-You are in for a world of pain if you do not understand what is going to happen and take appropriate precautions:
-
-1. Make sure your Raspberry Pi is connected to Ethernet. This is only a temporary requirement. You can return to WiFi-only operation after Home Assistant is installed.
-2. When the Ethernet interface initialises, work out its IP address:
-
-	```bash
-	$ ifconfig eth0
-
-	eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-	        inet 192.168.132.9  netmask 255.255.255.0  broadcast 192.168.132.255
-	        ether ab:cd:ef:12:34:56  txqueuelen 1000  (Ethernet)
-	        RX packets 4166292  bytes 3545370373 (3.3 GiB)
-	        RX errors 0  dropped 0  overruns 0  frame 0
-	        TX packets 2086814  bytes 2024386593 (1.8 GiB)
-	        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-	```
-
-	In the above, the IP address assigned to the Ethernet interface is on the second line of output, to the right of "inet": 192.168.132.9.
-3. Disconnect from your Raspberry Pi by pressing <kbd>control</kbd>+<kbd>d</kbd>.
-4. Re-connect to your Raspberry Pi using its IP address. For example:
-
-	```bash
-	$ ssh pi@192.168.132.9
-	``` 
-
-	Connecting via IP address guarantees you are connected to your Raspberry Pi's Ethernet interface, whereas a multicast DNS address like `iot-hub.local` can connect to any available interface.
-
-	If you are challenged with the [TOFU pattern](#tofudef), respond with "yes". 
-
-5. Run **ONE** of the following commands:
-
-	* This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=true`:
-
-		```bash
-		$ /boot/scripts/04_setup.sh
-		```
-
-	* This command assumes `HOME_ASSISTANT_SUPERVISED_INSTALL=false` but you want to override it:
-
-		```bash
-		$ /boot/scripts/04_setup.sh true
-		```
-
-As well as installing Home Assistant and Docker, the 04 script:
-
-* alters the default Network Manager configuration and turns off random WiFi MAC addresses; and
-* reboots your Raspberry Pi.
+```bash
+$ /boot/scripts/04_setup.sh
+```
 
 #### <a name="runScript05"> Script 05 </a>
 
@@ -914,30 +802,17 @@ The script:
 
 ### <a name="docScript04"> Script 04 </a>
 
-The `HOME_ASSISTANT_SUPERVISED_INSTALL` variable is set in the [installation options](#configOptions).
+The script:
 
-* If `true` (or overridden to be `true`), the script:
-
-	- Displays a hint to choose either "raspberrypi3" or "raspberrypi4" when prompted by the Home Assistant installation process.
-	- Installs Home Assistant dependencies.
-	- Installs Docker.
-	- Installs the Home Assistant agent and package.
-	- Turns off random WiFi MAC address generation imposed by NetworkManager.
-
-* If `false' (or overridden to be `false`), the script only installs Docker.
-
-The script then continues and:
-
+* Installs Docker.
 * Sets up the `docker` and `bluetooth` group memberships assumed by IOTstack.
 * Installs Docker-Compose.
 * Installs the `ruamel.yaml` and `blessed` Python dependencies assumed by IOTstack.
 * Appends directives to `/boot/cmdline.txt`:
 
 	- `cgroup_memory=1 cgroup_enable=memory` (so `docker stats` will report memory utilisation)
-	- `apparmor=1 security=apparmor` (if Supervised Home Assistant is installed; so AppArmor will be enabled).
 
 * Reboots.
-
 
 ### <a name="docScript05"> Script 05 </a>
 
@@ -1385,9 +1260,9 @@ Note:
 
 * The `upgrade_docker-compose.sh` script is *reasonably* platform-agnostic. It works on Raspberry Pi (Buster and Bullseye) full 32-bit, mixed 32-bit user with 64-bit kernel, and full 64-bit OS. It also appears to work on macOS for Docker Desktop.
 
-### <a name="reinstallation"> Reinstalling docker, docker-compose and home assistant</a>
+### <a name="reinstallation"> Reinstalling docker or docker-compose</a>
 
-Read [reinstalling docker + docker-compose](reinstallation.md) if you need to reinstall docker or docker-compose or supervised home assistant.
+Read [reinstalling docker + docker-compose](reinstallation.md) if you need to reinstall docker or docker-compose.
 
 ## <a name="chickenEgg"> Beware of chickens and eggs </a>
 
@@ -1509,7 +1384,32 @@ PiBuilder disables VNC. To understand why, and to find instructions on how to en
 
 * [VNC + PiBuilder](tutorials/vnc.md)
 
+## <a name="hassioBackground"></a>About Supervised Home Assistant
+
+> The information below has been added to [IOTstack Pull Request 528](https://github.com/SensorsIot/IOTstack/pull/528) and should appear in the IOTstack documentation for Home Assistant once that Pull Request has been approved and applied.
+
+IOTstack used to offer a menu entry leading to a convenience script that could install Supervised Home Assistant. That script stopped working when Home Assistant changed their approach. The script's author [made it clear](https://github.com/Kanga-Who/home-assistant/blob/master/Supervised%20on%20Raspberry%20Pi%20with%20Debian.md) that script's future was bleak so the affordance was [removed from IOTstack](https://github.com/SensorsIot/IOTstack/pull/493).
+
+For a time, you could manually install Supervised Home Assistant using their [installation instructions for advanced users](https://github.com/home-assistant/supervised-installer). Once you got HA working, you could install IOTstack, and the two would (mostly) happily coexist.
+
+The direction being taken by the Home Assistant folks is to supply a [ready-to-run image for your Raspberry Pi](https://www.home-assistant.io/installation/raspberrypi). They still support the installation instructions for advanced users but the [requirements](https://github.com/home-assistant/architecture/blob/master/adr/0014-home-assistant-supervised.md#supported-operating-system-system-dependencies-and-versions) are very specific. In particular:
+
+> Debian Linux Debian 11 aka Bullseye (no derivatives)
+
+Raspberry Pi OS is a Debian *derivative* and it is becoming increasingly clear that the "no derivatives" part of that requirement must be taken literally and seriously. Recent examples of significant incompatibilities include:
+
+* [introducing a dependency on `grub` (GRand Unified Bootloader)](https://github.com/home-assistant/supervised-installer/pull/201). The Raspberry Pi does not use `grub` but the change is actually about forcing Control Groups version 1 when the Raspberry Pi uses version 2.
+* [unilaterally starting `systemd-resolved`](https://github.com/home-assistant/supervised-installer/pull/202). This is a DNS resolver which claims port 53. That means you can't your own DNS service like PiHole, AdGuardHome or BIND9 as an IOTstack container. 
+
+Because of the self-updating nature of Supervised Home Assistant, your Raspberry Pi might be happily running Supervised Home Assistant plus IOTstack one day, and suddenly start misbehaving the next day, simply because Supervised Home Assistant assumed it was in total control of your Raspberry Pi.
+
+If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
+
 ## <a name="changeLog"> Change Summary </a>
+
+* 2022-04-06
+
+	- Withdraw all support for Supervised Home Assistant. See [About Supervised Home Assistant](#hassioBackground) for more information.
 
 * 2022-04-05
 
