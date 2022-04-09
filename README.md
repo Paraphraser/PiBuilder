@@ -530,7 +530,7 @@ I have tried to make this a generic script but I don't have the ability to test 
 
 Note:
 
-* Do not activate the 64-bit kernel at this stage. Defer this until your system is running.
+* If you are starting from a 32-bit base image, don't activate the 64-bit kernel by hand. The simplest way to get a combined 64-bit kernel plus 32-bit user mode is to enable the [`PREFER_64BIT_KERNEL`](#prefer64BitKernel) option and let PiBuilder do it for you.
 
 ### <a name="bootRPi"> Boot your Raspberry Pi </a>
 
