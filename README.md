@@ -163,7 +163,7 @@ $ IMAGE=«pathToZip»
 $ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
 ```
 
-You get the «hash» either by clicking the `Show SHA256 file integrity hash` link. Here's an example:
+You get the «hash» by clicking the `Show SHA256 file integrity hash` link. Here's an example run:
 
 ```bash
 $ SIGNATURE=6e9faca69564c47702d4564b2b15997b87d60483aceef7905ef20ba63b9c6b2b
@@ -586,7 +586,7 @@ Now it is time to run the first script. You need to decide on a name for your Ra
 * digits ("0".."9")
 * hyphen ("-") **not** underscore
 
-Please don't use "raspberrypi". Always choose a **different** name that is unique on your network. Even if you only have a single Raspberry Pi, now, you have no idea what the future holds. You have only yourself to blame if you ever get into the situation where two or more Raspberry Pis are using the same name. It will confuse both you and your Raspberry Pis.
+Please don't use "raspberrypi". Always choose a **different** name that is unique on your network. Even if you only have a single Raspberry Pi, now, you have no idea what the future holds. You will have only yourself to blame if you ever get into the situation where two or more Raspberry Pis are using the same name. It will confuse both you and your Raspberry Pis.
 
 When you have chosen a name, substitute it for `iot-hub` in the following:
 
@@ -1399,7 +1399,7 @@ The direction being taken by the Home Assistant folks is to supply a [ready-to-r
 Raspberry Pi OS is a Debian *derivative* and it is becoming increasingly clear that the "no derivatives" part of that requirement must be taken literally and seriously. Recent examples of significant incompatibilities include:
 
 * [introducing a dependency on `grub` (GRand Unified Bootloader)](https://github.com/home-assistant/supervised-installer/pull/201). The Raspberry Pi does not use `grub` but the change is actually about forcing Control Groups version 1 when the Raspberry Pi uses version 2.
-* [unilaterally starting `systemd-resolved`](https://github.com/home-assistant/supervised-installer/pull/202). This is a DNS resolver which claims port 53. That means you can't your own DNS service like PiHole, AdGuardHome or BIND9 as an IOTstack container. 
+* [unilaterally starting `systemd-resolved`](https://github.com/home-assistant/supervised-installer/pull/202). This is a DNS resolver which claims port 53. That means you can't run your own DNS service like PiHole, AdGuardHome or BIND9 as an IOTstack container. 
 
 Because of the self-updating nature of Supervised Home Assistant, your Raspberry Pi might be happily running Supervised Home Assistant plus IOTstack one day, and suddenly start misbehaving the next day, simply because Supervised Home Assistant assumed it was in total control of your Raspberry Pi.
 
