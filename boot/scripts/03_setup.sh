@@ -131,7 +131,7 @@ fi
 if SOURCE="$(supporting_file "$HOME/crontab")" ; then
    echo "Setting up crontab from $SOURCE"
    mkdir ~/Logs
-   crontab "$SOURCE"
+   sed "s|«HOMEDIR»|$HOME|g" "$SOURCE" | crontab
 fi
 
 # guarantee ~/.local/bin exists

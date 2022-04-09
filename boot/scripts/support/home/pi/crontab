@@ -1,17 +1,53 @@
-# this is a crontab template. Replace it with your own crontab which
-# you can capture with
-#
-#    $ crontab -l >User.crontab
-#
-# Your own crontab should contain ALL of the lines below. The SHELL
-# HOME and PATH lines are important. Do not omit.
+##======================================================================
+##
+## This is a crontab template. If you have an existing crontab on
+## another system, you can capture it like this:
+##
+##    $ crontab -l >User.crontab
+##
+## Then, after you move User.crontab to this system, you can import it:
+##
+##    $ crontab User.crontab
+##
+##======================================================================
+##
+##   References:  man 5 crontab
+##                https://crontab.guru
+##
+##   Special keys:
+##
+##     Key       Meaning
+##     @yearly   Run once a year  yyyy-01-01 00:00:00
+##     @monthly  Run once a month yyyy-mm-01 00:00:00
+##     @weekly   Run once a week  yyyy-mm-ss 00:00:00 (ss = Sunday)
+##     @daily    Run once a day   yyyy-mm-dd 00:00:00
+##     @hourly   Run once an hour yyyy-mm-dd hh:00:00
+##     @reboot   Run at cron daemon startup
+##
+##   General command syntax:
+##
+##     *    *    *    *    *    command
+##     ┬    ┬    ┬    ┬    ┬
+##     │    │    │    │    └───── * = 0-7  day of week (0=7=Sunday)
+##     │    │    │    └────────── * = 1-12 month of year
+##     │    │    └─────────────── * = 1-31 day of month
+##     │    └──────────────────── * = 0-23 hour of day
+##     └───────────────────────── * = 0-59 minute of hour
+##
+##======================================================================
 
+# Your own crontab should contain the SHELL and PATH lines. Do not omit.
+# Fix PATH if «HOMEDIR»/.local/bin does not exist. You must use absolute
+# paths here. You can't use $HOME, ~ or $PATH (a crontab restriction).
 SHELL=/bin/bash
-HOME=/home/pi
-PATH=/home/pi/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=«HOMEDIR»/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# your timed commands go here (the next line is the syntax)
-#min hour mday month wday command
-
-# commands to run at reboot go here (the next line is the syntax)
-#@reboot command arguments...
+# example commands (these are all "live" - you should delete them)
+#min hour mday mon  wday command
+*/10 *    *    *    *    echo "hh:00 hh:10 hh:20 hh:30 hh:40 hh:50" >/dev/null
+10   */3  *    *    *    echo "00:10 03:10 06:10 09:10 12:10 ..."   >/dev/null
+15   9-17 *    *    *    echo "09:15 10:15  ...  16:15 17:15"       >/dev/null
+20   3    */7  *    *    echo "03:20 mod(julianDayOfYear,7)=0"      >/dev/null
+59   23   30   6    *    echo "23:59 yyyy-06-30"                    >/dev/null
+0    7    *    *    1    echo "Rise and shine! It's 7am Monday!"    >/dev/null
+@reboot                  echo "cron daemon starts after reboot"     >/dev/null

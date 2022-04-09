@@ -1407,6 +1407,10 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 
 ## <a name="changeLog"> Change Summary </a>
 
+* 2022-04-09
+
+	- Fix `/home/pi` assumption in crontab template. Also expands template to provide a lot more inline help text. 
+
 * 2022-04-06
 
 	- Withdraw all support for Supervised Home Assistant. See [About Supervised Home Assistant](#hassioBackground) for more information.
@@ -1418,7 +1422,7 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 		```
 		cp: cannot stat '/etc/default/grub': No such file or directory
 		```
-		
+
 		Related info:
 		 
 		* [HA issue 3444](https://github.com/home-assistant/supervisor/issues/3444)
@@ -1445,7 +1449,7 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 	- Add scripts for uninstalling then reinstalling docker, docker-compose and supervised home assistant.
 	- Add documentation explaining the new scripts.
 	- Rename scripts with `docker_compose` in the name to use `docker-compose`.
-	
+
 * 2022-02-09
 
 	- Adjust for revised layout of [Raspberry Pi OS](https://www.raspberrypi.com/software/operating-systems/) releases page.
@@ -1466,10 +1470,10 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 		$ git config --global rerere.enabled true
 		$ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 		```
-		
+
 	- Version of docker-compose PiBuilder installs by default bumped to v2.2.3.
 	- Script to [upgrade docker-compose](#upgradeCompose) added to helpers folder.
-	
+
 * 2022-01-09
 
 	- patch `journald.conf` to control excessive log messages in the following pattern ([stackoverflow](https://stackoverflow.com/questions/63622619/docker-flooding-syslog-with-run-docker-runtime-logs)):
