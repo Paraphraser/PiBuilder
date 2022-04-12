@@ -6,28 +6,20 @@
 # the name of this script is
 SCRIPT=$(basename "$0")
 
-if [ $# -eq 1 ] ; then
+# where is this script is running?
+WHERE=$(dirname "$(realpath "$0")")
 
-   HOSTNAME="$1"
-   read -s -p "New password for $USER@$HOSTNAME: " NEW_PASSWORD
-   echo ""
-   read -s -p "Re-enter new password: " CHK_PASSWORD
-   echo ""
-   if [ ! "$NEW_PASSWORD" = "$CHK_PASSWORD" ] ; then
-      echo "Passwords do not match!"
-      exit -1
-   fi
+# assume ssh trust does not need to be reset on the support host
+WARN_TRUST_RESET="false"
 
-else
+# note the current hostname
+SAVE_HOSTNAME="$HOSTNAME"
 
-   echo "Usage: $SCRIPT machinename {password}"
-   echo "       (will prompt for password if omitted)"
-   exit -1
-
-fi
+# allow an optional argument to overwrite the hostname
+HOSTNAME="${1:-"$HOSTNAME"}"
 
 # declare path to support directory and import common functions
-SUPPORT="/boot/scripts/support"
+SUPPORT="$WHERE/support"
 . "$SUPPORT/pibuilder/functions.sh"
 
 # import user options and run the script prolog - if they exist
@@ -77,6 +69,7 @@ if SOURCE="$(supporting_file "/etc/ssh/etc-ssh-backup.tar.gz")" ; then
    sudo chown root:root /etc/ssh
    sudo chmod 755 /etc/ssh
    sudo tar --same-owner -xzf "$SOURCE" -C /etc/ssh
+   WARN_TRUST_RESET="true"
 
 else
 
@@ -88,20 +81,6 @@ fi
 # remove all ssh presets from boot volume
 echo "Removing all /etc/ssh presets"
 sudo rm -rf $SUPPORT/etc/ssh
-
-# change the login password
-echo "Setting the user password"
-echo -e "$NEW_PASSWORD\n$NEW_PASSWORD" | sudo passwd $USER
-
-# make the VNC password the same
-TARGET="/etc/vnc/config.d/common.custom"
-if [ -d $(dirname "$TARGET") ] && SOURCE="$(supporting_file "$TARGET")" ; then
-   echo "Setting up VNC (even though it is not activated)"
-   sudo cp "$SOURCE" "$TARGET"
-   echo -e "$NEW_PASSWORD\n$NEW_PASSWORD" | sudo vncpasswd -file "$TARGET"
-   sudo chown root:root "$TARGET"
-   sudo chmod 644 "$TARGET"
-fi
 
 # see if 64-bit kernel should be enabled
 TARGET="/boot/config.txt"
@@ -148,11 +127,17 @@ run_pibuilder_epilog
 echo "Setting boot behaviour to console (no GUI)"
 sudo raspi-config nonint do_boot_behaviour B1
 
-echo "Setting WiFi country code to $LOCALCC"
-sudo raspi-config nonint do_wifi_country "$LOCALCC"
+# set/override WiFi country code as an option
+if [ -n "$LOCALCC" ] ; then
+   echo "Setting WiFi country code to $LOCALCC"
+   sudo raspi-config nonint do_wifi_country "$LOCALCC"
+fi
 
-echo "Setting time-zone to $LOCALTZ"
-sudo raspi-config nonint do_change_timezone "$LOCALTZ"
+# set timezone if provided and what is in effect are different
+if [ -n "$LOCALTZ" -a "$LOCALTZ" != "$(cat /etc/timezone)" ] ; then 
+   echo "Setting time-zone to $LOCALTZ"
+   sudo raspi-config nonint do_change_timezone "$LOCALTZ"
+fi
 
 # try to establish locales - seems best to do this last. Note the patch
 # should always retain "en_GB.UTF-8" so we don't pull the rug out from
@@ -162,12 +147,25 @@ if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
    sudo dpkg-reconfigure -f noninteractive locales
 fi
 
-# set the host name (produces errors)
-echo "Setting machine name to $HOSTNAME"
-sudo raspi-config nonint do_hostname "$HOSTNAME"
+# does the host name need to be updated?
+if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
 
-echo "Remember to do ssh-keygen -R raspberrypi.local then re-connect"
-echo "to this machine under the name $HOSTNAME."
+   # yes! set the host name (produces errors)
+   echo "Setting machine name to $HOSTNAME"
+   sudo raspi-config nonint do_hostname "$HOSTNAME"
+   WARN_TRUST_RESET="true"
+
+fi
+
+# has anything been done to invalidate known_hosts on the support host?
+if [ "$WARN_TRUST_RESET" = "true" ] ; then
+
+   # maybe - advise accordingly
+   echo "Remember to do ssh-keygen -R $SAVE_HOSTNAME.local"
+   echo "Reconnect using ssh $USER@$HOSTNAME.local"
+
+fi
+
 echo "$SCRIPT complete - rebooting..."
 sudo touch /boot/ssh
 sudo reboot

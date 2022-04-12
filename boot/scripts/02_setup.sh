@@ -6,13 +6,16 @@
 # the name of this script is
 SCRIPT=$(basename "$0")
 
+# where is this script is running?
+WHERE=$(dirname "$(realpath "$0")")
+
 if [ "$#" -gt 0 ]; then
     echo "Usage: $SCRIPT"
     exit -1
 fi
 
 # declare path to support directory and import common functions
-SUPPORT="/boot/scripts/support"
+SUPPORT="$WHERE/support"
 . "$SUPPORT/pibuilder/functions.sh"
 
 # import user options and run the script prolog - if they exist

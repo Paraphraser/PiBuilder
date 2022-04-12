@@ -1,10 +1,12 @@
 # this file is "sourced" in all build scripts.
 
 # - country-code for WiFi
-LOCALCC="AU"
+#   normally set in Raspberry Pi Imager - will override if made active
+#LOCALCC="AU"
 
 # - local time-zone
-LOCALTZ="Etc/UTC"
+#   normally set in Raspberry Pi Imager - will override if made active
+#LOCALTZ="Etc/UTC"
 
 # - skip full upgrade in the 01 script.
 SKIP_FULL_UPGRADE=false

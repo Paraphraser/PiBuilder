@@ -1,19 +1,20 @@
 # VNC + PiBuilder
 
-## <a name="toc"> contents </a>
+## <a name="toc"></a>contents
 
 - [why VNC is not enabled by default](#theStory)
 - [enabling VNC: the magic incantation](#magicIncantation)
 
-	- [Step 1: change the boot mode](#setBootMode)
-	- [Step 2: set the screen resolution](#setResolution)
-	- [Step 3: enable the service](#enableService)
+	- [Step 1: create a VNC password](#setPassword)
+	- [Step 2: change the boot mode](#setBootMode)
+	- [Step 3: set the screen resolution](#setResolution)
+	- [Step 4: enable the service](#enableService)
 
 - [connecting over VNC](#connectVNC)
 - [changing your VNC password](#passwordChange)
 - [about `lxpanel`](#aboutlxpanel)
 
-## <a name="theStory"> why VNC is not enabled by default </a>
+## <a name="theStory"></a>why VNC is not enabled by default
 
 A [thread on Discord](https://discord.com/channels/638610460567928832/638610461109256194/949203175758524499) began with the following post:
 
@@ -47,13 +48,39 @@ No! Far from it!
 
 It just means that, if you want VNC enabled on a system built by PiBuilder, you need to do it yourself *after* you have finished running PiBuilder's scripts.
 
-## <a name="magicIncantation"> enabling VNC: the magic incantation </a>
+## <a name="magicIncantation"></a>enabling VNC: the magic incantation
 
 Note:
 
 * These instructions refer to `raspi-config`. That Python application is constantly evolving and is forever adding, removing and altering menu options. If the screen shots here differ from what you see on your own screen, you will have to follow your nose.
 
-### <a name="setBootMode"> Step 1: change the boot mode to "boot to desktop with auto-login" </a>
+### <a name="setPassword"></a>Step 1: create a VNC password
+
+The PiBuilder 01 script **used** to set the VNC password to be the same as the password for user "pi". It was convenient to do that in the 01 script because, at that point in the build process, the default login password of "raspberry" was likely to be in effect. It was highly desirable to force a change away from the default password so it was really a case of killing two birds with one stone.
+
+The 2022-04-04 changes to Raspberry Pi OS removed both the default user and default password. At the point in the build process where the 01 script runs, it's safe to assume that the user has already set sensible credentials for the first user account.
+
+Also, setting the VNC and user passwords to be the same has always been a bit of a hack because VNC only recognises the first 8 characters of any password as significant.
+
+The revised PiBuilder 01 script no longer prompts for a password so it can't set up a VNC password. Instead, you run:
+
+```
+$ /boot/scripts/helpers/set_vnc_password.sh
+```
+
+Remember:
+
+* The `scripts` folder is copied onto your `/boot` partition from your support host so the `set_vnc_password.sh` script will only be in the `helpers` folder if you have done that since the 2022-04-04 changes went into effect.
+
+The `set_vnc_password.sh` script takes no arguments. It does all the work of:
+
+1. Prompting, twice, for a password; then
+2. Initialising /etc/vnc/config.d/common.custom; and
+3. If the VNC service is already running, restarting the service.
+
+You can use `set_vnc_password.sh` to initialise your first VNC password, or to change an existing VNC password.
+
+### <a name="setBootMode"></a>Step 2: change the boot mode to "boot to desktop with auto-login"
 
 1. Run the command:
 
@@ -79,7 +106,7 @@ Note:
 
 3. Wait for the system to reboot. If your Raspberry Pi appears to hang, remove and re-connect the power.
 
-### <a name="setResolution"> Step 2: set the VNC screen resolution </a>
+### <a name="setResolution"></a>Step 3: set the VNC screen resolution
 
 1. Run the command:
 
@@ -100,7 +127,7 @@ Note:
 
 3. You are returned to the `raspi-config` main menu.
 
-### <a name="enableService"> Step 3: enable the VNC service </a>
+### <a name="enableService"></a>Step 4: enable the VNC service
 
 1. Assuming the `raspi-config` application is still running…
 
@@ -119,7 +146,7 @@ Note:
 
 3. Wait for the system to reboot. If your Raspberry Pi appears to hang, remove and re-connect the power.
 
-## <a name="connectVNC"> connecting over VNC </a>
+## <a name="connectVNC"></a>connecting over VNC
 
 The basic URL is:
 
@@ -154,26 +181,11 @@ At that point, you should click on the <kbd>Next</kbd> button and follow your no
 2. Skipping the WiFi screen. WiFi is either already set up by PiBuilder or you told it not to do that by omitting `wpa_supplicant.conf`.
 3. Skipping the software update screen. PiBuilder has just done all that.
 
-## <a name="passwordChange"> changing your VNC password </a>
+## <a name="passwordChange"></a>changing your VNC password
 
-The PiBuilder 01 script uses the `vncpasswd` command to set the VNC password to be the same as the user "pi" password. That means the VNC password will already be in place when you enable the VNC service.
+The process for changing your password is the same as setting it up in the first place. See [Step 1: create a VNC password](#setPassword).
 
-The VNC password is stored as a hash in the following file:
-
-```
-/etc/vnc/config.d/common.custom
-```
-
-You can change the password by running the following commands:
-
-```bash
-$ sudo vncpasswd -file /etc/vnc/config.d/common.custom
-$ sudo systemctl restart vncserver-x11-serviced
-```
-
-The `vncpasswd` command prompts twice for a new password. The `restart` causes the change to take effect.
-
-## <a name="aboutlxpanel"> about `lxpanel` </a>
+## <a name="aboutlxpanel"></a>about `lxpanel`
 
 As well as avoiding hangs on reboot, setting the Raspberry Pi boot mode to "Console" stops the `lxpanel` daemon from launching at boot time.
 

@@ -1,6 +1,9 @@
 # PiBuilder
 
-## <a name="introduction"> Introduction </a>
+<h3 style="text-align:center;">Updated for 2022-04-04 changes to Raspberry Pi OS</p>
+<h4 style="text-align:center;">(first cut)</p>
+
+## <a name="introduction"></a>Introduction
 
 This project documents my approach to building Raspberry Pi operating systems to support [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack).
 
@@ -20,19 +23,18 @@ I have tested PiBuilder on:
 
 The scripts will *probably* work on other Raspberry Pi hardware but I have no idea about other hardware platforms (eg Nuc) or operating systems (eg Debian). I have nothing against either non- Raspberry Pi hardware or operating systems. I can only test with what I have.
 
-## <a name="toc"> Contents </a>
+## <a name="toc"></a>Contents
 
 - [Definitions](#definitions)
 - [Build process summary](#buildProcessSummary)
 - [The build process in detail](#buildProcessDetailed)
 
 	- [Download this repository](#downloadRepo)
-	- [Choose an imaging tool](#chooseTool)
+	- [Download the imaging tool](#downloadTool)
 	- [Choose and download a base image](#chooseImage)
-	- [Transfer Raspbian image to SD or SSD](#burnImage)
+	- [Configure and transfer Raspbian image to SD or SSD](#burnImage)
 	- [PiBuilder configuration](#configPiBuilder)
 
-		- [Configure WiFi](#configWiFi)
 		- [Configure installation options](#configOptions)
 		- [Git user configuration](#configGit)
 		- [SAMBA support](#sambaSupport)
@@ -87,23 +89,24 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 - [Change Summary](#changeLog)
 
-## <a name="definitions"> Definitions </a>
+## <a name="definitions"></a>Definitions
 
 * "your support host" means the system where you have cloned the PiBuilder repository. It will usually be a Mac or PC.
 * "`~/PiBuilder`" means the path to the directory where you have cloned the PiBuilder repository from GitHub onto your support host. The directory does not have to be in your home directory on your support host. It can be anywhere.
 * "your Raspberry Pi" means the Raspberry Pi device for which you are building an operating system using PiBuilder.
-* "iot-hub" is the example hostname for your Raspberry Pi. You can choose any name you like for your Raspberry Pi (save that "raspberrypi" is not recommended). Just substitute the name of your Raspberry Pi wherever you see "iot-hub".
+* "«hostname»" is a placeholder meaning "the name you chose for your Raspberry Pi".
+* "«username»" is a placeholder meaning "the account name you use to login to your Raspberry Pi".
 
-## <a name="buildProcessSummary"> Build process summary </a>
+## <a name="buildProcessSummary"></a>Build process summary
 
-1. Download this repository.
-2. Choose an imaging tool.
-3. Choose a Raspbian image.
-4. Use the imaging tool to transfer the Raspbian image to your media (SD card or SSD).
-5. Configure PiBuilder.
-6. Run the PiBuilder `setup_boot_volume.sh` script to add installation files to the media.
-7. Move the media to your Raspberry Pi and apply power.
-8. Connect to your Raspberry Pi using SSH and run the PiBuilder scripts in order.
+1. [Download this repository](#downloadRepo).
+2. [Download the imaging tool](#downloadTool).
+3. [Choose and download a Raspbian image](#chooseImage).
+4. Use the imaging tool to [configure and transfer the Raspbian image](#burnImage) to your media (SD card or SSD).
+5. [Configure PiBuilder](#configPiBuilder).
+6. Either run the PiBuilder [`setup_boot_volume.sh`](#setupPiBuilder) script to add installation files to the media, or just copy what's needed by hand.
+7. [Move the media to your Raspberry Pi and apply power](#bootRPi).
+8. Connect to your Raspberry Pi using SSH and [run the PiBuilder scripts in order](#runScripts).
 
 The end point is a system with IOTstack and all dependencies installed. You can either start building a Docker stack using the IOTstack menu or restore an IOTstack backup.
 
@@ -111,9 +114,9 @@ Please don't be put off by the length of this README document. You can start usi
 
 Later, when you start to customise your Raspberry Pi, you will realise that you might have trouble remembering all the steps if you ever have to rebuild your Raspberry Pi in a hurry (failed SD card; magic smoke; operator error). That's when the true power of PiBuilder will start to become apparent. You can dig into the how-to when you are ready.
 
-## <a name="buildProcessDetailed"> The build process in detail </a>
+## <a name="buildProcessDetailed"></a>The build process in detail
 
-### <a name="downloadRepo"> Download this repository </a>
+### <a name="downloadRepo"></a>Download this repository
 
 1. Download this repository from GitHub:
 
@@ -134,47 +137,43 @@ Later, when you start to customise your Raspberry Pi, you will realise that you 
 
 	A dedicated branch helps you to keep your own changes separate from any changes made to the master version on GitHub, and makes it a bit simpler to manage merging if a change you make conflicts with a change coming from GitHub.
 
-### <a name="chooseTool"> Choose an imaging tool </a>
+### <a name="downloadTool"></a>Download the imaging tool
 
 I use and recommend [Raspberry Pi Imager](https://www.raspberrypi.com/software/). The instructions below assume you are using Raspberry Pi Imager.
 
-> [BalenaEtcher](https://www.balena.io/etcher/) is an alternative that does a similar job.
-
-### <a name="chooseImage"> Choose and download a base image </a>
+### <a name="chooseImage"></a>Choose and download a base image
 
 The most recent Raspberry Pi OS can always be found at:
 
 * [https://www.raspberrypi.com/software/operating-systems/](https://www.raspberrypi.com/software/operating-systems/)
 
-Currently, this leads both 64-bit and 32-bit versions of Raspbian Bullseye, plus a legacy version of 32-bit Raspbian Buster.
- 
 I always start from "Raspberry Pi OS with desktop" so that is what I recommend.
 
-Images for the Raspberry Pi are downloaded as `.zip` files. In all cases, you always have the choice of:
+Images for the Raspberry Pi are downloaded as `.xz` files (previously these were `.zip` files). In all cases, you always have the choice of:
 
-1. downloading the `.zip` *directly;* or
-2. downloading the `.zip` *indirectly* by starting with the `.torrent`.
+1. downloading the image *directly;* or
+2. downloading the image *indirectly* by starting with the `.torrent`.
 
-It is always a good idea to check the SHA256 signature on each zip. It gives you assurance that the image has not been tampered with and wasn't corrupted during download. The magic incantation is:
+It is always a good idea to check the SHA256 signature on each image. It gives you assurance that the image has not been tampered with and wasn't corrupted during download. The magic incantation is:
 
 ```bash
 $ SIGNATURE=«hash»
-$ IMAGE=«pathToZip»
+$ IMAGE=«pathToDownloadedFile»
 $ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
 ```
 
 You get the «hash» by clicking the `Show SHA256 file integrity hash` link. Here's an example run:
 
 ```bash
-$ SIGNATURE=6e9faca69564c47702d4564b2b15997b87d60483aceef7905ef20ba63b9c6b2b
-$ IMAGE=./2021-10-30-raspios-bullseye-armhf.zip
+$ SIGNATURE=5adcab7a063310734856adcdd2041c8d58f65c185a3383132bc758886528a93d
+$ IMAGE=./2022-04-04-raspios-bullseye-arm64.img.xz
 $ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
-./2021-10-30-raspios-bullseye-armhf.zip: OK
+./2022-04-04-raspios-bullseye-arm64.img.xz: OK
 ```
 
 If you don't see "OK", start over!
 
-> If your first attempt was a *direct* download of the `.zip`, consider trying the *indirect* method using a torrent.
+> If your first attempt was a *direct* download of the image, consider trying the *indirect* method using a torrent.
 
 ##### *on the topic of 32- vs 64-bit …*
 
@@ -196,7 +195,7 @@ If you don't see "OK", start over!
 
 	Please don't pick a 64-bit image as your starting point for no better reason than "64-bit must be better than 32-bit". PiBuilder will install 64-bit versions of everything, including docker and docker-compose, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you are upgrading from a 32-bit system, you will need to assure yourself that all your containers still work as expected.
 
-### <a name="burnImage"> Transfer Raspbian image to SD or SSD </a>
+### <a name="burnImage"></a>Configure and transfer Raspbian image to SD or SSD
 
 The steps are:
 
@@ -204,91 +203,58 @@ The steps are:
 2. Launch Raspberry Pi Imager.
 3. Click <kbd>CHOOSE OS</kbd>.
 4. Scroll down and choose "Use custom".
-5. Select the `.img` (or `.zip`) you downloaded earlier.
+5. Select the `.xz` (or `.zip`) you downloaded earlier.
 6. Click <kbd>CHOOSE STORAGE</kbd>
 7. Select the media connected in step 1. *Be careful with this step!*
-8. Click <kbd>WRITE</kbd>.
+8. Click the "gear" icon at the bottom, right of the window to open the "Advanced options" panel:
 
-At the end of the process, Raspberry Pi Imager ejects your media (BalenaEtcher does the same).
+	![Raspberry Pi Imager Advanced Options](./images/AdvancedOptions.jpg)
 
-### <a name="configPiBuilder"> PiBuilder configuration </a>
+	Unless you have good reasons to do otherwise, I recommend:
 
-#### <a name="configWiFi"> Configure WiFi </a>
+	- Open the "Image customization options" popup menu <span style="color:green">[A]</span> and choose "to always use". If you select that option then all of your settings will be remembered across launches of Raspberry Pi Imager. In other words, you will only have to configure Raspberry Pi Imager **once**.
 
-Decide whether you want your Raspberry Pi's WiFi interface to be enabled. On a Raspberry Pi which has both Ethernet and WiFi interfaces, you may not wish to have both enabled.
+	- Enable <span style="color:green">[B]</span>, then enter a name for your host at <a name="firstBootHostName"></a><span style="color:green">[C]</span>. I recommend choosing a generic name rather than a unique name for each host. The decision you make here boils down to:
 
-The Raspberry Pi does not care. It will happily activate both interfaces. The two interfaces can be in the same or different broadcast domains (subnets). If both interfaces are active, the Raspberry Pi will advertise its multicast DNS name (eg "iot-hub.local") on each, will respond to pings and accept connections on each, and will treat the interfaces as viable alternate paths for the traffic it transmits.
+		- if you choose a *generic* name (like "raspberrypi"), you will only have to set up this panel once. You will choose the actual host name later when you run the first PiBuilder script; but
+		- if you choose a *unique* name for each host then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
 
-In the case of Ethernet, the physical interface will not be enabled unless a cable is connected and the proper electrical signals are present. You can always control Ethernet by connecting and disconnecting cables.
+		Whatever you decide, you need to follow the rules for domain names:
 
-WiFi is different. You need to make the decision up front.
+		- letters ("a".."z", "A".."Z") but lower case is recommended
+		- digits ("0".."9")
+		- hyphen ("-") **not** underscore
 
-##### <a name="enableWiFi"> *if you want WiFi enabled …* </a>
+		This documentation uses "«hostname»" to represent the choice you make here.
 
-Use a text editor to open the following file:
+	- Enable <span style="color:green">[D]</span> and <span style="color:green">[E]</span>. This turns on SSH access.
+	- Enable <span style="color:green">[F]</span>, then:
 
-```
-~/PiBuilder/boot/wpa_supplicant.conf
-```
+		- Enter a username at <a name="firstBootUserName"></a><span style="color:green">[G]</span>. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username later so "choose wisely". The choice you make here will become the username for *all* of your Raspberry Pis. If you want a different username for each of your Raspberry Pis then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
 
-The file supplied with PiBuilder looks like this:
+			> The Raspberry Pi Foundation has just done a lot of work to improve security. This option gives you every opportunity to avoid making "pi" a good guess for half your credentials. 
 
-```
-# set your country code, WiFi SSID and pre-shared key here.
-# if you DON'T want to enable WiFi, just delete this file.
-country=«CC»
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
+			This documentation uses "«username»" to represent the choice you make here.
 
-network={
-    ssid="«SSID»"
-    psk="«PSK»"
-}
-```
+		- Set a strong password at <a name="firstBootUserPassword"></a><span style="color:green">[H]</span>. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
 
-You should replace three values:
+	- <a name="firstBootWiFi"></a>If you want the Raspberry Pi's WiFi interface to be active, enable <span style="color:green">[I]</span>, then:
 
-1. `«CC»` with your two-character country code (eg `AU`).
-2. `«SSID»` with your WiFi Service Set IDentifier (otherwise known as the name of your WiFi network).
-3. `«PSK»` with your Pre-Shared Key (otherwise known as the join password for your WiFi network).
+		- enter your WiFi network name in <span style="color:green">[J]</span>.
+		- enter your WiFi password in <span style="color:green">[K]</span>.
+		- <a name="firstBootCC"></a>use the popup menu <span style="color:green">[L]</span> to select your country code.
 
-Unless you change your WiFi password frequently, you should only need to edit this file once. The configuration can be re-used for all of your Raspberry Pis.
+		> Your support host may pre-populate some or all of these fields.
 
-That's all you have to do. Skip down to [Configure PiBuilder installation options](#configOptions).
- 
-##### <a name="disableWiFi"> *if you want WiFi disabled …* </a>
+	- Enable <span style="color:green">[M]</span> and then use the popup menus <a name="firstBootTZ"></a><span style="color:green">[N]</span> and <span style="color:green">[O]</span> to set appropriate values.
+	- Disable <span style="color:green">[P]</span>. You need to leave the boot partition mounted for the next step.
+	- Click <span style="color:green">[Q]</span> to <kbd>SAVE</kbd> your settings.
 
-If you don't want to enable WiFi then either delete or rename the `wpa_supplicant.conf` file. For example:
+9. Click <kbd>WRITE</kbd> and respond to any system prompts to transfer the prepared image to your media.
 
-```
-$ mv ~/PiBuilder/boot/wpa_supplicant.conf ~/PiBuilder/boot/wpa_supplicant.conf.off
-```
+### <a name="configPiBuilder"></a>PiBuilder configuration
 
-If `/boot/wpa_supplicant.conf` does not exist when you first boot your Raspberry Pi then the WiFi interface will not be enabled and you can expect to see the following message when you first login:
-
-```
-Wi-Fi is currently blocked by rfkill.
-Use raspi-config to set the country before use.
-``` 
-
-PiBuilder will still set the WiFi country code (see [`LOCALCC`](#localCC)) even though the WiFi interface is disabled, so you can ignore the instruction to use `raspi-config`.
-
-##### <a name="changeWiFi"> *if you change your mind about WiFi …* </a>
-
-If you change your mind after your system is up and running, and decide to activate WiFi:
-
-1. Follow the [*if you want WiFi enabled …*](#enableWiFi) instructions to edit `wpa_supplicant.conf`.
-2. Copy the file onto your Raspberry Pi at the path (you will need `sudo`):
-
-	```
-	/boot/wpa_supplicant.conf
-	```
-
-3. Reboot your Raspberry Pi.
-
-After the reboot, your WiFi interface will be enabled and the `wpa_supplicant.conf` will have disappeared from your `/boot` directory.
-
-#### <a name="configOptions"> Configure PiBuilder installation options </a>
+#### <a name="configOptions"></a>Configure PiBuilder installation options
 
 Use a text editor to open:
 
@@ -302,10 +268,12 @@ The file supplied with PiBuilder looks like this:
 # this file is "sourced" in all build scripts.
 
 # - country-code for WiFi
-LOCALCC="AU"
+#   normally set in Raspberry Pi Imager - will override if made active
+#LOCALCC="AU"
 
 # - local time-zone
-LOCALTZ="Etc/UTC"
+#   normally set in Raspberry Pi Imager - will override if made active
+#LOCALTZ="Etc/UTC"
 
 # - skip full upgrade in the 01 script.
 SKIP_FULL_UPGRADE=false
@@ -337,32 +305,18 @@ DISABLE_VM_SWAP=false
 #   default) while aarch64 will only work on a 64-bit kernel.
 #DOCKER_COMPOSE_ARCHITECTURE="armv7"
 
-# only used if you run the script. These should be kept up-to-date:
+#only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
 SQLITEVERSION="sqlite-autoconf-3380000"
 ```
 
-You **should** set the right hand side of:
-
-* <a name="localCC">`LOCALCC`</a> to your two-character country code. This should be the same value you used in `wpa_supplicant.conf`.
-* `LOCALTZ` to a valid country and city combination. It is OK to leave this alone if you are not certain about the correct values.
-
 You **can** set the right hand sides of the following variables:
 
-* <a name="skipFullUpgrade">`SKIP_FULL_UPGRADE`</a> to `true`. This prevents [Script 01](#docScript01) from performing a "full upgrade", which may be appropriate if you want to test against a base release of Raspberry Pi OS.
-* <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian. Electing to run the 64-bit kernel gets some speed improvements and mostly works but, occasionally, you may strike a container that won't "play nice". For example:
-
-	- [OctoPrint Docker](https://github.com/OctoPrint/octoprint-docker) seems to not like the 64-bit kernel but it is not clear whether the problem is the kernel, that I'm running it on a Raspberry Pi 3B+, or something intrinsic to the way the container is built.
-
-	If you enable the 64-bit kernel by setting `PREFER_64BIT_KERNEL` to `true`, but you later decide to revert to the 32-bit kernel:
-
-	```bash
-	$ cd /boot
-	$ sudo mv config.txt.bak config.txt
-	$ sudo reboot
-	```  
-
+* <a name="localCC"></a>`LOCALCC`to your two-character country code. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootCC).
+* <a name="localTZ"></a>`LOCALTZ` to a valid country and city combination. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootTZ).
+* <a name="skipFullUpgrade"></a>`SKIP_FULL_UPGRADE` to `true`. This prevents [Script 01](#docScript01) from performing a "full upgrade", which may be appropriate if you want to test against a base release of Raspberry Pi OS.
+* <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian.
 * <a name="disableVMswap">`DISABLE_VM_SWAP`</a> to `true` to disable virtual memory (VM) swapping to mass storage. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
 
 	Running out of RAM causes swapping to occur and that, in turn, has both a performance penalty (because SD cards are quite slow) and increases the wear and tear on the SD card (leading to a heightened risk of failure). There are two main causes of limited RAM:
@@ -394,7 +348,7 @@ You **can** set the right hand sides of the following variables:
 * `DOCKER_COMPOSE_ARCHITECTURE`. Valid values are `armv7` and `aarch64`. [Script 04](#docScript04) chooses `aarch64` if the full 64-bit OS is running, `armv7` otherwise. In essence, if the Raspberry Pi is running a version of Raspberry Pi OS which is *capable* of running in 32-bit user mode, [Script 04](#docScript04) will choose `armv7` irrespective of whether the kernel is running in 32- or 64-bit mode. This variable lets you override that behaviour and force the choice.
 * `SQLITEYEAR` and `SQLITEVERSION` let you choose the values which govern the version of SQLite that is installed, if you run the optional [Script 06](#docScript06). See the [releases](https://www.sqlite.org/download.html) page.
 
-##### <a name="perHostConfigOptions"> per-host PiBuilder installation options </a>
+##### <a name="perHostConfigOptions"></a>per-host PiBuilder installation options
 
 The file:
 
@@ -406,12 +360,12 @@ contains general options that will be used for **all** of your Raspberry Pis. If
 
 ```bash
 $ cd ~/PiBuilder/boot/scripts/support/pibuilder
-$ cp options.sh options.sh@iot-hub
+$ cp options.sh options.sh@«hostname»
 ```
 
 At run time, PiBuilder will give preference to an options file where the `@` suffix matches the name of the host.
 
-#### <a name="configGit"> Git user configuration </a>
+#### <a name="configGit"></a>Git user configuration
 
 The file at the path:
 
@@ -446,7 +400,7 @@ Hint:
 
 You should only need to change `.gitconfig` in PiBuilder if you also change `.gitconfig` your home directory on your support host. Otherwise, the configuration can be re-used for all of your Raspberry Pis.
 
-#### <a name="sambaSupport"> SAMBA support </a>
+#### <a name="sambaSupport"></a>SAMBA support
 
 PiBuilder can enable SMB services as an option. PiBuilder assumes that you have a working configuration that you want to preserve across rebuilds. If you do not have a working configuration, you need to do that first. You may find the following tutorials helpful:
 
@@ -506,7 +460,7 @@ When the 03 script runs, it detects the presence of `smb.conf` and uses it as a 
 2. Replace the default versions of the three files with your custom versions; and
 3. Create `$HOME/share` as a home for your SMB mount points.
 
-### <a name="setupPiBuilder"> Run the PiBuilder setup script </a>
+### <a name="setupPiBuilder"></a>Run the PiBuilder setup script
 
 Re-insert the media so the "boot" volume mounts. Run:
 
@@ -519,20 +473,18 @@ If your support platform is a Mac you can omit `«path-to-mount-point»` because
 
 I have tried to make this a generic script but I don't have the ability to test it on Windows. If the script does not work on your system, you can emulate it as follows:
 
-1. Notice that the `~/PiBuilder/boot` folder contains three items:
+1. Notice that the `~/PiBuilder/boot` folder contains a folder named `scripts`.
 
-	* a folder named `scripts`
-	* a file named `ssh`
-	* a file named `wpa_supplicant.conf`
+	> it used to also contain an empty file named `ssh` plus a file named `wpa_supplicant.conf` which you were expected to configure; those files have not been needed since the 2022-04-04 changes to Raspberry Pi OS.
 
-2. Copy those three items from `~/PiBuilder/boot` to the top level of the `boot` volume.
+2. Copy `scripts` from `~/PiBuilder/boot` to the top level of the `boot` volume.
 3. Eject the media.
 
 Note:
 
 * If you are starting from a 32-bit base image, don't activate the 64-bit kernel by hand. The simplest way to get a combined 64-bit kernel plus 32-bit user mode is to enable the [`PREFER_64BIT_KERNEL`](#prefer64BitKernel) option and let PiBuilder do it for you.
 
-### <a name="bootRPi"> Boot your Raspberry Pi </a>
+### <a name="bootRPi"></a>Boot your Raspberry Pi
 
 Transfer the media to your Raspberry Pi and apply power.
 
@@ -541,18 +493,27 @@ A Raspberry Pi normally takes 20-30 seconds to boot. However, the first time you
 You will know your Raspberry Pi is ready when it starts responding to pings:
 
 ```bash
-$ ping -c 1 raspberrypi.local
+$ ping -c 1 «hostname».local
 ```
 
-### <a name="runScripts"> Run the PiBuilder scripts in order </a>
+Your Raspberry Pi should be reachable on:
 
-#### <a name="runScript01"> Script 01 </a>
+* `«hostname».local` – its multicast DNS name;
+* `«hostname».your.domain.com` – if you have done the necessary work with local DHCP and DNS servers;
+* `«hostname»` – either implicitly because `.your.domain.com` is assumed and the above applies, or because you have added an entry to `/etc/hosts` on your support host; or 
+* your Raspberry Pi's IP address(es) – one IP address per interface if both Ethernet and WiFi are active.
+
+These instructions assume you will use the multicast DNS name (ie `«hostname».local`) but you can substitute the other forms if those make more sense in your environment. 
+
+### <a name="runScripts"></a>Run the PiBuilder scripts in order
+
+#### <a name="runScript01"></a>Script 01
 
 When your Raspberry Pi responds to pings, connect to it like this:
 
 ```bash
-$ ssh-keygen -R raspberrypi.local
-$ ssh -4 pi@raspberrypi.local
+$ ssh-keygen -R «hostname».local
+$ ssh -4 «username»@«hostname».local
 ```
 
 Notes:
@@ -568,80 +529,47 @@ ED25519 key fingerprint is SHA256:gobbledegook/gobbledegook.
 Are you sure you want to continue connecting (yes/no)? 
 ```
 
-This is sometimes referred to as <a name="tofudef">the TOFU (Trust On First Use) pattern</a>. Respond with:
+This is sometimes referred to as <a name="tofudef"></a>the TOFU (Trust On First Use) pattern. Respond with:
 
 ```
 yes
 ```
 
-Your Raspberry Pi will ask for a password for the user `pi`. Respond with:
+Your Raspberry Pi will ask for the password for the user «username».
 
-```
-raspberry
-```
-
-Now it is time to run the first script. You need to decide on a name for your Raspberry Pi. The name "iot-hub" is used in this documentation but you should choose a name that makes sense to you. In choosing a name, you need to follow the rules for domain names:
-
-* letters ("a".."z", "A".."Z") but all lower case is recommended
-* digits ("0".."9")
-* hyphen ("-") **not** underscore
-
-Please don't use "raspberrypi". Always choose a **different** name that is unique on your network. Even if you only have a single Raspberry Pi, now, you have no idea what the future holds. You will have only yourself to blame if you ever get into the situation where two or more Raspberry Pis are using the same name. It will confuse both you and your Raspberry Pis.
-
-When you have chosen a name, substitute it for `iot-hub` in the following:
+Now it is time to run the first script:
 
 ```bash
-$ /boot/scripts/01_setup.sh iot-hub
+$ /boot/scripts/01_setup.sh {newhostname}
 ```
 
-The script will ask for a new password for the user "pi". The password you choose here replaces the default `raspberry` password.
+Note:
 
-> It will also become the password for VNC access but VNC is not enabled by default.
-
-The characters you type are not echoed to the console so you will be prompted to enter the password twice:
-
-```
-New password for pi@iot-hub: 
-Re-enter new password: 
-```
+* <a name="newHostname"></a>`newhostname` is an optional parameter. If you supply an argument here, it overrides the value of [«hostname» set in Raspberry Pi Imager](#firstBootHostName) and becomes the «hostname». Any name you supply here must follow the same rules (letters, digits, hyphens).
 
 The 01 script runs to completion and reboots your Raspberry Pi. Rebooting disconnects your SSH session, returning you to your support host.
 
-Changing the name of your Raspberry Pi to something other than `raspberrypi` invalidates the associated SSH fingerprint that was set up earlier (the [TOFU pattern](#tofudef)). You should remove it from your "known hosts" file by typing:
+If the last part of the script prompts you to do so, run the command:
 
 ```bash
-$ ssh-keygen -R raspberrypi.local
+$ ssh-keygen -R «hostname».local 
 ```
 
-#### <a name="runScript02"> Script 02 </a>
-
-When your Raspberry Pi reboots, it will have the name "iot-hub" (or whatever name you chose). It should respond to:
-
-* `iot-hub.local` – its multicast DNS name;
-* `iot-hub.your.domain.com` – if you have done the necessary work with local DHCP and DNS servers;
-* `iot-hub` – either implicitly because `.your.domain.com` is assumed and the above applies, or because you have added an entry to `/etc/hosts` on your support host; or 
-* your Raspberry Pi's IP address(es) – one IP address per interface if both Ethernet and WiFi are active.
-
-These instructions assume you will use the multicast DNS name but you can substitute the other forms if those make more sense in your environment. 
+#### <a name="runScript02"></a>Script 02
 
 You will know your Raspberry Pi is ready when it starts responding to pings:
 
 ```bash
-$ ping -c 1 iot-hub.local
+$ ping -c 1 «hostname».local
 ```
 
 Connect and login:
 
 ```bash
-$ ssh-keygen -R iot-hub.local
-$ ssh -4 pi@iot-hub.local
+$ ssh -4 «username»@«hostname».local
 ```
 
-Note:
-
-* The `ssh-keygen` is a protective command in case you had another host with the same name but a different fingerprint. Ignore any errors.
-
-You can expect to see the [TOFU pattern](#tofudef) again. Respond with "yes". Then run:
+If you see the [TOFU pattern](#tofudef) again, respond with "yes". Then run:
 
 ```bash
 $ /boot/scripts/02_setup.sh
@@ -651,12 +579,12 @@ The 02 script runs to completion and reboots your Raspberry Pi. It is quite a qu
 
 The 02 script also disables IPv6 so, from this point onwards, you can omit the `-4` parameter from SSH commands.
 
-#### <a name="runScript03"> Script 03 </a>
+#### <a name="runScript03"></a>Script 03
 
 Connect and login:
 
 ```bash
-$ ssh pi@iot-hub.local
+$ ssh «username»@«hostname».local
 ```
 
 Run:
@@ -673,12 +601,12 @@ A common problem with this script is the error "Unable to connect to raspbian.ra
 
 The 03 script ends with a logout (not a reboot) so you can login again immediately.
 
-#### <a name="runScript04"> Script 04 </a>
+#### <a name="runScript04"></a>Script 04
 
 Connect and login:
 
 ```bash
-$ ssh pi@iot-hub.local
+$ ssh «username»@«hostname».local
 ```
 
 Run:
@@ -687,12 +615,12 @@ Run:
 $ /boot/scripts/04_setup.sh
 ```
 
-#### <a name="runScript05"> Script 05 </a>
+#### <a name="runScript05"></a>Script 05
 
 Once your Raspberry Pi comes back, login using:
 
 ```bash
-$ ssh pi@iot-hub.local
+$ ssh «username»@«hostname».local
 ```
 
 Run:
@@ -710,7 +638,7 @@ $ cd ~/IOTstack
 $ ./menu.sh
 ``` 
 
-#### <a name="runScript06"> Script 06 (optional) </a>
+#### <a name="runScript06"></a>Script 06 (optional)
 
 This script is entirely optional. It rebuilds SQLite from source code. The version of SQLite you get from `apt install` doesn't have all the features you might expect if SQLite is your thing.
 
@@ -722,7 +650,7 @@ It is also OK to defer running this script until you have an actual need:
 $ /boot/scripts/06_setup.sh
 ```  
 
-## <a name="synopses"> Script summaries </a>
+## <a name="synopses"></a>Script summaries
 
 Every script has the same basic scaffolding:
 
@@ -740,33 +668,35 @@ Every script has the same basic scaffolding:
 
 > When used in the context of shell scripts, the words "*source*", "*sourcing*" and "*sourced*" mean that the associated file is processed, inline, as though it were part of the original calling script. It is analogous to an "include" file.
 
-### <a name="docScript01"> Script 01 </a>
+### <a name="docScript01"></a>Script 01
 
 The script:
 
 * Assumes fresh install of Raspberry Pi OS.
-* Snapshots `/etc` as `/etc-baseline` (a baseline reference).
-* Snapshots `/boot/cmdline.txt` and `/boot/config.txt` (baseline references).
+* Snapshots baseline references as follows:
+
+	- `/etc` as `/etc-baseline` 
+	- `/boot/cmdline.txt` as `/boot/cmdline.txt.baseline`
+	- `/boot/config.txt` as `/boot/config.txt.baseline`
+
 * Initialises `~/.ssh` and `~/.gnupg` directories with correct permissions (700).
 * If the operating system is Raspbian Buster, adds support for fetching `libseccomp2` as a backport (needed for Alpine-based Docker images).
 * Runs an OS update.
 * Runs an OS full-upgrade followed by an autoremove unless [`SKIP_FULL_UPGRADE`](#skipFullUpgrade) is `true`.
 * Optionally replaces `/etc/ssh` with a preset.
-* Sets the user password.
-* Sets up VNC with the same password (but does NOT activate VNC)
 * Optionally sets up locale(s).
 * Optionally enables the 64-bit kernel (see [`PREFER_64BIT_KERNEL`](#prefer64BitKernel)).
 * Optionally enables the Raspberry Pi ribbon-cable camera (see [`ENABLE_PI_CAMERA`](#enablePiCam)).
 * Sets raspi-config options:
 
 	- boot to console
-	- WiFi country code
-	- TimeZone
-	- Machine name
+	- WiFi country code  (if [`LOCALCC`](#localCC) is enabled)
+	- TimeZone  (if [`LOCALTZ`](#localTZ) is enabled)
 
+* Optionally changes «hostname» (if [newhostname](#newHostname) argument is provided)
 * Reboots
 
-### <a name="docScript02"> Script 02 </a>
+### <a name="docScript02"></a>Script 02
 
 The script:
 
@@ -780,7 +710,7 @@ The script:
 * Optionally disables virtual memory swapping (see [`DISABLE_VM_SWAP`](#disableVMswap)).
 * Reboots.
 
-### <a name="docScript03"> Script 03 </a>
+### <a name="docScript03"></a>Script 03
 
 The script:
 
@@ -800,7 +730,7 @@ The script:
 * Copies placeholder configuration files for `rclone` and IOTstackBackup into `~/.config`
 * Ends with a logout.
 
-### <a name="docScript04"> Script 04 </a>
+### <a name="docScript04"></a>Script 04
 
 The script:
 
@@ -814,7 +744,7 @@ The script:
 
 * Reboots.
 
-### <a name="docScript05"> Script 05 </a>
+### <a name="docScript05"></a>Script 05
 
 The script:
 
@@ -837,13 +767,13 @@ The script:
 * Erases bash history.
 * Ends with a logout.
 
-### <a name="docScript06">Script 06 (optional)</a>
+### <a name="docScript06"></a>Script 06 (optional)
 
 This script is optional. It rebuilds SQLite from source code. The version you get from `apt install` doesn't have all the features you might want.
 
-## <a name="scriptSearch"> How PiBuilder scripts search for files, folders and patches </a>
+## <a name="scriptSearch"></a>How PiBuilder scripts search for files, folders and patches
 
-### <a name="searchForItem"> Search function – `supporting_file()` </a>
+### <a name="searchForItem"></a>Search function – `supporting_file()`
 
 PiBuilder's search function is called `supporting_file()`. Despite the name, it can search for both files and folders.
 
@@ -878,7 +808,7 @@ That path is considered the *general* path.
 The `supporting_file()` function also prepares a *host-specific* path by appending `@` plus the `$HOSTNAME` environment variable. For example:
 
 ```
-/boot/scripts/support/etc/resolv.conf@iot-hub
+/boot/scripts/support/etc/resolv.conf@«hostname»
 ```
 
 If the *host-specific* path exists, the *general* path is ignored. The *general* path is only used if the *host-specific* path does not exist.
@@ -901,7 +831,7 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
 fi
 ``` 
 
-### <a name="searchForPatch"> Patch function – `try_patch()` </a>
+### <a name="searchForPatch"></a>Patch function – `try_patch()`
 
 The `try_patch()` function takes two arguments:
 
@@ -923,7 +853,7 @@ supporting_file "/etc/resolv.conf.patch"
 Calling `supporting_file()` implies two candidates will be considered:
 
 ```
-/boot/scripts/support/etc/resolv.conf.patch@iot-hub
+/boot/scripts/support/etc/resolv.conf.patch@«hostname»
 /boot/scripts/support/etc/resolv.conf.patch
 ``` 
 
@@ -947,11 +877,11 @@ The `try_patch()` function has two common use patterns:
 	fi
 	```
 
-## <a name="patchPreparation"> Preparing your own patches </a>
+## <a name="patchPreparation"></a>Preparing your own patches
 
 PiBuilder can *apply* patches for you, but you still need to *create* each patch.
 
-### <a name="patchTools"> Tools overview: *diff* and *patch* </a>
+### <a name="patchTools"></a>Tools overview: *diff* and *patch*
 
 Understanding how patching works will help you to develop and test patches before handing them to PiBuilder. Assume:
 
@@ -980,7 +910,7 @@ That `patch` command will:
 1. copy «original» to «original».bak; and
 2. apply «patch» to «original» to convert it to «final».
 
-### <a name="patchSummary"> Basic process </a>
+### <a name="patchSummary"></a>Basic process
 
 The basic process for creating a patch file for use in PiBuilder is:
 
@@ -1043,18 +973,18 @@ The basic process for creating a patch file for use in PiBuilder is:
 	That folder is where your patch files should be placed. The patch file you prepared will have one of the following names:
 
 	```
-	resolvconf.conf.patch@iot-hub
+	resolvconf.conf.patch@«hostname»
 	resolvconf.conf.patch
 	```
 
 	The proper location for the patch file in the PiBuilder structure structure on your support host is one of the following paths:
 
 	```
-	~/PiBuilder/boot/scripts/support/etc/resolvconf.conf.patch@iot-hub
+	~/PiBuilder/boot/scripts/support/etc/resolvconf.conf.patch@«hostname»
 	~/PiBuilder/boot/scripts/support/etc/resolvconf.conf.patch
 	```
 
-### <a name="patchTutorials"> Tutorials </a>
+### <a name="patchTutorials"></a>Tutorials
 
 PiBuilder already has "hooks" in place for some common situations. All you need to do is prepare a patch file and PiBuilder will apply it the next time you build an operating system:
 
@@ -1067,7 +997,7 @@ The next tutorial covers a situation where PiBuilder does not have a "hook". It 
 
 * [Restoring Buster-style log rotation for syslog](tutorials/logrotate.md)
 
-## <a name="moreGit"> Keeping in sync with GitHub </a>
+## <a name="moreGit"></a>Keeping in sync with GitHub
 
 The instructions in [download this repository](#downloadRepo) recommended that you create a Git branch ("custom") to hold your customisations. If you did not do that, please do so now:
 
@@ -1214,7 +1144,7 @@ $ git commit -m "merged with GitHub updates"
 
 Now you are in sync with GitHub.
 
-## <a name="upgradeCompose"> Upgrading docker-compose </a>
+## <a name="upgradeCompose"></a>Upgrading docker-compose
 
 You can check the version of docker-compose installed on your system by running either or both of the following commands:
 
@@ -1260,11 +1190,11 @@ Note:
 
 * The `upgrade_docker-compose.sh` script is *reasonably* platform-agnostic. It works on Raspberry Pi (Buster and Bullseye) full 32-bit, mixed 32-bit user with 64-bit kernel, and full 64-bit OS. It also appears to work on macOS for Docker Desktop.
 
-### <a name="reinstallation"> Reinstalling docker or docker-compose</a>
+### <a name="reinstallation"></a>Reinstalling docker or docker-compose
 
 Read [reinstalling docker + docker-compose](reinstallation.md) if you need to reinstall docker or docker-compose.
 
-## <a name="chickenEgg"> Beware of chickens and eggs </a>
+## <a name="chickenEgg"></a>Beware of chickens and eggs
 
 Installing and configuring software on a Raspberry Pi (or any computer) involves quite a few chicken-and-egg situations. For example:
 
@@ -1298,9 +1228,9 @@ Chicken-and-egg!
 
 There is no substitute for thinking, planning and testing.
 
-## <a name="aboutSSH"> Some words about SSH </a>
+## <a name="aboutSSH"></a>Some words about SSH
 
-### <a name="aboutEtcSSH"> About `/etc/ssh` </a>
+### <a name="aboutEtcSSH"></a>About `/etc/ssh`
 
 Whenever you start from a clean Raspberry Pi OS image, the very first boot-up initialises:
 
@@ -1332,7 +1262,7 @@ and then run `setup_boot_volume.sh`, the `etc-ssh-backup.tar.gz@iot-hub` will be
 When you boot your Raspberry Pi and run:
 
 ```bash
-$ /boot/scripts/01_setup.sh iot-hub
+$ /boot/scripts/01_setup.sh
 ``` 
 
 the script will search for `etc-ssh-backup.tar.gz@iot-hub` and, if found, will use it to restore `/etc/ssh` as it was at the time the snapshot was taken. In effect, you have given the machine its original SSH identity.
@@ -1343,24 +1273,11 @@ The contents of `/etc/ssh` are not tied to the physical hardware so if, for exam
 
 Whether you do this for any or all of your hosts is entirely up to you. I have gone to the trouble of setting up SSH certificates and it is a real pain to have to run around and re-sign the host keys every time I rebuild a Raspberry Pi. It is much easier to set up `/etc/ssh` **once**, then take a snapshot, and re-use the snapshot each time I rebuild.
 
-The *practical* effect of this is that my build sequence begins with:
-
-```bash
-$ ssh pi@raspberrypi.local
-raspberry
-$ /boot/scripts/01_setup.sh previousname
-$ ssh-keygen -R raspberrypi.local
-$ ssh previousname
-…
-```
-
-No `pi@` on the front. No `.local` or domain name on the end. No [TOFU pattern](#tofudef). No password prompt. Just logged-in.
-
 If you want to learn how to set up password-less SSH access, see [IOTstackBackup SSH tutorial](https://github.com/Paraphraser/IOTstackBackup/blob/master/ssh_tutorial.md). Google is your friend if you want to go the next step and set up SSH certificates.
 
-### <a name="aboutDotSSH"> About `~/.ssh` </a>
+### <a name="aboutDotSSH"></a>About `~/.ssh`
 
-The contents of `~/.ssh` carry the client identity (how "pi" authenticates to target hosts), as distinct from the machine identity (how your Raspberry Pi proves itself to clients seeking to connect).
+The contents of `~/.ssh` carry the client identity (how «username» authenticates to target hosts), as distinct from the machine identity (how your Raspberry Pi proves itself to clients seeking to connect).
 
 Personally, I use a different approach to maintain and manage `~/.ssh` but it is still perfectly valid to run the supplied:
 
@@ -1370,7 +1287,7 @@ $ /boot/scripts/helpers/user_ssh_backup.sh
 
 and then restore the snapshot in the same way as Script 01 does for `/etc/ssh`. I haven't provided a solution in PiBuilder. You will have to come up with that for yourself.
 
-### <a name="snapshotSecurity"> Security of snapshots </a>
+### <a name="snapshotSecurity"></a>Security of snapshots
 
 There is an assumption that it is "hard" for an unauthorised person to gain access to `etc/ssh` and, to a lesser extent, `~/.ssh`. How "hard" that actually is depends on a lot of things, not the least of which is whether you are in the habit of leaving terminal sessions unattended...
 
@@ -1378,7 +1295,7 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
-## <a name="aboutVNC"> Some words about VNC </a>
+## <a name="aboutVNC"></a>Some words about VNC
 
 PiBuilder disables VNC. To understand why, and to find instructions on how to enable VNC, please see:
 
@@ -1405,7 +1322,39 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
-## <a name="changeLog"> Change Summary </a>
+## <a name="changeLog"></a>Change Summary
+
+* 2022-04-12
+
+	- Adapt to [2022-04-04 changes](https://downloads.raspberrypi.org/raspios_arm64/release_notes.txt) made by Raspberry Pi Foundation (no "pi" user, no default password, etc).
+	- Null `ssh` file removed from boot folder (now set in Raspberry Pi Imager). Creating `/boot/ssh` still works and has the expected effect of enabling SSH.
+	- `wpa_supplicant.conf` template removed from boot folder (now set in Raspberry Pi Imager). Adding `/boot/wpa_supplicant.conf` still works and has the expected effect of enabling WiFi but Raspberry Pi Imager goes to the trouble of masking the WiFi PSK so it's a better choice. 
+	- PiBuilder options changed - `LOCALCC` and `LOCALTZ` default to commented-out. These values should be set in Raspberry Pi Imager. Enabling `LOCALCC` and/or `LOCALTZ` still works and still has the expected effect.
+	- VNC changes:
+
+		- password support moved out of 01 Script to `set_vnc_password.sh` helper script.
+		- `common.custom` template removed from support structure (embedded in `set_vnc_password.sh`)
+		- vnc.md tutorial updated to explain use of `set_vnc_password.sh` script.
+
+	- other 01 script changes:
+
+		- hostname parameter now optional. If invoked as:
+
+			```
+			/boot/scripts/01_setup.sh
+			```
+			
+			then HOSTNAME will not change. If invoked as:
+			
+			```
+			/boot/scripts/01_setup.sh newhostname
+			```
+			
+			then HOSTNAME will change if and only if newhostname is different.
+			
+		- user password change no longer enforced (assumes a strong password set in Raspberry Pi Imager).
+
+	- `/boot/scripts/support` is no longer assumed. Path to `support` directory is now discovered dynamically, relative to `0x_setup.sh` script.
 
 * 2022-04-09
 
