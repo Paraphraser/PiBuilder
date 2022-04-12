@@ -36,7 +36,10 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [PiBuilder configuration](#configPiBuilder)
 
 		- [Configure installation options](#configOptions)
-		- [Git user configuration](#configGit)
+		- [Configure home directory](#configHome)
+
+			- [Git user configuration](#configGit)
+
 		- [SAMBA support](#sambaSupport)
 
 	- [Run the PiBuilder setup script](#setupPiBuilder)
@@ -230,11 +233,15 @@ The steps are:
 	- Enable <span style="color:green">[D]</span> and <span style="color:green">[E]</span>. This turns on SSH access.
 	- Enable <span style="color:green">[F]</span>, then:
 
-		- Enter a username at <a name="firstBootUserName"></a><span style="color:green">[G]</span>. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username later so "choose wisely". The choice you make here will become the username for *all* of your Raspberry Pis. If you want a different username for each of your Raspberry Pis then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
+		- Enter a username at <a name="firstBootUserName"></a><span style="color:green">[G]</span>. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it.
 
-			> The Raspberry Pi Foundation has just done a lot of work to improve security. This option gives you every opportunity to avoid making "pi" a good guess for half your credentials. 
-
+			The choice you make here will become the username for *all* of your Raspberry Pis. If you want a different username for each of your Raspberry Pis then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
+			
 			This documentation uses "«username»" to represent the choice you make here.
+
+			Note:
+			
+			* PiBuilder assumes the «username» is "pi". If you choose a different «username» then make sure you follow the [configure home directory](#configHome) instructions. You will need to do that once for each unique «username» you create.
 
 		- Set a strong password at <a name="firstBootUserPassword"></a><span style="color:green">[H]</span>. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
 
@@ -365,12 +372,50 @@ $ cp options.sh options.sh@«hostname»
 
 At run time, PiBuilder will give preference to an options file where the `@` suffix matches the name of the host.
 
-#### <a name="configGit"></a>Git user configuration
+#### <a name="configHome"></a>Configure home directory
+
+PiBuilder assumes «username» equals "pi". If you choose a different «username», you will need to take special care with the following folder and its contents:
+
+```
+~/PiBuilder/boot/scripts/support/home/pi/
+```
+
+This is the default structure:
+
+```
+└── home
+    └── pi
+        ├── .config
+        │   ├── iotstack_backup
+        │   │   └── config.yml
+        │   └── rclone
+        │       └── rclone.conf
+        ├── .gitconfig
+        ├── .gitignore_global
+        ├── .profile
+        └── crontab
+```
+
+Let's suppose that, instead of "pi", you decide to use "me" for your «username». What you will need to do is make a copy of the "pi" directory, as in:
+
+```
+$ cd ~/PiBuilder/boot/scripts/support/home
+$ cp -a pi me
+```
+
+If you have followed the instructions about creating a custom branch to hold your changes, your next step would be:
+
+```
+$ git add me
+$ git commit -m "clone default home directory structure"
+```
+
+##### <a name="configGit"></a>Git user configuration
 
 The file at the path:
 
 ```
-~/PiBuilder/boot/scripts/support/home/pi/.gitconfig
+~/PiBuilder/boot/scripts/support/home/«username»/.gitconfig
 ```
 
 is only a template. It contains:
@@ -1215,7 +1260,7 @@ Installing and configuring software on a Raspberry Pi (or any computer) involves
 * This repo assumes the last option: you have saved the `rclone` and `iotstack_backup` configuration files into the proper location in the `support` directory:
 
 	```
-	~/PiBuilder/boot/scripts/support/home/pi/.config/
+	~/PiBuilder/boot/scripts/support/home/«username»/.config/
 	├── iotstack_backup
 	│   └── config.yml
 	└── rclone
