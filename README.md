@@ -1,7 +1,6 @@
 # PiBuilder
 
-<h3 style="text-align:center;">Updated for 2022-04-04 changes to Raspberry Pi OS</p>
-<h4 style="text-align:center;">(first cut)</p>
+* Updated for 2022-04-04 changes to Raspberry Pi OS (first cut)
 
 ## <a name="introduction"></a>Introduction
 
@@ -215,9 +214,9 @@ The steps are:
 
 	Unless you have good reasons to do otherwise, I recommend:
 
-	- Open the "Image customization options" popup menu <span style="color:green">[A]</span> and choose "to always use". If you select that option then all of your settings will be remembered across launches of Raspberry Pi Imager. In other words, you will only have to configure Raspberry Pi Imager **once**.
+	- Open the "Image customization options" popup menu [A] and choose "to always use". If you select that option then all of your settings will be remembered across launches of Raspberry Pi Imager. In other words, you will only have to configure Raspberry Pi Imager **once**.
 
-	- Enable <span style="color:green">[B]</span>, then enter a name for your host at <a name="firstBootHostName"></a><span style="color:green">[C]</span>. I recommend choosing a generic name rather than a unique name for each host. The decision you make here boils down to:
+	- Enable [B], then enter a name for your host at <a name="firstBootHostName"></a>[C]. I recommend choosing a generic name rather than a unique name for each host. The decision you make here boils down to:
 
 		- if you choose a *generic* name (like "raspberrypi"), you will only have to set up this panel once. You will choose the actual host name later when you run the first PiBuilder script; but
 		- if you choose a *unique* name for each host then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
@@ -230,10 +229,10 @@ The steps are:
 
 		This documentation uses "«hostname»" to represent the choice you make here.
 
-	- Enable <span style="color:green">[D]</span> and <span style="color:green">[E]</span>. This turns on SSH access.
-	- Enable <span style="color:green">[F]</span>, then:
+	- Enable [D] and [E]. This turns on SSH access.
+	- Enable [F], then:
 
-		- Enter a username at <a name="firstBootUserName"></a><span style="color:green">[G]</span>. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it.
+		- Enter a username at <a name="firstBootUserName"></a>[G]. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it.
 
 			The choice you make here will become the username for *all* of your Raspberry Pis. If you want a different username for each of your Raspberry Pis then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
 			
@@ -243,19 +242,19 @@ The steps are:
 			
 			* PiBuilder assumes the «username» is "pi". If you choose a different «username» then make sure you follow the [configure home directory](#configHome) instructions. You will need to do that once for each unique «username» you create.
 
-		- Set a strong password at <a name="firstBootUserPassword"></a><span style="color:green">[H]</span>. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
+		- Set a strong password at <a name="firstBootUserPassword"></a>[H]. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
 
-	- <a name="firstBootWiFi"></a>If you want the Raspberry Pi's WiFi interface to be active, enable <span style="color:green">[I]</span>, then:
+	- <a name="firstBootWiFi"></a>If you want the Raspberry Pi's WiFi interface to be active, enable [I], then:
 
-		- enter your WiFi network name in <span style="color:green">[J]</span>.
-		- enter your WiFi password in <span style="color:green">[K]</span>.
-		- <a name="firstBootCC"></a>use the popup menu <span style="color:green">[L]</span> to select your country code.
+		- enter your WiFi network name in [J].
+		- enter your WiFi password in [K].
+		- <a name="firstBootCC"></a>use the popup menu [L] to select your country code.
 
 		> Your support host may pre-populate some or all of these fields.
 
-	- Enable <span style="color:green">[M]</span> and then use the popup menus <a name="firstBootTZ"></a><span style="color:green">[N]</span> and <span style="color:green">[O]</span> to set appropriate values.
-	- Disable <span style="color:green">[P]</span>. You need to leave the boot partition mounted for the next step.
-	- Click <span style="color:green">[Q]</span> to <kbd>SAVE</kbd> your settings.
+	- Enable [M] and then use the popup menus <a name="firstBootTZ"></a>[N] and [O] to set appropriate values.
+	- Disable [P]. You need to leave the boot partition mounted for the next step.
+	- Click [Q] to <kbd>SAVE</kbd> your settings.
 
 9. Click <kbd>WRITE</kbd> and respond to any system prompts to transfer the prepared image to your media.
 
