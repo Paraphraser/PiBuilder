@@ -21,22 +21,57 @@ SUPPORT="$WHERE/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
-TARGET="$HOME/.gitconfig"
-if SOURCE="$(supporting_file "$TARGET")" ; then
-   echo "Installing $TARGET from $SOURCE"
-   cp "$SOURCE" "$TARGET"
+# SUPPORT_HOME defaults to HOME
+SUPPORT_HOME="$HOME"
+
+# does the expected folder exist (eg /boot/scripts/support/home/$USER)?
+if [ ! -d "$SUPPORT/$SUPPORT_HOME" ] ; then
+
+   # no! switch to user "pi" instead
+   echo "$SUPPORT/$SUPPORT_HOME does not exist - substituting user 'pi'"
+   SUPPORT_HOME="/home/pi"
+
 fi
 
-TARGET="$HOME/.gitignore_global"
-if SOURCE="$(supporting_file "$TARGET")" ; then
-   echo "Installing $TARGET from $SOURCE"
-   cp "$SOURCE" "$TARGET"
+# create $HOME/.profile
+TARGET=".profile"
+if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
+   echo "Creating $TARGET from $SOURCE"
+   cp "$SOURCE" "$HOME/$TARGET"
 fi
 
-TARGET="$HOME/IOTstack/requirements-mkdocs.txt"
-if [ -e "$TARGET" ] ; then
-   echo "Adding mkdocs support (eg mkdocs serve -a 0.0.0.0:8765)" 
-   pip3 install -r "$TARGET"
+# create a crontab
+TARGET="crontab"
+if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
+   echo "Setting up $TARGET from $SOURCE"
+   mkdir ~/Logs
+   sed "s|«HOMEDIR»|$HOME|g" "$SOURCE" | crontab
+fi
+
+TARGET=".gitconfig"
+if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
+   echo "Installing $TARGET from $SOURCE"
+   cp "$SOURCE" "$HOME/$TARGET"
+fi
+
+TARGET=".gitignore_global"
+if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
+   echo "Installing $TARGET from $SOURCE"
+   cp "$SOURCE" "$HOME/$TARGET"
+fi
+
+TARGET=".config/rclone/rclone.conf"
+if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
+   echo "Installing configuration file for rclone from $SOURCE"
+   mkdir -p $(dirname "$HOME/$TARGET")
+   cp "$SOURCE" "$HOME/$TARGET"
+fi
+
+TARGET=".config/iotstack_backup/config.yml"
+if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
+   echo "Installing configuration file for iotstack_backup from $SOURCE"
+   mkdir -p $(dirname "$HOME/$TARGET")
+   cp "$SOURCE" "$HOME/$TARGET"
 fi
 
 # run the script epilog if it exists

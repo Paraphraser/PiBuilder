@@ -34,10 +34,11 @@ echo "Taking baseline copies of cmdline.txt and config.txt"
 sudo cp /boot/cmdline.txt /boot/cmdline.txt.baseline
 sudo cp /boot/config.txt /boot/config.txt.baseline
 
-echo "Initialising empty user directories for SSH and GnuPG"
+echo "Initialising empty user directories for SSH, GnuPG, etc"
 [ ! -d "$HOME/.gnupg" ] && mkdir -p "$HOME/.gnupg"
 [ ! -d "$HOME/.ssh" ] && mkdir -p "$HOME/.ssh"
 chmod 700 "$HOME/.gnupg" "$HOME/.ssh"
+[ ! -d "$HOME/.local/bin" ] && mkdir -p "$HOME/.local/bin"
 
 if is_running_OS_release buster ; then
    echo "Adding Debian Buster Backports support (for libseccomp2)"

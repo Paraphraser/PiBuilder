@@ -1,6 +1,6 @@
 # PiBuilder
 
-* Updated for 2022-04-04 changes to Raspberry Pi OS (first cut)
+* Updated for 2022-04-04 changes to Raspberry Pi OS (second cut)
 
 ## <a name="introduction"></a>Introduction
 
@@ -373,7 +373,7 @@ At run time, PiBuilder will give preference to an options file where the `@` suf
 
 #### <a name="configHome"></a>Configure home directory
 
-PiBuilder assumes «username» equals "pi". If you choose a different «username», you will need to take special care with the following folder and its contents:
+PiBuilder assumes «username» equals "pi". If you choose a different «username», you *might* need to take special care with the following folder and its contents:
 
 ```
 ~/PiBuilder/boot/scripts/support/home/pi/
@@ -395,7 +395,7 @@ This is the default structure:
         └── crontab
 ```
 
-Let's suppose that, instead of "pi", you decide to use "me" for your «username». What you will need to do is make a copy of the "pi" directory, as in:
+Let's suppose that, instead of "pi", you decide to use "me" for your «username». What you *might* need to do is make a copy of the "pi" directory, as in:
 
 ```
 $ cd ~/PiBuilder/boot/scripts/support/home
@@ -408,6 +408,10 @@ If you have followed the instructions about creating a custom branch to hold you
 $ git add me
 $ git commit -m "clone default home directory structure"
 ```
+
+Note:
+
+* This duplication is *optional*, not *essential*. If PiBuilder is not able to find a specific home folder for «username», it falls back to using "pi" as the source of files being copied into the `/home/«username»` folder on your Raspberry Pi.
 
 ##### <a name="configGit"></a>Git user configuration
 
@@ -1367,6 +1371,13 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-04-13
+
+	- consolidate dependencies on `/boot/scripts/support/home/pi` into the 05 script.
+	- 05 script now checks for `/boot/scripts/support/home/$USER`. If that path does not exist, the script substitutes `/boot/scripts/support/home/pi`. This will avoid the need to duplicate the "pi" home folder structure for each distinct «username».
+	- 03 script now does protective creation of `$HOME/IOTstack/backups` and `$HOME/IOTstack/services`. This prevents `docker-compose` from creating those folders with root ownership. Follows-on from a question on Discord.
+	- Moves `mkdocs` setup to 03 script.
 
 * 2022-04-12
 
