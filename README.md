@@ -250,7 +250,7 @@ The steps are:
 		- enter your WiFi password in [K].
 		- <a name="firstBootCC"></a>use the popup menu [L] to select your country code.
 
-		> Your support host may pre-populate some or all of these fields.
+			> Your support host may pre-populate some or all of these fields.
 
 	- Enable [M] and then use the popup menus <a name="firstBootTZ"></a>[N] and [O] to set appropriate values.
 	- Disable [P]. You need to leave the boot partition mounted for the next step.
@@ -728,6 +728,7 @@ The script:
 	- `/boot/config.txt` as `/boot/config.txt.baseline`
 
 * Initialises `~/.ssh` and `~/.gnupg` directories with correct permissions (700).
+* Ensures `~/.local/bin` exists.
 * If the operating system is Raspbian Buster, adds support for fetching `libseccomp2` as a backport (needed for Alpine-based Docker images).
 * Runs an OS update.
 * Runs an OS full-upgrade followed by an autoremove unless [`SKIP_FULL_UPGRADE`](#skipFullUpgrade) is `true`.
@@ -768,14 +769,25 @@ The script:
 * Makes Python3 the default.
 * Optionally sets up Network Time Protocol sync with local time-servers. See [Configuring Raspbian to use local time-servers](https://gist.github.com/Paraphraser/e1129880015203c29f5e1376c6ca4a08).
 * Installs any custom UDEV rules in `/etc/udev/rules.d`.
-* Replaces `~/.profile`.
-* Initialises crontab (scaffolding only; does nothing).
-* Ensures `~/.local/bin` exists.
 * Clones [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack) to `~/IOTstack`.
 * Clones [IOTstackAliases](https://github.com/Paraphraser/IOTstackAliases) to `~/.local/IOTstackAliases`.
 * Installs `rclone` and `niet` packages (IOTstackBackup dependencies).
 * Clones [IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup) to `~/.local/IOTstackBackup` and installs scripts in `~/.local/bin`.
-* Copies placeholder configuration files for `rclone` and IOTstackBackup into `~/.config`
+* Adds `mkdocs` support. With that in place, you can do:
+
+	```bash
+	$ cd ~/IOTstack
+	$ mkdocs serve -a «ipaddress»:«port»
+	```
+
+	where «ipaddress» is the IP address of your Raspberry Pi, and «port» is a port not otherwise in use (eg 9780). Then, from another host you can point your browser at:
+
+	```
+	http://«ipaddress»:«port»
+	```
+
+	and see the Wiki view of the IOTstack documentation.
+
 * Ends with a logout.
 
 ### <a name="docScript04"></a>Script 04
@@ -796,22 +808,10 @@ The script:
 
 The script:
 
+* Replaces `~/.profile`.
+* Initialises crontab (scaffolding only; does nothing).
 * Sets up Git scaffolding (`.gitconfig` and `.gitignore_global`).
-* Adds `mkdocs` support. With that in place, you can do:
-
-	```bash
-	$ cd ~/IOTstack
-	$ mkdocs serve -a «ipaddress»:«port»
-	```
-
-	where «ipaddress» is the IP address of your Raspberry Pi, and «port» is a port not otherwise in use (eg 9780). Then, from another host you can point your browser at:
-
-	```
-	http://«ipaddress»:«port»
-	```
-
-	and see the Wiki view of the IOTstack documentation.
-
+* Copies placeholder configuration files for `rclone` and IOTstackBackup into `~/.config`
 * Erases bash history.
 * Ends with a logout.
 
