@@ -54,7 +54,7 @@ echo "Installing docker-compose"
 
 # apply defaults for docker-compose (can be overridden in options.sh)
 # https://github.com/docker/compose/releases
-DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.4.1"}"
+DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.5.0"}"
 if is_running_OS_64bit ; then
    DOCKER_COMPOSE_ARCHITECTURE="${DOCKER_COMPOSE_ARCHITECTURE:-"aarch64"}"
 else
@@ -91,7 +91,7 @@ $SUDO mkdir -p "$PLUGINS"
 TARGET="$PLUGINS/docker-compose"
 
 # try to fetch
-$SUDO curl -L "$COMPOSE_URL" -o "$TARGET"
+$SUDO wget -q "$COMPOSE_URL" -O "$TARGET"
 
 # did the download succeed?
 if [ $? -eq 0 ] ; then

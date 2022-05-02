@@ -1372,6 +1372,11 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-05-02
+
+	- Bump docker-compose to v2.5.0
+	- Switch from `curl` to `wget` for docker-compose downloads (slightly better error-handling)
+
 * 2022-04-13
 
 	- consolidate dependencies on `/boot/scripts/support/home/pi` into the 05 script.

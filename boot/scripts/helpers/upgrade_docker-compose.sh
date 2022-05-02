@@ -8,8 +8,8 @@
 # This script can be invoked as:
 #
 # 1. sudo ./upgrade_docker-compose.sh
-# 2. sudo ./upgrade_docker-compose.sh v2.4.1
-# 3. sudo DOCKER_COMPOSE_VERSION=v2.4.1 ./upgrade_docker-compose.sh
+# 2. sudo ./upgrade_docker-compose.sh vX.X.X
+# 3. sudo DOCKER_COMPOSE_VERSION=vX.X.X ./upgrade_docker-compose.sh
 #
 # The parameter takes precedence over the environment variable if both
 # are used.
@@ -23,7 +23,7 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_PLATFORM=linux ./upgrade_docker-compose.sh v2.4.1
+#  DOCKER_COMPOSE_PLATFORM=linux ./upgrade_docker-compose.sh vX.X.X
 #
 # -----
 #
@@ -34,12 +34,12 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./upgrade_docker-compose.sh v2.4.1
+#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./upgrade_docker-compose.sh vX.X.X
 #
 # -----
 #
 # Despite the name, this script will also downgrade. If, for example,
-# you are running docker-compose v2.4.1 and want to revert to v2.3.4
+# you are running docker-compose vX.X.2 and want to revert to vX.X.1
 # the script will do that.
 #
 
@@ -50,7 +50,7 @@
 SCRIPT=$(basename "$0")
 
 # the default version of docker-compose at the moment is
-DOCKER_COMPOSE_VERSION_DEFAULT="v2.4.1"
+DOCKER_COMPOSE_VERSION_DEFAULT="v2.5.0"
 
 # at most one argument
 if [ "$#" -gt 1 ]; then
@@ -65,6 +65,14 @@ fi
 # support three forms of invocation for the version
 DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"$DOCKER_COMPOSE_VERSION_DEFAULT"}"
 DOCKER_COMPOSE_VERSION=${1:-$DOCKER_COMPOSE_VERSION}
+
+# at the moment, versions begin with "v"
+if ! [[ "$DOCKER_COMPOSE_VERSION" =~ ^v ]] ; then
+
+   echo "version numbers for docker-compose begin with 'v' - did you mean v$DOCKER_COMPOSE_VERSION ?"
+   exit 1
+   
+fi
 
 # select default platform and use that unless overridden
 declare -l DEFAULT_PLATFORM=$(uname -s)
@@ -230,7 +238,7 @@ if [ -z "$WHERE" ] ; then
    echo "   $COMPOSE_URL"
 
    # try to fetch
-   curl -L "$COMPOSE_URL" -o "$TARGET"
+   wget -q "$COMPOSE_URL" -O "$TARGET"
 
    # did the download succeed?
    if [ $? -eq 0 ] ; then
