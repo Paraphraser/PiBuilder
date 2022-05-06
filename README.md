@@ -73,10 +73,7 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [Tutorials](#patchTutorials)
 
 - [Keeping in sync with GitHub](#moreGit)
-- [Upgrading docker-compose](#upgradeCompose)
-
-	- [Reinstalling docker or docker-compose](#reinstallation)
-
+- [Routine Maintenance](#sysMaintenance)
 - [Beware of chickens and eggs](#chickenEgg)
 
 - [Some words about SSH](#aboutSSH)
@@ -1192,55 +1189,9 @@ $ git commit -m "merged with GitHub updates"
 
 Now you are in sync with GitHub.
 
-## <a name="upgradeCompose"></a>Upgrading docker-compose
+## <a name="sysMaintenance"></a>Routine Maintenance
 
-You can check the version of docker-compose installed on your system by running either or both of the following commands:
-
-```bash
-$ docker-compose version
-$ docker compose version
-```
-
-The first form follows your PATH variable and executes the first executable file it finds with the name `docker-compose`. The second form uses plugin syntax (likely how "compose" will be invoked in the future).
-
-Both commands should return the same version number. If you spot any discrepancies, you can find out where `docker-compose` is installed on your system by running:
-
-```bash
-$ /boot/scripts/helpers/find_docker-compose.sh
-```
-
-You can find out if a later version of modern docker-compose is available by visiting the [releases page](https://github.com/docker/compose/releases).
-
-You can upgrade (or downgrade) to a particular version of modern docker-compose like this:
-
-```bash
-$ sudo /boot/scripts/helpers/upgrade_docker-compose.sh «version»
-```
-
-where:
-
-* «version» is the value on the [releases page](https://github.com/docker/compose/releases) and always starts with a "v". For example:
-
-	```bash
-	$ sudo /boot/scripts/helpers/upgrade_docker-compose.sh v2.4.1
-	```
-
-The `upgrade_docker-compose.sh` script:
-
-1. Checks for the old version of docker-compose installed by `apt`. If it finds that, it gives you instructions on how to proceed but it does not attempt to change your system. This is because you may have to remove and re-install docker, and that is not something you are going to want to do while your stack is running. You will also likely want to take a backup before you start.
-2. Checks for and removes the Python version of docker-compose.
-3. Checks for and removes other versions of modern docker-compose.
-4. Attempts to download and install the requested version of modern docker-compose.
-
-If the download fails (typically because you have asked for a version that does not actually exist - did you forget the "v"?), the script falls back to the Python version of docker-compose.
-
-Note:
-
-* The `upgrade_docker-compose.sh` script is *reasonably* platform-agnostic. It works on Raspberry Pi (Buster and Bullseye) full 32-bit, mixed 32-bit user with 64-bit kernel, and full 64-bit OS. It also appears to work on macOS for Docker Desktop.
-
-### <a name="reinstallation"></a>Reinstalling docker or docker-compose
-
-Read [reinstalling docker + docker-compose](reinstallation.md) if you need to reinstall docker or docker-compose.
+Read [Maintaining docker + docker-compose](reinstallation.md) if you need to upgrade or reinstall either/both docker and docker-compose.
 
 ## <a name="chickenEgg"></a>Beware of chickens and eggs
 
@@ -1372,6 +1323,10 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-05-06
+
+	- All docker, docker-compose maintenance activities (remove, re-install, upgrade) moved to [Maintaining docker + docker-compose](reinstallation.md).
+
 * 2022-05-02
 
 	- Bump docker-compose to v2.5.0
@@ -1481,7 +1436,7 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 		```
 
 	- Version of docker-compose PiBuilder installs by default bumped to v2.2.3.
-	- Script to [upgrade docker-compose](#upgradeCompose) added to helpers folder.
+	- Script to upgrade docker-compose added to helpers folder.
 
 * 2022-01-09
 
