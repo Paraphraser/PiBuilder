@@ -15,9 +15,21 @@ SKIP_FULL_UPGRADE=false
 #   true, adds "arm_64bit=1" to /boot/config.txt
 PREFER_64BIT_KERNEL=false
 
-# - preference for disabling swap. You should consider this on any Pi
-#   that boots from SD.
-DISABLE_VM_SWAP=false
+# - preference for handling virtual memory swapping. Three options:
+#      VM_SWAP=disable
+#         turns off swapping. You should consider this on any Pi
+#         that boots from SD.
+#      VM_SWAP=automatic
+#         changes /etc/dphys-swapfile configuration so that swap size
+#         is twice real RAM, with a maximum limit of 2GB. In practice,
+#         this will usually result in 2GB of swap space. You should
+#         consider this if your Pi boots from SSD.
+#      VM_SWAP=default
+#         the Raspberry Pi OS defaults apply. In practice, this means
+#         swap is enabled and the swap space is 100MB.
+#   if VM_SWAP is not defined but the old DISABLE_VM_SWAP=true then
+#   that combination is interpreted as VM_SWAP=disable
+#VM_SWAP=default
 
 # - default language
 #   Whatever you change this to must be in your list of active locales

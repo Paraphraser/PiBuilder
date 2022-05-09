@@ -81,12 +81,56 @@ try_patch "/etc/sysctl.conf" "disable IPv6"
 # patch journald.conf to reduce endless docker-runtime mount messages
 try_patch "/etc/systemd/journald.conf" "less verbose journalctl"
 
-# turn off VM swapping if requested
-if [ "$DISABLE_VM_SWAP" = "true" ] && [ -n "$(swapon -s)" ] ; then
-   echo "Disabling virtual memory swapping"
-   sudo swapoff -a
-   sudo systemctl disable dphys-swapfile.service
-fi
+# handle change of controlling variable name from "DISABLE_VM_SWAP" to "VM_SWAP":
+#
+#  if VM_SWAP present, the value (default|disable|automatic) prevails.
+#  if VM_SWAP omitted:
+#     if DISABLE_VM_SWAP is true, VM_SWAP=disable
+#     if DISABLE_VM_SWAP omitted or false, VM_SWAP=default
+#
+[ -z "$VM_SWAP" ] && [ "$DISABLE_VM_SWAP" = "true" ] && VM_SWAP=disable
+VM_SWAP="${VM_SWAP:-default}"
+
+# now, how should VM be handled?
+case "$VM_SWAP" in
+
+   "disable" )
+
+      # is swap turned on?
+      if [ -n "$(swapon -s)" ] ; then
+
+         # yes! just disable it without changing the config
+         echo "Disabling virtual memory swapping"
+         sudo dphys-swapfile swapoff
+         sudo systemctl disable dphys-swapfile.service
+
+      fi
+      ;;
+
+   "automatic" )
+
+      # turn off swap if it is enabled
+      [ -n "$(swapon -s)" ] &&  sudo dphys-swapfile swapoff
+
+      # try to patch the swap file setup
+      if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
+
+         # patch success! deploy
+         sudo dphys-swapfile setup
+
+      fi
+
+      # re-enable swap (reboot occurrs soon)
+      sudo dphys-swapfile swapon
+
+      ;;
+
+   *)
+      # catch-all implying "default" meaning "leave everything alone"
+      echo "Virtual memory system left at Raspberry Pi OS defaults"
+      ;;
+
+esac
 
 # run the script epilog if it exists
 run_pibuilder_epilog

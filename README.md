@@ -285,9 +285,21 @@ SKIP_FULL_UPGRADE=false
 #   true, adds "arm_64bit=1" to /boot/config.txt
 PREFER_64BIT_KERNEL=false
 
-# - preference for disabling swap. You should consider this on any Pi
-#   that boots from SD.
-DISABLE_VM_SWAP=false
+# - preference for handling virtual memory swapping. Three options:
+#      VM_SWAP=disable
+#         turns off swapping. You should consider this on any Pi
+#         that boots from SD.
+#      VM_SWAP=automatic
+#         changes /etc/dphys-swapfile configuration so that swap size
+#         is twice real RAM, with a maximum limit of 2GB. In practice,
+#         this will usually result in 2GB of swap space. You should
+#         consider this if your Pi boots from SSD.
+#      VM_SWAP=default
+#         the Raspberry Pi OS defaults apply. In practice, this means
+#         swap is enabled and the swap space is 100MB.
+#   if VM_SWAP is not defined but the old DISABLE_VM_SWAP=true then
+#   that combination is interpreted as VM_SWAP=disable
+#VM_SWAP=default
 
 # - default language
 #   Whatever you change this to must be in your list of active locales
@@ -319,15 +331,21 @@ You **can** set the right hand sides of the following variables:
 * <a name="localCC"></a>`LOCALCC`to your two-character country code. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootCC).
 * <a name="localTZ"></a>`LOCALTZ` to a valid country and city combination. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootTZ).
 * <a name="skipFullUpgrade"></a>`SKIP_FULL_UPGRADE` to `true`. This prevents [Script 01](#docScript01) from performing a "full upgrade", which may be appropriate if you want to test against a base release of Raspberry Pi OS.
-* <a name="prefer64BitKernel">`PREFER_64BIT_KERNEL`</a> to `true`. This only applies to 32-bit versions of Raspbian.
-* <a name="disableVMswap">`DISABLE_VM_SWAP`</a> to `true` to disable virtual memory (VM) swapping to mass storage. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
+* <a name="prefer64BitKernel"></a>`PREFER_64BIT_KERNEL` to `true`. This only applies to 32-bit versions of Raspbian.
+* <a name="handleVMswap"></a>`VM_SWAP` to:
+
+	- `disable` to disable virtual memory (VM) swapping to mass storage. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
+	- `automatic` changes the swap configuration in `/etc/dphys-swapfile` so that swap size is calculated in two steps. First, the amount of real RAM is doubled (eg a 2GB Raspberry Pi 4 will be doubled to 4GB) and then a maximum limit of 2GB will be applied. This calculation will result in a 2GB swap file for any Raspberry Pi with 1GB or more of real RAM. This is the recommended option if your Raspberry Pi boots from SSD or HD.
+	- `default` makes no changes to the virtual memory system. The current Raspberry Pi OS defaults enable virtual memory swapping with a swap file size of 100MB. This is perfectly workable on systems with 4GB of RAM or more.
+
+	If `VM_SWAP` is not set, it defaults to `default`.
 
 	Running out of RAM causes swapping to occur and that, in turn, has both a performance penalty (because SD cards are quite slow) and increases the wear and tear on the SD card (leading to a heightened risk of failure). There are two main causes of limited RAM:
 
 	- Insufficient physical memory. A good example is a Raspberry Pi Zero W2 which only has 512MB to start with; and/or
 	- Expecting your Raspberry Pi to do too much work, such as running a significant number of containers which either have large memory footprints, or cause a lot of I/O and consume cache buffers, or both.
 
-	If you disable VM swapping by setting `DISABLE_VM_SWAP` to `true`, but you later decide to re-enable swapping, run these commands:
+	If you disable VM swapping by setting `VM_SWAP` to `disable`, but you later decide to re-enable swapping, run these commands:
 
 	```bash
 	$ sudo systemctl enable dphys-swapfile.service
@@ -339,7 +357,7 @@ You **can** set the right hand sides of the following variables:
 	It is important to appreciate that VM swapping is not **bad**. Please don't disable swapping without giving it some thought. If you can afford to add an SSD, you'll get a better result with swapping enabled than if you stick with the SD and disable swapping.
 
 * `LOCALE_LANG` to a valid language descriptor but any value you set here **must** also be enabled via a locale patch. See [setting localisation options](tutorials/locales.md) tutorial. "en_GB.UTF-8" is the default language and I recommend leaving that enabled in any locale patch that you create.
-* <a name="enablePiCam">`ENABLE_PI_CAMERA`</a> controls whether the Raspberry Pi ribbon-cable camera support is enabled at boot time.
+* <a name="enablePiCam"></a>`ENABLE_PI_CAMERA` controls whether the Raspberry Pi ribbon-cable camera support is enabled at boot time.
 
 	- `false` (or undefined) means "do not attempt to enable the camera".
 	- `true` means "enable the camera in the mode that is native for the version of Raspberry Pi OS that is running".
@@ -753,7 +771,7 @@ The script:
 * Optionally sets up local DNS.
 * Disables IPv6.
 * Alters `/etc/systemd/journald.conf` to reduce endless docker-runtime mount messages.
-* Optionally disables virtual memory swapping (see [`DISABLE_VM_SWAP`](#disableVMswap)).
+* Optionally changes virtual memory swapping (see [`VM_SWAP `](#handleVMswap)).
 * Reboots.
 
 ### <a name="docScript03"></a>Script 03
@@ -1322,6 +1340,14 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-05-09
+
+	- Deprecate `DISABLE_VM_SWAP` in favour of `VM_SWAP` with the choices:
+
+		-  `disable` is the same as `DISABLE_VM_SWAP=true`
+		-  `default` is the same as `DISABLE_VM_SWAP=false`
+		-  `automatic` will generally result in a 2GB swap file (up from the 100MB default). 
 
 * 2022-05-06
 
