@@ -134,7 +134,7 @@ git clone https://github.com/Paraphraser/IOTstackAliases.git ~/.local/IOTstackAl
 
 echo "Installing rclone and shell yaml support"
 curl https://rclone.org/install.sh | sudo bash
-sudo pip3 install -U niet
+sudo pip3 install -U shyaml
 
 echo "Cloning and installing IOTstackBackup"
 git clone https://github.com/Paraphraser/IOTstackBackup.git ~/.local/IOTstackBackup

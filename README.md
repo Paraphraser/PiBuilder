@@ -786,7 +786,7 @@ The script:
 * Installs any custom UDEV rules in `/etc/udev/rules.d`.
 * Clones [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack) to `~/IOTstack`.
 * Clones [IOTstackAliases](https://github.com/Paraphraser/IOTstackAliases) to `~/.local/IOTstackAliases`.
-* Installs `rclone` and `niet` packages (IOTstackBackup dependencies).
+* Installs `rclone` and `shyaml` packages (IOTstackBackup dependencies).
 * Clones [IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup) to `~/.local/IOTstackBackup` and installs scripts in `~/.local/bin`.
 * Adds `mkdocs` support. With that in place, you can do:
 
@@ -1340,6 +1340,10 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-05-11
+
+	- Deprecate `niet` YAML CLI parsing tool in favour of `shyaml`. Avoids installation warnings.
 
 * 2022-05-09
 
