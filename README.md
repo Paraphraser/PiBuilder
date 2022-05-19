@@ -1341,6 +1341,10 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-05-19
+
+	- Bump docker-compose to v2.5.1
+
 * 2022-05-11
 
 	- Deprecate `niet` YAML CLI parsing tool in favour of `shyaml`. Avoids installation warnings.
