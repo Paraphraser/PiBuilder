@@ -1,7 +1,5 @@
 # PiBuilder
 
-* Updated for 2022-04-04 changes to Raspberry Pi OS (second cut)
-
 ## <a name="introduction"></a>Introduction
 
 This project documents my approach to building Raspberry Pi operating systems to support [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack).
@@ -1340,6 +1338,10 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-06-05
+
+	- Bump docker-compose to v2.6.0
 
 * 2022-05-19
 
