@@ -15,6 +15,7 @@
 SCRIPT=$(basename "$0")
 
 TARGET="docker-compose"
+TARGET_PLUGIN="docker-compose-plugin"
 
 # no arguments
 if [ "$#" -ne 0 ]; then
@@ -33,8 +34,8 @@ if [ "$(uname -s)" !=  "Linux" -o -z "$(which apt)" -o -z "$(which pip3)" ] ; th
 fi
 
 # step 1 - remove any versions installed via apt
-echo "Attempting to remove any version installed by 'apt'"
-sudo apt -y remove $TARGET
+echo "Attempting to remove any versions managed by 'apt'"
+sudo apt -y remove $TARGET $TARGET_PLUGIN
 
 # step 2 - remove any python versions
 echo "Attempting to remove any versions installed by 'pip3'"

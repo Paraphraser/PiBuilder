@@ -38,6 +38,21 @@ about your networking arrangements or your ISP.
 ========================================================================
 EOM
 
+COMPOSE_PLUGIN="/usr/libexec/docker/cli-plugins/docker-compose"
+COMPOSE_SYMLINK="/usr/local/bin/docker-compose"
+
+read -r -d '' COMPOSEFAIL <<-EOM
+========================================================================
+$SCRIPT expects the docker convenience script to install docker-compose
+as a plug-in at:
+   $COMPOSE_PLUGIN
+Unfortunately, that file can't be found. This is probably because the
+convenience script has changed and is something that PiBuilder can't
+control. Please open an issue at:
+   https://github.com/Paraphraser/PiBuilder/issues
+========================================================================
+EOM
+
 # install Docker
 echo "Installing docker"
 curl -fsSL https://get.docker.com | sudo sh
@@ -46,76 +61,29 @@ if [ $? -ne 0 ] ; then
    exit 1
 fi
 
+# installing docker now brings docker-compose-plugin with it. After
+# being installed by the convenience script, both are maintained by
+# the normal apt update/upgrade duet.The convenience script installs
+# /usr/libexec/docker/cli-plugins/docker-compose which is not in the
+# PATH. Rather than trying to manipulate the PATH, the simplest
+# approach to keeping the "docker-compose" command functional (as
+# distinct from "docker compose" as a plugin) is a symbolic link.
+
+# did the convenience script install the plugin?
+if [ -f "$COMPOSE_PLUGIN" ] ; then
+   # yes! go with the symlink
+   echo "Creating symbolic link for docker-compose-plugin"
+   echo "  - $COMPOSE_SYMLINK linked to"
+   echo "  - $COMPOSE_PLUGIN"
+   sudo ln -s "$COMPOSE_PLUGIN" "$COMPOSE_SYMLINK"
+else
+   echo "$COMPOSEFAIL"
+   exit 1
+fi
+
 echo "Setting groups required for docker and bluetooth"
 sudo usermod -G docker -a $USER
 sudo usermod -G bluetooth -a $USER
-
-echo "Installing docker-compose"
-
-# apply defaults for docker-compose (can be overridden in options.sh)
-# https://github.com/docker/compose/releases
-DOCKER_COMPOSE_VERSION="${DOCKER_COMPOSE_VERSION:-"v2.6.0"}"
-if is_running_OS_64bit ; then
-   DOCKER_COMPOSE_ARCHITECTURE="${DOCKER_COMPOSE_ARCHITECTURE:-"aarch64"}"
-else
-   DOCKER_COMPOSE_ARCHITECTURE="${DOCKER_COMPOSE_ARCHITECTURE:-"armv7"}"
-fi
-
-# construct the URL
-COMPOSE_URL="https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-$DOCKER_COMPOSE_ARCHITECTURE"
-
-# download defaults to user-space
-PLUGINS="$HOME/.docker/cli-plugins"
-
-# where sudo is not required
-unset SUDO
-
-# iterate system-wide candidates
-for CANDIDATE in \
-  "/usr/libexec/docker/cli-plugins" \
-  "/usr/local/libexec/docker/cli-plugins" \
-  "/usr/lib/docker/cli-plugins" \
-  "/usr/local/lib/docker/cli-plugins"
-do
-  if [ -d "$CANDIDATE" ] ; then
-     PLUGINS="$CANDIDATE"
-     SUDO="sudo"
-     break
-  fi
-done
-
-# ensure the download directory exists
-$SUDO mkdir -p "$PLUGINS"
-
-# the target is
-TARGET="$PLUGINS/docker-compose"
-
-# try to fetch
-$SUDO wget -q "$COMPOSE_URL" -O "$TARGET"
-
-# did the download succeed?
-if [ $? -eq 0 ] ; then
-
-   # yes! set execute permission on the target
-   $SUDO chmod +x "$TARGET"
-
-   # and also copy to /usr/local/bin/ (sudo always required)
-   sudo cp "$TARGET" "/usr/local/bin/"
-
-   # yes! report success
-   echo "Modern docker-compose installed as $TARGET - also copied to /usr/local/bin/"
-
-else
-
-   # no! failed. That means TARGET is useless
-   $SUDO rm -f "$TARGET"
-
-   echo "Attempt to download docker-compose failed"
-   echo "   URL=$COMPOSE_URL"
-   echo "Falling back to using pip method"
-   sudo pip3 install -U docker-compose
-
-fi
 
 echo "Installing IOTstack dependencies"
 sudo pip3 install -U ruamel.yaml==0.16.12 blessed

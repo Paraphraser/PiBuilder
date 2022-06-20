@@ -13,9 +13,6 @@ You can follow these instructions even if you did not use PiBuilder to build you
 
 - [Upgrading docker, docker-compose](#upgrading)
 
-	- [Upgrading docker](#upgradeDocker)
-	- [Upgrading docker-compose](#upgradeCompose)
-
 <hr>
 
 ## <a name="caveat"></a>General caveats
@@ -24,33 +21,19 @@ It's important to realise that, sometimes, things just get so messed up under th
 
 ## <a name="preparation"></a>Preparation
 
-1. Check that your system has `wget` installed:
+Clone PiBuilder onto your Raspberry Pi:
 
-	```
-	$ which wget
-	/usr/bin/wget
-	```
+```
+$ cd
+$ git clone https://github.com/Paraphraser/PiBuilder.git
+```
 
-	If the `which` command does not return a path, you will need to install `wget`:
-
-	```
-	$ sudo apt update
-	$ sudo apt install -y wget
-	```
-
-2. Clone PiBuilder onto your Raspberry Pi:
-
-	```
-	$ cd
-	$ git clone https://github.com/Paraphraser/PiBuilder.git
-	```
-
-	It does not matter whether or not you used PiBuilder to build your Raspberry Pi. The idea here is to make sure you have the latest and greatest version of PiBuilder on your Raspberry Pi. If you *previously* cloned PiBuilder, make sure it is up-to-date:
+It does not matter whether or not you used PiBuilder to build your Raspberry Pi. The idea here is to make sure you have the latest and greatest version of PiBuilder on your Raspberry Pi. If you *previously* cloned PiBuilder, make sure it is up-to-date:
 	
-	```
-	$ cd ~/PiBuilder
-	$ git pull origin master
-	```
+```
+$ cd ~/PiBuilder
+$ git pull origin master
+```
 
 ## <a name="nuclearOption"></a>The nuclear option – getting a clean slate
 
@@ -95,9 +78,10 @@ It's important to realise that, sometimes, things just get so messed up under th
 	$ sudo reboot
 	```
 
-	Note:
+	Notes:
 	
 	* It is safe to run both of these `uninstall_` commands even if you are not sure whether docker and docker-compose are installed.
+	* The reboot is **important**. Trying to re-install docker without first doing a reboot risks creating a mess on your system.
 
 ### <a name="reinstalling"></a>Re-installing docker, docker-compose
 
@@ -121,9 +105,7 @@ $ docker-compose up -d
 
 ## <a name="upgrading"></a>Upgrading docker, docker-compose
 
-### <a name="upgradeDocker"></a>Upgrading docker
-
-Docker is upgraded via `apt` so you can use the standard system maintenance commands:
+Both docker and docker-compose are upgraded via `apt` so you can use the standard system maintenance commands:
 
 ```
 $ sudo apt update
@@ -134,51 +116,3 @@ $ sudo apt upgrade
 Note:
 
 * If an `apt upgrade` installs a new version of `docker`, that *will* restart your stack. That's why the `apt list` command is in the middle - so you can see whether `docker` will be upgraded and decide whether to proceed or defer the upgrade.
-
-### <a name="upgradeCompose"></a>Upgrading docker-compose
-
-You can check the version of docker-compose installed on your system by running either or both of the following commands:
-
-```bash
-$ docker-compose version
-$ docker compose version
-```
-
-The first form follows your PATH variable and executes the first executable file it finds with the name `docker-compose`. The second form uses plugin syntax (likely how "compose" will be invoked in the future).
-
-Both commands should return the same version number. If you spot any discrepancies, you can find out where `docker-compose` is installed on your system by running:
-
-```bash
-$ cd ~/PiBuilder/boot/scripts/helpers
-$ ./find_docker-compose.sh
-```
-
-You can find out if a later version of modern docker-compose is available by visiting the [releases page](https://github.com/docker/compose/releases).
-
-You can upgrade (or downgrade) to a particular version of modern docker-compose like this:
-
-```bash
-$ cd ~/PiBuilder/boot/scripts/helpers
-$ sudo ./upgrade_docker-compose.sh «version»
-```
-
-where:
-
-* «version» is the value on the [releases page](https://github.com/docker/compose/releases) and always starts with a "v". For example:
-
-	```bash
-	$ sudo ./upgrade_docker-compose.sh v2.4.1
-	```
-
-The `upgrade_docker-compose.sh` script:
-
-1. Checks for the old version of docker-compose installed by `apt`. If it finds that, it gives you instructions on how to proceed but it does not attempt to change your system. This is because you may have to remove and re-install docker, and that is not something you are going to want to do while your stack is running. You will also likely want to take a backup before you start.
-2. Checks for and removes the Python version of docker-compose.
-3. Checks for and removes other versions of modern docker-compose.
-4. Attempts to download and install the requested version of modern docker-compose.
-
-If the download fails (typically because you have asked for a version that does not actually exist - did you forget the "v"?), the script falls back to the Python version of docker-compose.
-
-Note:
-
-* The `upgrade_docker-compose.sh` script is *reasonably* platform-agnostic. It works on Raspberry Pi (Buster and Bullseye) full 32-bit, mixed 32-bit user with 64-bit kernel, and full 64-bit OS. It also appears to work on macOS for Docker Desktop.

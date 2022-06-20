@@ -40,16 +40,6 @@ PREFER_64BIT_KERNEL=false
 #   Options are: disabled, "false", "true" and "legacy"
 #ENABLE_PI_CAMERA=false
 
-# - override for docker-compose version number. See:
-#     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.4.1"
-# - override for docker-compose architecture. Options are:
-#     armv7
-#     aarch64
-#   armv7 will work on both 32-bit and 64-bit kernels (this is the
-#   default) while aarch64 will only work on a 64-bit kernel.
-#DOCKER_COMPOSE_ARCHITECTURE="armv7"
-
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"

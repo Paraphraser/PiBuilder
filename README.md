@@ -308,16 +308,6 @@ PREFER_64BIT_KERNEL=false
 #   Options are: disabled, "false", "true" and "legacy"
 #ENABLE_PI_CAMERA=false
 
-# - override for docker-compose version number. See:
-#     https://github.com/docker/compose/releases
-#DOCKER_COMPOSE_VERSION="v2.4.1"
-# - override for docker-compose architecture. Options are:
-#     armv7
-#     aarch64
-#   armv7 will work on both 32-bit and 64-bit kernels (this is the
-#   default) while aarch64 will only work on a 64-bit kernel.
-#DOCKER_COMPOSE_ARCHITECTURE="armv7"
-
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
@@ -363,8 +353,6 @@ You **can** set the right hand sides of the following variables:
 		- *Buster*, then `legacy` is identical to `true`;
 		- *Bullseye* the legacy camera system is loaded rather than the native version. In other words, Bullseye's camera system behaves like Buster and earlier. This is the setting to use if downstream applications have not been updated to use Bullseye's native camera system. 
 
-* `DOCKER_COMPOSE_VERSION` is the version of docker-compose to be installed. See the [releases page](https://github.com/docker/compose/releases) for current version numbers. Unfortunately, it is not yet possible to use a generic value like "native". Also note that version numbers begin with the letter "v". In other words, "v2.4.1" is correct while "2.4.1" will fail.
-* `DOCKER_COMPOSE_ARCHITECTURE`. Valid values are `armv7` and `aarch64`. [Script 04](#docScript04) chooses `aarch64` if the full 64-bit OS is running, `armv7` otherwise. In essence, if the Raspberry Pi is running a version of Raspberry Pi OS which is *capable* of running in 32-bit user mode, [Script 04](#docScript04) will choose `armv7` irrespective of whether the kernel is running in 32- or 64-bit mode. This variable lets you override that behaviour and force the choice.
 * `SQLITEYEAR` and `SQLITEVERSION` let you choose the values which govern the version of SQLite that is installed, if you run the optional [Script 06](#docScript06). See the [releases](https://www.sqlite.org/download.html) page.
 
 ##### <a name="perHostConfigOptions"></a>per-host PiBuilder installation options
@@ -807,9 +795,8 @@ The script:
 
 The script:
 
-* Installs Docker.
+* Installs Docker and Docker-Compose.
 * Sets up the `docker` and `bluetooth` group memberships assumed by IOTstack.
-* Installs Docker-Compose.
 * Installs the `ruamel.yaml` and `blessed` Python dependencies assumed by IOTstack.
 * Appends directives to `/boot/cmdline.txt`:
 
@@ -1338,6 +1325,15 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-06-20
+
+	- The "convenience script" (`https://get.docker.com | sudo sh`) for installing `docker` also installs `docker-compose-plugin`. That, in turn, means that = both `docker` and `docker-compose-plugin` are maintained by regular `apt update ; apt upgrade`.
+	- The `04_setup.sh` script now takes advantage of this arrangement and creates a symlink in `/usr/local/bin` so that both the *command* (`docker-compose`) and *plugin* (`docker compose`) forms work from a single binary.
+	- [Maintaining docker + docker-compose](reinstallation.md) updated to explain the above.
+	- `upgrade_docker-compose.sh` reduced to help text pointing to revised documentation.
+ 	- `uninstall_docker-compose.sh` adjusted to also remove the `docker-compose-plugin` package.
+	- `DOCKER_COMPOSE_VERSION` and `DOCKER_COMPOSE_ARCHITECTURE` removed from `options.sh`.
 
 * 2022-06-05
 
