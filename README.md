@@ -84,6 +84,8 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 - [About Supervised Home Assistant](#hassioBackground)
 
+- [`~/.profile` to `~/.bashrc` migration](#bashrcMigration)
+
 - [Change Summary](#changeLog)
 
 ## <a name="definitions"></a>Definitions
@@ -808,7 +810,7 @@ The script:
 
 The script:
 
-* Replaces `~/.profile`.
+* Appends to `~/.bashrc`.
 * Initialises crontab (scaffolding only; does nothing).
 * Sets up Git scaffolding (`.gitconfig` and `.gitignore_global`).
 * Copies placeholder configuration files for `rclone` and IOTstackBackup into `~/.config`
@@ -1324,7 +1326,106 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
+## <a name="bashrcMigration"></a>`~/.profile` to `~/.bashrc` migration
+
+To migrate an existing Pi that was built using PiBuilder to the new structure, proceed as follows:
+
+1. Make a copy of your existing `~/.profile`:
+
+	```bash
+	$ cp ~/.profile ~/profile.save
+	``` 
+
+2. Restore the default version of `~/.profile`:
+
+	```bash
+	$ cp /etc/skel/.profile ~/.profile
+	```
+
+3. Append the new PiBuilder extensions to `~/.bashrc`
+
+	```bash
+	$ wget -q -O bashrc-additions https://raw.githubusercontent.com/Paraphraser/PiBuilder/master/boot/scripts/support/home/pi/.bashrc
+	$ cat bashrc-additions >>~/.bashrc
+	```
+	
+4. Review `profile.save` and move any custom changes to `~/.bashrc`:
+
+	- Typically, you will place your changes after the PiBuilder additions.
+	- You may also wish to add a custom version of the PiBuilder additions plus your own extras to:
+
+		```
+		~/PiBuilder/boot/scripts/support/home/pi/.bashrc@$HOSTNAME
+		```
+
+5. **Before** you logout, test connecting to your Pi via `ssh`.
+6. Clean up:
+
+	```bash
+	$ rm profile.save bashrc-additions
+	```
+
+### remote execution of commands in `~/.local/bin`
+
+The table below summarises when and how `~/.profile` and `~/.bashrc` run.
+
+![Raspberry Pi Imager Advanced Options](./images/profile-vs-bashrc.png)
+
+With one exception, this is usually what you want. The exception is the situation where, from another computer, you want to execute a command remotely via `ssh`. For example:
+
+```bash
+$ ssh pi@raspberrypi.local docker ps
+```
+
+That will work because `docker` is in the default search PATH on the remote machine.
+
+However, a problem arises if the command you want to execute remotely is in the `~/.local/bin` on the remote machine. On a vanilla `ssh` request to open a terminal session, like this:
+
+```bash
+$ ssh pi@raspberrypi.local
+```
+
+`~/.profile` will run and add `~/.local/bin` to your PATH. But as the table shows, `~/.profile` does not run when you execute a command remotely, so something like the following will fail:
+
+```bash
+$ ssh pi@raspberrypi.local myWonderScript.sh
+```
+
+You can, of course, solve this problem by passing the path to the script:
+
+```bash
+$ ssh pi@raspberrypi.local ./.local/bin/myWonderScript.sh
+```
+
+But there is better way, and it involves a small change to `~/.bashrc` which you can implement by running the following command:
+
+```bash
+$ sed -i.bak 's#^      \*) return\;\;#      \*) [ -d "$HOME/.local/bin" ] \&\& PATH="$HOME/.local/bin:$PATH" \; return \;\;#' "$HOME/.bashrc"
+```
+
+> Note: the command makes a backup copy of `bashrc` as `~/.bashrc.bak`
+
+In essence, it changes the "starts but exits immediately" cell in the table above so that it reads "starts, adds `~/.local/bin` to PATH, and exits."
+
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-06-29
+
+	- Deprecates `~/.profile` support in `05_setup.sh` in favour of `~/.bashrc`:
+
+		- The previous arrangement always **replaced** `~/.profile`.
+		- The new arrangement **appends** to `~/.bashrc`.
+
+		Switching to `~/.bashrc` solves a problem when the Desktop (VNC or console) is enabled **and** `~/.profile`, or any file sourced by `~/.profile`, contains syntactic constructs unique to `bash`.
+		
+		VNC and console logins:
+		
+		- occur under `sh` so any `bash` constructs will fail and prevent login.
+		- only invoke `~/.profile` so it is the only script that needs to be compatible with `sh`.
+		
+		PiBuilder now assumes the presence of the default version of `~/.profile` that ships with Raspberry Pi OS and no longer interferes with that file.
+
+		See [`~/.profile` to `~/.bashrc` migration](#bashrcMigration) for instructions on how to update existing systems that were built using older versions of PiBuilder.
 
 * 2022-06-20
 

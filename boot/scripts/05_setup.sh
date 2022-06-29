@@ -33,11 +33,11 @@ if [ ! -d "$SUPPORT/$SUPPORT_HOME" ] ; then
 
 fi
 
-# create $HOME/.profile
-TARGET=".profile"
+# append to $HOME/.bashrc
+TARGET=".bashrc"
 if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
-   echo "Creating $TARGET from $SOURCE"
-   cp "$SOURCE" "$HOME/$TARGET"
+   echo "Appending $SOURCE to $TARGET"
+   cat "$SOURCE" >>"$HOME/$TARGET"
 fi
 
 # create a crontab

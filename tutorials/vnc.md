@@ -70,7 +70,13 @@ $ /boot/scripts/helpers/set_vnc_password.sh
 
 Remember:
 
-* The `scripts` folder is copied onto your `/boot` partition from your support host so the `set_vnc_password.sh` script will only be in the `helpers` folder if you have done that since the 2022-04-04 changes went into effect.
+* The `scripts` folder is copied onto your `/boot` partition from your support host so the `set_vnc_password.sh` script will only be in the `helpers` folder if you have done that since the 2022-04-04 changes went into effect. As an alternative, you can download and execute the script like this:
+
+	```bash
+	$ wget -q https://raw.githubusercontent.com/Paraphraser/PiBuilder/master/boot/scripts/helpers/set_vnc_password.sh
+	$ chmod +x set_vnc_password.sh
+	$ ./set_vnc_password.sh
+	```
 
 The `set_vnc_password.sh` script takes no arguments. It does all the work of:
 
@@ -105,6 +111,16 @@ You can use `set_vnc_password.sh` to initialise your first VNC password, or to c
 	* Before you press <kbd>return</kbd> at step 5, start a `ping` command running on another computer (Linux, macOS, Windows) directed to the IP address of your Raspberry Pi. You should expect ping replies to stop shortly after you tell the Raspberry Pi to reboot by pressing <kbd>return</kbd>. If ping replies persist for more than 10 seconds then you can probably conclude that the Raspberry Pi has hung on the way down.
 
 3. Wait for the system to reboot. If your Raspberry Pi appears to hang, remove and re-connect the power.
+
+	*Pro tip:*
+	
+	* it is a good idea to start a `ping` to your Raspberry Pi from *another* host before you initiate a reboot. The expected pattern is:
+	
+		1. ping replies arrive while the Pi is still running.
+		2. ping replies cease shortly after the Pi starts to go down.
+		3. ping replies resume after the Pi starts to come up.
+	
+		If ping replies do not cease once a reboot has been triggered, that's a good indication that the Pi has hung on the way down.
 
 ### <a name="setResolution"></a>Step 3: set the VNC screen resolution
 
@@ -160,26 +176,9 @@ where `«host»` is any of:
 * a multicast domain name (eg iot-hub.local)
 * a domain name (eg iot-hub.mydomain.com)
 
-The `«port»` number defaults to 5900 and can usually be omitted.
+The `«port»` number defaults to 5900 and can usually be omitted. You should be prompted for a password. Respond with the password you set up in [Step 1: create a VNC password](#setPassword). After verification, you should expect to the desktop.
 
-If you are prompted for a username, use "pi".
-
-You should be prompted for a password. Assuming you used PiBuilder to build your Raspberry Pi, the VNC password will be the same as the new password you entered for user "pi" when you started the 01 script. After password verification, you should expect to see a screen like:
-
-![boot to desktop with auto-login](./images/vnc4.jpg)
-
-That screen shot was taken on:
-
-* a 4GB Raspberry Pi 4 B
-* image `2022-01-28-raspios-bullseye-arm64.zip` (full 64-bit Debian Bullseye)
-* built with PiBuilder (as at 2022-03-15)
-* VNC activated by following the [magic incantation](#magicIncantation) above ***after*** the 05 script had completed.
-
-At that point, you should click on the <kbd>Next</kbd> button and follow your nose. I recommend:
-
-1. Responding to the password-change prompt using the same password as you just used to connect. It's not really clear what the VNC password-change screen actually affects. It does not seem to change anything but I think it's best to avoid any possibility of confusion by keeping the passwords the same. See [changing your VNC password](#passwordChange) if you do want to change your VNC password. That actually works!
-2. Skipping the WiFi screen. WiFi is either already set up by PiBuilder or you told it not to do that by omitting `wpa_supplicant.conf`.
-3. Skipping the software update screen. PiBuilder has just done all that.
+Alternatively, you may see a screen with a login dialog. That is what would happen if you chose boot mode B3 (Desktop, requiring user to login) in [Step 2: change the boot mode to "boot to desktop with auto-login"](#setBootMode). In that case, enter a valid username (eg "pi") and password.
 
 ## <a name="passwordChange"></a>changing your VNC password
 
