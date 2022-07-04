@@ -30,6 +30,10 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 	- [Download the imaging tool](#downloadTool)
 	- [Choose and download a base image](#chooseImage)
 	- [Configure and transfer Raspbian image to SD or SSD](#burnImage)
+
+		- [GUI method (Raspberry Pi Imager)](#burnGUI)
+		- [Classic method (files on boot partition)](#burnClassic)
+
 	- [PiBuilder configuration](#configPiBuilder)
 
 		- [Configure installation options](#configOptions)
@@ -91,7 +95,7 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 ## <a name="definitions"></a>Definitions
 
 * "your support host" means the system where you have cloned the PiBuilder repository. It will usually be a Mac or PC.
-* "`~/PiBuilder`" means the path to the directory where you have cloned the PiBuilder repository from GitHub onto your support host. The directory does not have to be in your home directory on your support host. It can be anywhere.
+* <a name="tildePiBuilder"></a>"`~/PiBuilder`" means the path to the directory where you have cloned the PiBuilder repository from GitHub onto your support host. The directory does not have to be in your home directory on your support host. It can be anywhere.
 * "your Raspberry Pi" means the Raspberry Pi device for which you are building an operating system using PiBuilder.
 * "«hostname»" is a placeholder meaning "the name you chose for your Raspberry Pi".
 * "«username»" is a placeholder meaning "the account name you use to login to your Raspberry Pi".
@@ -123,7 +127,7 @@ Later, when you start to customise your Raspberry Pi, you will realise that you 
 	$ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 	```
 
-	You don't have to keep the PiBuilder folder in your home directory. It can be anywhere. Just remember the [definition](#definitions) that `~/PiBuilder` always means "the path to the PiBuilder folder on your support host".
+	You don't have to keep the PiBuilder folder in your home directory. It can be anywhere. Just remember the [definition](#tildePiBuilder) that `~/PiBuilder` always means "the path to the PiBuilder folder on your support host".
 
 2. Create a branch to keep track of your changes:
 
@@ -196,6 +200,8 @@ If you don't see "OK", start over!
 
 ### <a name="burnImage"></a>Configure and transfer Raspbian image to SD or SSD
 
+#### <a name="burnGUI"></a> GUI method (Raspberry Pi Imager)
+
 The steps are:
 
 1. Connect your media (SD or SSD) to your support platform (eg Mac/PC). 
@@ -254,6 +260,64 @@ The steps are:
 	- Click [Q] to <kbd>SAVE</kbd> your settings.
 
 9. Click <kbd>WRITE</kbd> and respond to any system prompts to transfer the prepared image to your media.
+
+#### <a name="burnClassic"></a> Classic method (files on boot partition)
+
+The "classic" method involves creating files that are placed on the boot partition where Raspberry Pi OS can find them at boot time, and then act on the instructions they contain. You can use this method with [Raspberry Pi Imager](https://www.raspberrypi.com/software/), [Balena Etcher](https://www.balena.io/etcher) or any other tool for transferring images to boot media.
+
+You need to set up three files:
+
+* `ssh` is an empty file. PiBuilder provides this automatically. Its presence enables SSH.
+* `userconf.txt` contains the username and password for the default user. The default user is given the user ID 1000. Traditionally, this has been the username "pi". Many IOTstack containers assume ID 1000 exists.
+* `wpa_supplicant.conf` contains the WiFi credentials. This file is optional and contains the Service Set Identifier (SSID), otherwise known as the WiFi Network Name, and Pre-Shared Key (PSK), otherwise known as the WiFi join password. If you do not provide this file, the Raspberry Pi's WiFi interface is disabled.
+
+PiBuilder provides two scripts to help you to set up these files correctly:
+
+* `create_user_credentials.sh` and
+* `create_wifi_credentials.sh`.
+
+Unfortunately, these helper scripts depend on the availability of other software tools so they may not run successfully on your support platform. You may find that you need to have access to a working Raspberry Pi before you can:
+
+1. Copy these scripts onto the working Pi;
+2. Execute these scripts to create the credentials files; then
+3. Copy the credentials files back to your working copy of PiBuilder.
+
+In other words, this is a [chicken and egg](#chickenEgg) problem.
+
+Remember, you can always use the [GUI method](#burnGUI) to get your Pi up and running.
+
+##### Generate user credentials file
+
+The critical dependency in this script is the availability of `openssl passwd -6`. Not every implementation of the `openssl` tool supports the `-6` flag for the `passwd` command. 
+	
+To initialise your user credentials:
+
+```
+$ ./create_user_credentials.sh {«username»}
+```
+	
+where:
+
+* «username» is an optional argument that defaults to "pi".
+
+The script prompts you, twice, to enter a password for the user, and then generates `userconf.txt` in your working directory. You need to move that file to the PiBuilder `boot` folder, so that it winds up on the `boot` partition of your image.
+	
+##### Generate WiFi credentials file
+
+The critical dependency in this script is the availability of the `wpa_passphrase` tool. 
+
+To initialise your WiFi credentials:
+
+```
+$ ./create_wifi_credentials.sh "«SSID»" "«CC»"
+```
+	
+where both arguments are required and should be enclosed in quote marks:
+	
+* «SSID» is the WiFi network name
+* «CC» is the two-character country code
+
+The script prompts you, twice, to enter the PSK for the WiFi network, and then generates `wpa_supplicant.conf` in your working directory. You need to move that file to the PiBuilder `boot` folder, so that it winds up on the `boot` partition of your image.
 
 ### <a name="configPiBuilder"></a>PiBuilder configuration
 
@@ -1408,6 +1472,10 @@ $ sed -i.bak 's#^      \*) return\;\;#      \*) [ -d "$HOME/.local/bin" ] \&\& P
 In essence, it changes the "starts but exits immediately" cell in the table above so that it reads "starts, adds `~/.local/bin` to PATH, and exits."
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-07-04
+
+	- Explains how to set up [credentials files on boot partition](#burnClassic) and provides helper scripts to assist with the process. This an alternative to using Raspberry Pi Imager.
 
 * 2022-06-29
 
