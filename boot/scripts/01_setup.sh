@@ -22,9 +22,6 @@ HOSTNAME="${1:-"$HOSTNAME"}"
 SUPPORT="$WHERE/support"
 . "$SUPPORT/pibuilder/functions.sh"
 
-# import user options and run the script prolog - if they exist
-run_pibuilder_prolog
-
 # copy etc
 echo "Taking a baseline copy of /etc"
 sudo cp -a /etc /etc-baseline
@@ -33,6 +30,9 @@ sudo cp -a /etc /etc-baseline
 echo "Taking baseline copies of cmdline.txt and config.txt"
 sudo cp /boot/cmdline.txt /boot/cmdline.txt.baseline
 sudo cp /boot/config.txt /boot/config.txt.baseline
+
+# import user options and run the script prolog - if they exist
+run_pibuilder_prolog
 
 echo "Initialising empty user directories for SSH, GnuPG, etc"
 [ ! -d "$HOME/.gnupg" ] && mkdir -p "$HOME/.gnupg"

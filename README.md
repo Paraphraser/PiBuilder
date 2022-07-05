@@ -1473,6 +1473,10 @@ In essence, it changes the "starts but exits immediately" cell in the table abov
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-07-05
+
+	- In 01 script, optional prolog should not run until *after* the baseline snapshots are taken.
+
 * 2022-07-04
 
 	- Explains how to set up [credentials files on boot partition](#burnClassic) and provides helper scripts to assist with the process. This an alternative to using Raspberry Pi Imager.
