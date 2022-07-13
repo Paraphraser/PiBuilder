@@ -52,6 +52,7 @@ subversion
 sysstat
 tcpdump
 time
+traceroute
 uuid-runtime
 wget
 BASE_PACKAGES
