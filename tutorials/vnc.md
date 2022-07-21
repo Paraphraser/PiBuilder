@@ -106,12 +106,6 @@ You can use `set_vnc_password.sh` to initialise your first VNC password, or to c
 	4. Use the <kbd>tab</kbd> key to select `<finish>` and and press <kbd>return</kbd>.
 	5. Use the <kbd>tab</kbd> key to select `<Yes>` and and press <kbd>return</kbd>.
 
-	Tip:
-
-	* Before you press <kbd>return</kbd> at step 5, start a `ping` command running on another computer (Linux, macOS, Windows) directed to the IP address of your Raspberry Pi. You should expect ping replies to stop shortly after you tell the Raspberry Pi to reboot by pressing <kbd>return</kbd>. If ping replies persist for more than 10 seconds then you can probably conclude that the Raspberry Pi has hung on the way down.
-
-3. Wait for the system to reboot. If your Raspberry Pi appears to hang, remove and re-connect the power.
-
 	*Pro tip:*
 	
 	* it is a good idea to start a `ping` to your Raspberry Pi from *another* host before you initiate a reboot. The expected pattern is:
@@ -121,6 +115,8 @@ You can use `set_vnc_password.sh` to initialise your first VNC password, or to c
 		3. ping replies resume after the Pi starts to come up.
 	
 		If ping replies do not cease once a reboot has been triggered, that's a good indication that the Pi has hung on the way down.
+
+3. Wait for the system to reboot. If your Raspberry Pi appears to hang, remove and re-connect the power.
 
 ### <a name="setResolution"></a>Step 3: set the VNC screen resolution
 
