@@ -20,6 +20,7 @@ PREFER_64BIT_KERNEL=false
 #         turns off swapping. You should consider this on any Pi
 #         that boots from SD.
 #      VM_SWAP=automatic
+#         same as "disable" if the Pi is running from SD. Otherwise,
 #         changes /etc/dphys-swapfile configuration so that swap size
 #         is twice real RAM, with a maximum limit of 2GB. In practice,
 #         this will usually result in 2GB of swap space. You should
@@ -29,7 +30,7 @@ PREFER_64BIT_KERNEL=false
 #         swap is enabled and the swap space is 100MB.
 #   if VM_SWAP is not defined but the old DISABLE_VM_SWAP=true then
 #   that combination is interpreted as VM_SWAP=disable
-#VM_SWAP=default
+#VM_SWAP=automatic
 
 # - default language
 #   Whatever you change this to must be in your list of active locales

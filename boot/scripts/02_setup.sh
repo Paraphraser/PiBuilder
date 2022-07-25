@@ -89,7 +89,7 @@ try_patch "/etc/systemd/journald.conf" "less verbose journalctl"
 #     if DISABLE_VM_SWAP omitted or false, VM_SWAP=default
 #
 [ -z "$VM_SWAP" ] && [ "$DISABLE_VM_SWAP" = "true" ] && VM_SWAP=disable
-VM_SWAP="${VM_SWAP:-default}"
+VM_SWAP="${VM_SWAP:-automatic}"
 
 # now, how should VM be handled?
 case "$VM_SWAP" in
@@ -109,20 +109,36 @@ case "$VM_SWAP" in
 
    "automatic" )
 
-      # turn off swap if it is enabled
-      [ -n "$(swapon -s)" ] &&  sudo dphys-swapfile swapoff
+      # is this Pi running from SD?
+      if [ -e "/sys/class/block/mmcblk0" ] ; then
 
-      # try to patch the swap file setup
-      if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
+         # yes, is SD! is swap turned on?
+         if [ -n "$(swapon -s)" ] ; then
 
-         # patch success! deploy
-         sudo dphys-swapfile setup
+            # yes! just disable it without changing the config
+            echo "Running from SD card - disabling virtual memory swapping"
+            sudo dphys-swapfile swapoff
+            sudo systemctl disable dphys-swapfile.service
+
+         fi
+
+      else
+
+         # no, not SD. turn off swap if it is enabled
+         [ -n "$(swapon -s)" ] &&  sudo dphys-swapfile swapoff
+
+         # try to patch the swap file setup
+         if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
+
+            # patch success! deploy
+            sudo dphys-swapfile setup
+
+         fi
+
+         # re-enable swap (reboot occurrs soon)
+         sudo dphys-swapfile swapon
 
       fi
-
-      # re-enable swap (reboot occurrs soon)
-      sudo dphys-swapfile swapon
-
       ;;
 
    *)

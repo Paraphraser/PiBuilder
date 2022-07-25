@@ -354,6 +354,7 @@ PREFER_64BIT_KERNEL=false
 #         turns off swapping. You should consider this on any Pi
 #         that boots from SD.
 #      VM_SWAP=automatic
+#         same as "disable" if the Pi is running from SD. Otherwise,
 #         changes /etc/dphys-swapfile configuration so that swap size
 #         is twice real RAM, with a maximum limit of 2GB. In practice,
 #         this will usually result in 2GB of swap space. You should
@@ -363,7 +364,7 @@ PREFER_64BIT_KERNEL=false
 #         swap is enabled and the swap space is 100MB.
 #   if VM_SWAP is not defined but the old DISABLE_VM_SWAP=true then
 #   that combination is interpreted as VM_SWAP=disable
-#VM_SWAP=default
+#VM_SWAP=automatic
 
 # - default language
 #   Whatever you change this to must be in your list of active locales
@@ -377,7 +378,7 @@ PREFER_64BIT_KERNEL=false
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
-SQLITEVERSION="sqlite-autoconf-3380000"
+SQLITEVERSION="sqlite-autoconf-3390100"
 ```
 
 You **can** set the right hand sides of the following variables:
@@ -389,10 +390,14 @@ You **can** set the right hand sides of the following variables:
 * <a name="handleVMswap"></a>`VM_SWAP` to:
 
 	- `disable` to disable virtual memory (VM) swapping to mass storage. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
-	- `automatic` changes the swap configuration in `/etc/dphys-swapfile` so that swap size is calculated in two steps. First, the amount of real RAM is doubled (eg a 2GB Raspberry Pi 4 will be doubled to 4GB) and then a maximum limit of 2GB will be applied. This calculation will result in a 2GB swap file for any Raspberry Pi with 1GB or more of real RAM. This is the recommended option if your Raspberry Pi boots from SSD or HD.
+	- `automatic`:
+
+		- If the Pi is running from an SD card, this is the same as `disable`.
+		- If the Pi is not running from an SD card, the script changes the swap configuration in `/etc/dphys-swapfile` so that swap size is calculated in two steps. First, the amount of real RAM is doubled (eg a 2GB Raspberry Pi 4 will be doubled to 4GB) and then a maximum limit of 2GB will be applied. This calculation will result in a 2GB swap file for any Raspberry Pi with 1GB or more of real RAM. This is the recommended option if your Raspberry Pi boots from SSD or HD.
+
 	- `default` makes no changes to the virtual memory system. The current Raspberry Pi OS defaults enable virtual memory swapping with a swap file size of 100MB. This is perfectly workable on systems with 4GB of RAM or more.
 
-	If `VM_SWAP` is not set, it defaults to `default`.
+	If `VM_SWAP` is not set, it defaults to `automatic`.
 
 	Running out of RAM causes swapping to occur and that, in turn, has both a performance penalty (because SD cards are quite slow) and increases the wear and tear on the SD card (leading to a heightened risk of failure). There are two main causes of limited RAM:
 
