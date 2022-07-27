@@ -41,8 +41,6 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 			- [Git user configuration](#configGit)
 
-		- [SAMBA support](#sambaSupport)
-
 	- [Run the PiBuilder setup script](#setupPiBuilder)
 	- [Boot your Raspberry Pi](#bootRPi)
 	- [Run the PiBuilder scripts in order](#runScripts)
@@ -177,26 +175,6 @@ $ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
 If you don't see "OK", start over!
 
 > If your first attempt was a *direct* download of the image, consider trying the *indirect* method using a torrent.
-
-##### *on the topic of 32- vs 64-bit …*
-
-* "32-bit" systems:
-
-	- Are capable of running both 32-bit and 64-bit kernels. See also the PiBuilder option: [`PREFER_64BIT_KERNEL`](#prefer64BitKernel).
-	- User mode is fixed to 32-bit.
-	- Docker will pull images built for "arm" architecture.
-
-	The ability to switch kernel modes can come in handy if you find a container misbehaving under a 64-bit kernel.
-
-* "64-bit" systems:
-
-	- Run 64-bit in both kernel and user modes.
-	- Docker will pull images built for "arm64" architecture.
-	- Installs, looks, feels and behaves like Raspberry Pi OS (Raspbian) but self-identifies as "Debian".
-
-	Once you are running full 64-bit, you have no ability to chop and change.
-
-	Please don't pick a 64-bit image as your starting point for no better reason than "64-bit must be better than 32-bit". PiBuilder will install 64-bit versions of everything, including docker and docker-compose, and Docker will pull "arm64" images when you bring up your stack. Just because something *installs* without error does not guarantee that it will *run* correctly. If you are upgrading from a 32-bit system, you will need to assure yourself that all your containers still work as expected.
 
 ### <a name="burnImage"></a>Configure and transfer Raspbian image to SD or SSD
 
@@ -520,66 +498,6 @@ Hint:
 
 You should only need to change `.gitconfig` in PiBuilder if you also change `.gitconfig` your home directory on your support host. Otherwise, the configuration can be re-used for all of your Raspberry Pis.
 
-#### <a name="sambaSupport"></a>SAMBA support
-
-PiBuilder can enable SMB services as an option. PiBuilder assumes that you have a working configuration that you want to preserve across rebuilds. If you do not have a working configuration, you need to do that first. You may find the following tutorials helpful:
-
-* KaliTut [Samba on Raspberry Pi Guide – A To Z](https://kalitut.com/samba-on-raspberry-pi/) (April 2021)
-* PiMyLifeUp [Raspberry Pi SAMBA](https://pimylifeup.com/raspberry-pi-samba/) (Feb 2021)
-* JUANMTECH [SAMBA file sharing](https://www.juanmtech.com/samba-file-sharing-raspberry-pi/) (Oct 2017)
-
-Note:
-
-* Tutorials differ in the packages they tell you to install. You only need:
-
-	```bash
-	$ sudo apt install -y samba smbclient
-	```
-
-	The `samba` package *includes* `samba-common` and `samba-common-bin` so you do not need to install those separately.
-
-***After*** you have SAMBA working on your Raspberry Pi, you need to preserve three files:
-
-1. Your configuration:
-
-	```bash
-	$ cp /etc/samba/smb.conf $HOME
-	```
-
-2. Any SAMBA credentials you may have set up:
-
-	```bash
-	$ touch $HOME/passdb.tdb
-	$ sudo cp /var/lib/samba/private/passdb.tdb $HOME/passdb.tdb
-	```
-
-3. Host-specific information generated when SAMBA is first installed on any given host:
-
-	```bash
-	$ touch $HOME/secrets.tdb@$HOSTNAME
-	$ sudo cp /var/lib/samba/private/secrets.tdb $HOME/secrets.tdb@$HOSTNAME
-	```
-
-	`@HOSTNAME` syntax is used because `secrets.tdb` contains *host-specific* information. While you may use common `smb.conf` and `passdb.tdb` files on several hosts, you should obtain `secrets.tdb` from the host on which it was created. 
-
-Next, navigate to the top level of your copy of PiBuilder and create two directories:
-
-```bash
-$ cd ~/PiBuilder
-$ mkdir -p boot/scripts/support/etc/samba boot/scripts/support/var/lib/samba/private
-```
-
-Finally:
-
-1. Move `smb.conf` into `~/PiBuilder/boot/scripts/support/etc/samba`; and
-2. Move the `.tdb` files into `~/PiBuilderboot/scripts/support/var/lib/samba/private`.
-
-When the 03 script runs, it detects the presence of `smb.conf` and uses it as a trigger to:
-
-1. Install SAMBA;
-2. Replace the default versions of the three files with your custom versions; and
-3. Create `$HOME/share` as a home for your SMB mount points.
-
 ### <a name="setupPiBuilder"></a>Run the PiBuilder setup script
 
 Re-insert the media so the "boot" volume mounts. Run:
@@ -674,6 +592,10 @@ If the last part of the script prompts you to do so, run the command:
 ```bash
 $ ssh-keygen -R «hostname».local 
 ```
+
+Note:
+
+* The 01 script forces your Raspberry Pi's boot mode to "console". You may notice this change if you have an external screen connected your Pi. It is the expected behaviour. See [VNC + console + PiBuilder](tutorials/vnc.md) if you want to understand the reason for this.
 
 #### <a name="runScript02"></a>Script 02
 
@@ -810,7 +732,7 @@ The script:
 * Optionally enables the Raspberry Pi ribbon-cable camera (see [`ENABLE_PI_CAMERA`](#enablePiCam)).
 * Sets raspi-config options:
 
-	- boot to console
+	- boot to console (see [VNC + console + PiBuilder](tutorials/vnc.md) if you want to understand the reason for this)
 	- WiFi country code  (if [`LOCALCC`](#localCC) is enabled)
 	- TimeZone  (if [`LOCALTZ`](#localTZ) is enabled)
 
@@ -837,7 +759,7 @@ The script:
 
 * If the operating system is Raspbian Buster, installs `libseccomp2` as a backport (needed for Alpine-based Docker images).
 * Installs add-on packages (IOTstack dependencies and useful tools including crypto support).
-* Optionally installs [SAMBA support](#sambaSupport).
+* Optionally installs [SAMBA support](tutorials/samba.md).
 * Makes Python3 the default.
 * Optionally sets up Network Time Protocol sync with local time-servers. See [Configuring Raspbian to use local time-servers](https://gist.github.com/Paraphraser/e1129880015203c29f5e1376c6ca4a08).
 * Installs any custom UDEV rules in `/etc/udev/rules.d`.
@@ -1111,6 +1033,7 @@ PiBuilder already has "hooks" in place for some common situations. All you need 
 * [Setting Domain Name System servers](tutorials/dns.md)
 * [Setting your closest Network Time Protocol servers](tutorials/ntp.md)
 * [Setting up static IP addresses for your Raspberry Pi](tutorials/ip.md)
+* [Setting up SAMBA](tutorials/samba.md)
 
 The next tutorial covers a situation where PiBuilder does not have a "hook". It explains how to prepare the patches, how to add them to your PiBuilder structure, and how to hook the patches into the PiBuilder process using a script epilog:
 
@@ -1478,6 +1401,19 @@ In essence, it changes the "starts but exits immediately" cell in the table abov
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-07-27
+
+   - Implement suggestion from Andreas Spiess to:
+
+	   - change the implementation of `VM_SWAP=automatic` (02 script) to sense whether the Pi is running from SD and, if so, disable VM swapping (ie a synonym for `VM_SWAP=disable`).
+	   - make `VM_SWAP=automatic` the default.
+
+	   Together, "automatic" should then handle the majority of situations correctly.
+	   
+	- Move SAMBA discussion to [tutorial document](tutorials/samba.md).
+	- Remove cautionary words about full 64-bit Bullseye. The wording was never *intended* to direct users to the 32-bit system but it seemed to be having that effect.
+	- Adds a note to the 01 script detail explaining the change of boot mode (which is noticeable if the Pi is connected to an HDMI screen).
+
 * 2022-07-05
 
 	- In 01 script, optional prolog should not run until *after* the baseline snapshots are taken.
@@ -1658,7 +1594,7 @@ In essence, it changes the "starts but exits immediately" cell in the table abov
 
 * 2022-01-08
 
-	- add [SAMBA support](#sambaSupport) to 03 script.
+	- add SAMBA support to 03 script.
 
 * 2022-01-02
 

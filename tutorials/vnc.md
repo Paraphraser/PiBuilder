@@ -1,8 +1,8 @@
-# VNC + PiBuilder
+# VNC + console + PiBuilder
 
 ## <a name="toc"></a>contents
 
-- [why VNC is not enabled by default](#theStory)
+- [why VNC and console support is not enabled by default](#theStory)
 - [enabling VNC: the magic incantation](#magicIncantation)
 
 	- [Step 1: create a VNC password](#setPassword)
@@ -14,7 +14,7 @@
 - [changing your VNC password](#passwordChange)
 - [about `lxpanel`](#aboutlxpanel)
 
-## <a name="theStory"></a>why VNC is not enabled by default
+## <a name="theStory"></a> why VNC and console support is not enabled by default
 
 A [thread on Discord](https://discord.com/channels/638610460567928832/638610461109256194/949203175758524499) began with the following post:
 
