@@ -57,7 +57,7 @@ EOF
 echo "Searching for plugin-style versions"
 for DIR in $INSTALL_DIRS ; do
   CANDIDATE="$DIR/$TARGET"
-  if [ -e "$CANDIDATE" ] ; then
+  if [ -e "$CANDIDATE" -o -L "$CANDIDATE" ] ; then
      echo "  removing $CANDIDATE"
      sudo rm -f "$CANDIDATE"
   fi

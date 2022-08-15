@@ -11,7 +11,11 @@ You can follow these instructions even if you did not use PiBuilder to build you
 	- [Uninstalling docker, docker-compose](#uninstalling)
 	- [Re-installing docker, docker-compose](#reinstalling)
 
-- [Upgrading docker, docker-compose](#upgrading)
+- [Upgrading docker](#upgradingDocker)
+- [Upgrading docker-compose](#upgradingCompose)
+
+	- [Option 1: let `apt` do the work](#composeByApt)
+	- [Option 2: upgrade docker-compose by hand](#composeByHand)
 
 <hr>
 
@@ -103,9 +107,9 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-## <a name="upgrading"></a>Upgrading docker, docker-compose
+## <a name="upgradingDocker"></a>Upgrading docker
 
-Both docker and docker-compose are upgraded via `apt` so you can use the standard system maintenance commands:
+After Docker has been installed by the `04_setup.sh` script, it is upgraded via `apt`. You can use the standard system maintenance commands:
 
 ```
 $ sudo apt update
@@ -116,3 +120,49 @@ $ sudo apt upgrade
 Note:
 
 * If an `apt upgrade` installs a new version of `docker`, that *will* restart your stack. That's why the `apt list` command is in the middle - so you can see whether `docker` will be upgraded and decide whether to proceed or defer the upgrade.
+
+## <a name="upgradingCompose"></a>Upgrading docker-compose
+
+This is a bit complicated. Start by running this command:
+
+```
+$ docker-compose version
+```
+
+If the answer is 1.29.2 or earlier then you should follow the steps above at:
+
+* [The nuclear option – getting a clean slate](#nuclearOption)
+ 
+If you have just run the `04_setup.sh` script (either because you have just done a PiBuilder installation or because you were following these instructions) then docker-compose will be at version 2.x.x.
+
+### <a name="composeByApt"></a>Option 1: let `apt` do the work
+
+Once docker-compose has been installed by the `04_setup.sh` script, it can be upgraded via `apt` so you can use the standard system maintenance commands:
+
+```
+$ sudo apt update
+$ sudo apt upgrade
+```
+
+### <a name="composeByHand"></a>Option 2: upgrade docker-compose by hand
+
+The problem with letting `apt` do the work is there seem to be significant delays between new versions of docker-compose being released on GitHub and making their way into the `apt` repositories.
+
+At the time of writing (2022-08-15):
+
+* the `apt` version is v2.6.0. It was released on 2022-05-31.
+* the [releases page](https://github.com/docker/compose/releases) has advanced through v2.6.1, v2.7.0, v2.8.0 and v2.9.0.
+
+If you need a more-recent version of docker-compose, proceed like this:
+
+```bash
+$ cd ~/PiBuilder/boot/scripts/helpers
+$ ./uninstall_docker-compose.sh
+$ sudo ./upgrade_docker-compose.sh v2.9.0
+```
+
+Notes:
+
+1. Replace "v2.9.0" with whatever version you need. The leading "v" is required.
+2. This uninstall/upgrade sequence can also be used to downgrade to any v2.x.x.
+3. Once you have used the `upgrade_docker-compose.sh` script to upgrade docker-compose, the [`apt` method](#composeByApt) will no longer work. If you want to revert to the `apt` method, you will need the [nuclear option](#nuclearOption). 
