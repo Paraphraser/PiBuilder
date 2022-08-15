@@ -41,7 +41,12 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 			- [Git user configuration](#configGit)
 
-	- [Run the PiBuilder setup script](#setupPiBuilder)
+	- [Copy required files to boot volume script](#copyToBoot)
+
+		- [Linux/macOS: run `setup_boot_volume.sh`](#copyToBootMac)
+		- [Windows: copy by command](#copyToBootWin)
+		- [Any platform: copy using GUI](#copyToBootGUI)
+
 	- [Boot your Raspberry Pi](#bootRPi)
 	- [Run the PiBuilder scripts in order](#runScripts)
 
@@ -105,7 +110,7 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 3. [Choose and download a Raspbian image](#chooseImage).
 4. Use the imaging tool to [configure and transfer the Raspbian image](#burnImage) to your media (SD card or SSD).
 5. [Configure PiBuilder](#configPiBuilder).
-6. Either run the PiBuilder [`setup_boot_volume.sh`](#setupPiBuilder) script to add installation files to the media, or just copy what's needed by hand.
+6. [Copy the required files to your boot volume](#copyToBoot).
 7. [Move the media to your Raspberry Pi and apply power](#bootRPi).
 8. Connect to your Raspberry Pi using SSH and [run the PiBuilder scripts in order](#runScripts).
 
@@ -125,7 +130,7 @@ Later, when you start to customise your Raspberry Pi, you will realise that you 
 	$ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 	```
 
-	You don't have to keep the PiBuilder folder in your home directory. It can be anywhere. Just remember the [definition](#tildePiBuilder) that `~/PiBuilder` always means "the path to the PiBuilder folder on your support host".
+	You don't have to keep the PiBuilder folder in your home directory. It can be anywhere. Just remember the [definition](#tildePiBuilder) that `~/PiBuilder` always means "the path to the PiBuilder folder on your support host (Mac/PC)".
 
 2. Create a branch to keep track of your changes:
 
@@ -141,6 +146,8 @@ Later, when you start to customise your Raspberry Pi, you will realise that you 
 ### <a name="downloadTool"></a>Download the imaging tool
 
 I use and recommend [Raspberry Pi Imager](https://www.raspberrypi.com/software/). The instructions below assume you are using Raspberry Pi Imager.
+
+An alternative is [Balena Etcher](https://www.balena.io/etcher/).
 
 ### <a name="chooseImage"></a>Choose and download a base image
 
@@ -182,7 +189,7 @@ If you don't see "OK", start over!
 
 The steps are:
 
-1. Connect your media (SD or SSD) to your support platform (eg Mac/PC). 
+1. Connect your media (SD or SSD) to your support host (eg Mac/PC). 
 2. Launch Raspberry Pi Imager.
 3. Click <kbd>CHOOSE OS</kbd>.
 4. Scroll down and choose "Use custom".
@@ -254,7 +261,7 @@ PiBuilder provides two scripts to help you to set up these files correctly:
 * `create_user_credentials.sh` and
 * `create_wifi_credentials.sh`.
 
-Unfortunately, these helper scripts depend on the availability of other software tools so they may not run successfully on your support platform. You may find that you need to have access to a working Raspberry Pi before you can:
+Unfortunately, these helper scripts depend on the availability of other software tools so they may not run successfully on your support host. You may find that you need to have access to a working Raspberry Pi before you can:
 
 1. Copy these scripts onto the working Pi;
 2. Execute these scripts to create the credentials files; then
@@ -498,29 +505,68 @@ Hint:
 
 You should only need to change `.gitconfig` in PiBuilder if you also change `.gitconfig` your home directory on your support host. Otherwise, the configuration can be re-used for all of your Raspberry Pis.
 
-### <a name="setupPiBuilder"></a>Run the PiBuilder setup script
+### <a name="copyToBoot"></a>Copy required files to boot volume
 
-Re-insert the media so the "boot" volume mounts. Run:
+#### <a name="copyToBootMac"></a> Linux/macOS: run `setup_boot_volume.sh`
+
+You can use this method if your support host is Linux or macOS.
+
+Re-insert the media (SD or SSD) so the "boot" volume mounts. Then run:
 
 ```bash
 $ cd ~/PiBuilder
 $ ./setup_boot_volume.sh «path-to-mount-point»
 ```
 
-If your support platform is a Mac you can omit `«path-to-mount-point»` because it defaults to `/Volumes/boot`. 
+Notes:
 
-I have tried to make this a generic script but I don't have the ability to test it on Windows. If the script does not work on your system, you can emulate it as follows:
+1. Remember, `~/PiBuilder` means the path to the directory where you have cloned the PiBuilder repository from GitHub onto your support host.
 
-1. Notice that the `~/PiBuilder/boot` folder contains a folder named `scripts`.
+2. If your support host is a Mac you can omit `«path-to-mount-point»` because it defaults to `/Volumes/boot`. This script is *mainly* intended for macOS. It removes Spotlight-related indexing files that macOS sticks onto any volume as soon as it is mounted. The indexing files do no harm but it is untidy.
 
-	> it used to also contain an empty file named `ssh` plus a file named `wpa_supplicant.conf` which you were expected to configure; those files have not been needed since the 2022-04-04 changes to Raspberry Pi OS.
+The script ejects the media.
 
-2. Copy `scripts` from `~/PiBuilder/boot` to the top level of the `boot` volume.
-3. Eject the media.
+#### <a name="copyToBootWin"></a> Windows: copy by command
 
-Note:
+Re-insert the media (SD or SSD) so the "boot" volume mounts.
 
-* If you are starting from a 32-bit base image, don't activate the 64-bit kernel by hand. The simplest way to get a combined 64-bit kernel plus 32-bit user mode is to enable the [`PREFER_64BIT_KERNEL`](#prefer64BitKernel) option and let PiBuilder do it for you.
+I am not a Windows user and I don't have a machine to test this on but, if we make two assumptions:
+
+1. The folder on your PC where you have cloned PiBuilder from GitHub is at the path:
+
+	```
+	C:\Documents and Settings\Andreas\Desktop\PiBuilder
+	```
+
+2. The SD card or SSD (prepared by Raspberry Pi Imager or Balena Etcher) is mounted at `X:` drive,
+
+then I believe the following command will get the job done:
+
+```
+xcopy "C:\Documents and Settings\Andreas\Desktop\PiBuilder\boot\*" X:\ /E/H
+```
+Eject the media.
+
+#### <a name="copyToBootGUI"></a> Any platform: copy using GUI
+
+You should be able to use this method regardless of the operating system or Graphical User Interface (GUI) running on your support host.
+
+Re-insert the media (SD or SSD) so the "boot" volume mounts.
+
+In the figure below, <mark>A</mark> represents the directory structure where you have cloned PiBuilder onto your support host. The `boot` **folder** has a highlight and you can see that it contains the `scripts` folder plus the `ssh` file. It may also contain `userconf.txt` and `wpa_supplicant.conf` but that will depend on whether you have created either or both of those files.
+
+![copying files to boot volume](./images/copy-to-boot-volume.png)
+
+<mark>B</mark> is the typical view of the `boot` **folder** that you would see in any windowing system.
+
+<mark>C</mark> is the `boot` **volume** (or "drive") created by either Raspberry Pi Imager or Balena Etcher. This is what you would typically see if you inserted the media, waited for it to mount, and then opened the volume/drive. 
+
+The line marked "COPY" is telling you to:
+
+1. Select the contents of the `boot` **folder** (<mark>B</mark>); then
+2. Either drag-and-drop or copy-and-paste the selection into the `boot` **volume** <mark>C</mark>.
+
+Eject the media.
 
 ### <a name="bootRPi"></a>Boot your Raspberry Pi
 
@@ -547,138 +593,171 @@ These instructions assume you will use the multicast DNS name (ie `«hostname».
 
 #### <a name="runScript01"></a>Script 01
 
-When your Raspberry Pi responds to pings, connect to it like this:
+1. *On your support host:*
 
-```bash
-$ ssh-keygen -R «hostname».local
-$ ssh -4 «username»@«hostname».local
-```
+	When your Raspberry Pi responds to pings, connect to it like this:
 
-Notes:
+	```bash
+	$ ssh-keygen -R «hostname».local
+	$ ssh -4 «username»@«hostname».local
+	```
+	
+	Notes:
+	
+	* The `ssh-keygen` command is protective and removes any obsolete information from your "known hosts" file. Ignore any errors.
+	* The `-4` parameter on the `ssh` command instructs SSH to stick to IPv4.
+	
+	Normally, SSH will issue a challenge like this:
+	
+	```
+	The authenticity of host '«description»' can't be established.
+	ED25519 key fingerprint is SHA256:gobbledegook/gobbledegook.
+	Are you sure you want to continue connecting (yes/no)? 
+	```
+	
+	This is sometimes referred to as <a name="tofudef"></a>the TOFU (Trust On First Use) pattern. Respond with:
+	
+	```
+	yes
+	```
 
-* The `ssh-keygen` command is protective and removes any obsolete information from your "known hosts" file. Ignore any errors.
-* The `-4` parameter on the `ssh` command instructs SSH to stick to IPv4.
+2. *On your Raspberry Pi:*
 
-Normally, SSH will issue a challenge like this:
+	Your Raspberry Pi will ask for the password for the user «username».
+	
+	Now you are logged-in to your Raspberry Pi. It is time to run the first script:
+	
+	```bash
+	$ /boot/scripts/01_setup.sh {newhostname}
+	```
+	
+	Notes:
+	
+	* <a name="newHostname"></a>`newhostname` is an optional parameter. If you supply an argument here, it overrides the value of [«hostname» set in Raspberry Pi Imager](#firstBootHostName) and becomes the «hostname». Any name you supply here must follow the same rules (letters, digits, hyphens).
+	
+	* The 01 script forces your Raspberry Pi's boot mode to "console". You may notice this change if you have an external screen connected your Pi. It is the expected behaviour. See [VNC + console + PiBuilder](tutorials/vnc.md) if you want to understand the reason for this.
 
-```
-The authenticity of host '«description»' can't be established.
-ED25519 key fingerprint is SHA256:gobbledegook/gobbledegook.
-Are you sure you want to continue connecting (yes/no)? 
-```
+	The 01 script runs to completion and reboots your Raspberry Pi. Rebooting disconnects your SSH session, returning you to your support host.
 
-This is sometimes referred to as <a name="tofudef"></a>the TOFU (Trust On First Use) pattern. Respond with:
+3. *On your support host:*
 
-```
-yes
-```
+	If the last part of the 01 script output prompts you to do so, run the command:
+	
+	```bash
+	$ ssh-keygen -R «hostname».local 
+	```
 
-Your Raspberry Pi will ask for the password for the user «username».
-
-Now it is time to run the first script:
-
-```bash
-$ /boot/scripts/01_setup.sh {newhostname}
-```
-
-Note:
-
-* <a name="newHostname"></a>`newhostname` is an optional parameter. If you supply an argument here, it overrides the value of [«hostname» set in Raspberry Pi Imager](#firstBootHostName) and becomes the «hostname». Any name you supply here must follow the same rules (letters, digits, hyphens).
-
-The 01 script runs to completion and reboots your Raspberry Pi. Rebooting disconnects your SSH session, returning you to your support host.
-
-If the last part of the script prompts you to do so, run the command:
-
-```bash
-$ ssh-keygen -R «hostname».local 
-```
-
-Note:
-
-* The 01 script forces your Raspberry Pi's boot mode to "console". You may notice this change if you have an external screen connected your Pi. It is the expected behaviour. See [VNC + console + PiBuilder](tutorials/vnc.md) if you want to understand the reason for this.
 
 #### <a name="runScript02"></a>Script 02
 
-You will know your Raspberry Pi is ready when it starts responding to pings:
+1. *On your support host:*
 
-```bash
-$ ping -c 1 «hostname».local
-```
+	You will know your Raspberry Pi is ready when it starts responding to pings:
+	
+	```bash
+	$ ping -c 1 «hostname».local
+	```
+	
+	Connect and login:
+	
+	```bash
+	$ ssh -4 «username»@«hostname».local
+	```
+	
+	If you see the [TOFU pattern](#tofudef) again, respond with "yes".
+	
+2. *On your Raspberry Pi:*
 
-Connect and login:
+	Run:
 
-```bash
-$ ssh -4 «username»@«hostname».local
-```
+	```bash
+	$ /boot/scripts/02_setup.sh
+	```
 
-If you see the [TOFU pattern](#tofudef) again, respond with "yes". Then run:
+	The 02 script runs to completion and reboots your Raspberry Pi. It is quite a quick script so don't be surprised or think it hasn't done anything.
 
-```bash
-$ /boot/scripts/02_setup.sh
-```
-
-The 02 script runs to completion and reboots your Raspberry Pi. It is quite a quick script so don't be surprised or think it hasn't done anything.
-
-The 02 script also disables IPv6 so, from this point onwards, you can omit the `-4` parameter from SSH commands.
+	The 02 script also disables IPv6 so, from this point onwards, you can omit the `-4` parameter from SSH commands.
 
 #### <a name="runScript03"></a>Script 03
 
-Connect and login:
+1. *On your support host:*
 
-```bash
-$ ssh «username»@«hostname».local
-```
+	Connect and login:
+	
+	```bash
+	$ ssh «username»@«hostname».local
+	```
 
-Run:
+2. *On your Raspberry Pi:*
 
-```bash
-$ /boot/scripts/03_setup.sh
-```
+	Run:
+	
+	```bash
+	$ /boot/scripts/03_setup.sh
+	```
 
-A common problem with this script is the error "Unable to connect to raspbian.raspberrypi.org". This seems to be transient but it also happens far more frequently than you would like or expect. The script attempts to work around this problem by processing each package individually, while keeping track of packages that could not be installed. Then, if there were any packages that could not be installed, the script:
-
-- displays a list of the failed packages;
-- invites you to try running the failed installations by hand; and
-- asks you to re-run 03_setup.sh (which will skip over any packages that are already installed).
-
-The 03 script ends with a logout (not a reboot) so you can login again immediately.
+	A common problem with this script is the error "Unable to connect to raspbian.raspberrypi.org". This seems to be transient but it also happens far more frequently than you would like or expect. The script attempts to work around this problem by processing each package individually, while keeping track of packages that could not be installed. Then, if there were any packages that could not be installed, the script:
+	
+	- displays a list of the failed packages;
+	- invites you to try running the failed installations by hand; and
+	- asks you to re-run 03_setup.sh (which will skip over any packages that are already installed).
+	
+	The 03 script ends with a logout (not a reboot) so you can login again immediately.
 
 #### <a name="runScript04"></a>Script 04
 
-Connect and login:
+1. *On your support host:*
 
-```bash
-$ ssh «username»@«hostname».local
-```
+	Connect and login:
+	
+	```bash
+	$ ssh «username»@«hostname».local
+	```
 
-Run:
+2. *On your Raspberry Pi:*
 
-```bash
-$ /boot/scripts/04_setup.sh
-```
+	Run:
+	
+	```bash
+	$ /boot/scripts/04_setup.sh
+	```
+
+	The 04 script runs to completion and reboots your Raspberry Pi.
 
 #### <a name="runScript05"></a>Script 05
 
-Once your Raspberry Pi comes back, login using:
+1. *On your support host:*
 
-```bash
-$ ssh «username»@«hostname».local
-```
+	Once your Raspberry Pi comes back, login using:
+	
+	```bash
+	$ ssh «username»@«hostname».local
+	```
 
-Run:
+2. *On your Raspberry Pi:*
 
-```bash
-$ /boot/scripts/05_setup.sh
-```
+	Run:
+	
+	```bash
+	$ /boot/scripts/05_setup.sh
+	```
 
-That ends in a logout. Login again.
+	The 05 script ends with a logout (not a reboot) so you can login again immediately.
 
-At this point, your Raspberry Pi is ready to run IOTstack. You can either restore a backup or go into the IOTstack menu and start choosing your containers:
+3. *On your support host:*
 
-```bash
-$ cd ~/IOTstack
-$ ./menu.sh
-``` 
+	```bash
+	$ ssh «username»@«hostname».local
+	```
+
+4. *On your Raspberry Pi:*
+
+	At this point, your Raspberry Pi is ready to run IOTstack. You can either restore a backup or go into the IOTstack menu and start choosing your containers:
+
+	```bash
+	$ cd ~/IOTstack
+	$ ./menu.sh
+	``` 
 
 #### <a name="runScript06"></a>Script 06 (optional)
 
@@ -826,7 +905,7 @@ On your support host (Mac/PC), the `support` directory is at the path:
 ~/PiBuilder/boot/scripts/support
 ```
 
-When you [run the PiBuilder setup script](#setupPiBuilder), the `scripts` folder and its contents are copied to the `boot` partition. When the media is mounted on your Raspberry Pi, the absolute path to the `support` directory is:
+When you [copy the required files to your boot volume](#copyToBoot), the `scripts` folder and its contents are copied to the `boot` partition. When the media is mounted on your Raspberry Pi, the absolute path to the `support` directory is:
 
 ```
 /boot/scripts/support
@@ -985,7 +1064,7 @@ The basic process for creating a patch file for use in PiBuilder is:
 
 	You can do both. A *host-specific* patch always takes precedence over a *general* patch.
 
-4. Place the «patch» file in its proper location in the PiBuilder structure on your support host.
+4. Place the «patch» file in its proper location in the PiBuilder structure on your support host (Mac/PC).
 
 	For example, suppose you have prepared a patch that will be applied to the following file on your Raspberry Pi:
 
@@ -1400,6 +1479,11 @@ $ sed -i.bak 's#^      \*) return\;\;#      \*) [ -d "$HOME/.local/bin" ] \&\& P
 In essence, it changes the "starts but exits immediately" cell in the table above so that it reads "starts, adds `~/.local/bin` to PATH, and exits."
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-08-15
+
+	- Add sub-headings to make it clear which commands are being executed on the support host vs those being executed on the Raspberry Pi.
+	- Expand section on copying required files to boot volume to try to cater for Linux, macOS, Windows, and whether the tool of choice is the command line or a GUI.
 
 * 2022-07-27
 
