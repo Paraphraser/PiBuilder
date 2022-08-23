@@ -33,12 +33,38 @@ if [ ! -d "$SUPPORT/$SUPPORT_HOME" ] ; then
 
 fi
 
-# append to $HOME/.bashrc
-TARGET=".bashrc"
-if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
-   echo "Appending $SOURCE to $TARGET"
-   cat "$SOURCE" >>"$HOME/$TARGET"
-fi
+# defaults for profile-handling
+DOT_PROFILE_ACTION="${DOT_PROFILE_ACTION:-append}"
+DOT_BASHRC_ACTION="${DOT_BASHRC_ACTION:-append}"
+
+# function to handle .profile and .bashrc
+# $1 = name of target file (".profile" or ".bashrc")
+# $2 = value of control var ("$DOT_PROFILE_ACTION" or "$DOT_BASHRC_ACTION")
+handleProfile() {
+   local SOURCE
+   if SOURCE="$(supporting_file "$SUPPORT_HOME/$1")" ; then
+      case "${2,,}" in
+         "append" )
+            echo "Appending $SOURCE to $1"
+            cat "$SOURCE" >>"$HOME/$1"
+         ;;
+         "replace" )
+            echo "Replacing $1 with $SOURCE"
+            touch "$HOME/$1"
+            mv "$HOME/$1" "$HOME/$1.bak"
+            cp "$SOURCE" "$HOME/$1"
+         ;;
+         *)
+            echo "$SOURCE found but profile action = $2"
+         ;;
+      esac
+   else
+      echo "No supporting file found for $1 - skipped"
+   fi
+}
+
+handleProfile ".profile" "$DOT_PROFILE_ACTION"
+handleProfile ".bashrc" "$DOT_BASHRC_ACTION"
 
 # create a crontab
 TARGET="crontab"

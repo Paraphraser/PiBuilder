@@ -91,8 +91,6 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 - [About Supervised Home Assistant](#hassioBackground)
 
-- [`~/.profile` to `~/.bashrc` migration](#bashrcMigration)
-
 - [Change Summary](#changeLog)
 
 ## <a name="definitions"></a>Definitions
@@ -360,6 +358,12 @@ PREFER_64BIT_KERNEL=false
 #   Options are: disabled, "false", "true" and "legacy"
 #ENABLE_PI_CAMERA=false
 
+# - Handling options for .bashrc and .profile
+#   Options are: "append" (default), "replace" and "skip"
+#   See PiBuilder "login" tutorial
+#DOT_BASHRC_ACTION=append
+#DOT_PROFILE_ACTION=append
+
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
@@ -408,6 +412,8 @@ You **can** set the right hand sides of the following variables:
 	- `legacy`, if the Raspberry Pi is running:
 		- *Buster*, then `legacy` is identical to `true`;
 		- *Bullseye* the legacy camera system is loaded rather than the native version. In other words, Bullseye's camera system behaves like Buster and earlier. This is the setting to use if downstream applications have not been updated to use Bullseye's native camera system. 
+
+* `DOT_BASHRC_ACTION` and `DOT_PROFILE_ACTION` both default to `append`. Allowable values if uncommented are `append`, `replace` and `skip`. See [Login Profiles: `~/.bashrc` and `~/.profile`](tutorials/login.md) tutorial for more information on how to use these options.
 
 * `SQLITEYEAR` and `SQLITEVERSION` let you choose the values which govern the version of SQLite that is installed, if you run the optional [Script 06](#docScript06). See the [releases](https://www.sqlite.org/download.html) page.
 
@@ -1397,88 +1403,19 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
-## <a name="bashrcMigration"></a>`~/.profile` to `~/.bashrc` migration
-
-To migrate an existing Pi that was built using PiBuilder to the new structure, proceed as follows:
-
-1. Make a copy of your existing `~/.profile`:
-
-	```bash
-	$ cp ~/.profile ~/profile.save
-	``` 
-
-2. Restore the default version of `~/.profile`:
-
-	```bash
-	$ cp /etc/skel/.profile ~/.profile
-	```
-
-3. Append the new PiBuilder extensions to `~/.bashrc`
-
-	```bash
-	$ wget -q -O bashrc-additions https://raw.githubusercontent.com/Paraphraser/PiBuilder/master/boot/scripts/support/home/pi/.bashrc
-	$ cat bashrc-additions >>~/.bashrc
-	```
-	
-4. Review `profile.save` and move any custom changes to `~/.bashrc`:
-
-	- Typically, you will place your changes after the PiBuilder additions.
-	- You may also wish to add a custom version of the PiBuilder additions plus your own extras to:
-
-		```
-		~/PiBuilder/boot/scripts/support/home/pi/.bashrc@$HOSTNAME
-		```
-
-5. **Before** you logout, test connecting to your Pi via `ssh`.
-6. Clean up:
-
-	```bash
-	$ rm profile.save bashrc-additions
-	```
-
-### remote execution of commands in `~/.local/bin`
-
-The table below summarises when and how `~/.profile` and `~/.bashrc` run.
-
-![Raspberry Pi Imager Advanced Options](./images/profile-vs-bashrc.png)
-
-With one exception, this is usually what you want. The exception is the situation where, from another computer, you want to execute a command remotely via `ssh`. For example:
-
-```bash
-$ ssh pi@raspberrypi.local docker ps
-```
-
-That will work because `docker` is in the default search PATH on the remote machine.
-
-However, a problem arises if the command you want to execute remotely is in the `~/.local/bin` on the remote machine. On a vanilla `ssh` request to open a terminal session, like this:
-
-```bash
-$ ssh pi@raspberrypi.local
-```
-
-`~/.profile` will run and add `~/.local/bin` to your PATH. But as the table shows, `~/.profile` does not run when you execute a command remotely, so something like the following will fail:
-
-```bash
-$ ssh pi@raspberrypi.local myWonderScript.sh
-```
-
-You can, of course, solve this problem by passing the path to the script:
-
-```bash
-$ ssh pi@raspberrypi.local ./.local/bin/myWonderScript.sh
-```
-
-But there is better way, and it involves a small change to `~/.bashrc` which you can implement by running the following command:
-
-```bash
-$ sed -i.bak 's#^      \*) return\;\;#      \*) [ -d "$HOME/.local/bin" ] \&\& PATH="$HOME/.local/bin:$PATH" \; return \;\;#' "$HOME/.bashrc"
-```
-
-> Note: the command makes a backup copy of `bashrc` as `~/.bashrc.bak`
-
-In essence, it changes the "starts but exits immediately" cell in the table above so that it reads "starts, adds `~/.local/bin` to PATH, and exits."
-
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-08-23
+
+	- Improvements to `~/.bashrc` and `~/.profile` handling:
+
+		- Add [tutorial](tutorials/login.md).
+		- Add reference versions of login documents.
+		- Support `DOT_PROFILE_ACTION` and `DOT_BASHRC_ACTION` options with values `append` and `replace`.
+
+	- Bump docker-compose to v2.10.0.
+	- Bump SQLite to version 3390200.
+	- Remove `COMPOSE_DOCKER_CLI_BUILD=1` (now implied by `DOCKER_BUILDKIT=1`). Also remove obsolete cross-reference URLs in favour of up-to-date URL. 
 
 * 2022-08-15
 
@@ -1521,8 +1458,6 @@ In essence, it changes the "starts but exits immediately" cell in the table abov
 		- only invoke `~/.profile` so it is the only script that needs to be compatible with `sh`.
 		
 		PiBuilder now assumes the presence of the default version of `~/.profile` that ships with Raspberry Pi OS and no longer interferes with that file.
-
-		See [`~/.profile` to `~/.bashrc` migration](#bashrcMigration) for instructions on how to update existing systems that were built using older versions of PiBuilder.
 
 * 2022-06-20
 
