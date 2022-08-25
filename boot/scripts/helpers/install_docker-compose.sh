@@ -7,9 +7,9 @@
 #
 # This script can be invoked as:
 #
-# 1. sudo ./upgrade_docker-compose.sh
-# 2. sudo ./upgrade_docker-compose.sh vX.X.X
-# 3. sudo DOCKER_COMPOSE_VERSION=vX.X.X ./upgrade_docker-compose.sh
+# 1. sudo ./install_docker-compose.sh
+# 2. sudo ./install_docker-compose.sh vX.X.X
+# 3. sudo DOCKER_COMPOSE_VERSION=vX.X.X ./install_docker-compose.sh
 #
 # The parameter takes precedence over the environment variable if both
 # are used.
@@ -23,7 +23,7 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_PLATFORM=linux ./upgrade_docker-compose.sh vX.X.X
+#  DOCKER_COMPOSE_PLATFORM=linux ./install_docker-compose.sh vX.X.X
 #
 # -----
 #
@@ -34,7 +34,7 @@
 #
 # Example:
 #
-#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./upgrade_docker-compose.sh vX.X.X
+#  DOCKER_COMPOSE_ARCHITECTURE=armv7 ./install_docker-compose.sh vX.X.X
 #
 # -----
 #
@@ -50,7 +50,7 @@
 SCRIPT=$(basename "$0")
 
 # the default version of docker-compose at the moment is
-DOCKER_COMPOSE_VERSION_DEFAULT="v2.10.0"
+DOCKER_COMPOSE_VERSION_DEFAULT="v2.10.1"
 
 read -r -d '' COMPOSENOTES <<-EOM
 \n
@@ -293,10 +293,7 @@ if [ -z "$WHERE" ] ; then
       echo "Docker documentation recommends adding the following to your .profile"
       echo "   export COMPOSE_DOCKER_CLI_BUILD=1"
       echo "   export DOCKER_BUILDKIT=1"
-      echo "References:"
-      echo "   https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/"
-      echo "   https://docs.docker.com/compose/reference/build/#native-build-using-the-docker-cli"
-      echo "   https://docs.docker.com/compose/reference/envvars/#compose_docker_cli_build"
+      echo "Reference:"
       echo "   https://docs.docker.com/develop/develop-images/build_enhancements/#to-enable-buildkit-builds"
 
    else

@@ -1405,6 +1405,11 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-08-25
+
+	- Bump default version of docker-compose installed via script to v2.10.1
+	- Rename `upgrade_docker-compose.sh` to `install_docker-compose.sh` to reflect the fact that the script depends on `uninstall_docker-compose.sh` having been run beforehand.
+
 * 2022-08-23
 
 	- Improvements to `~/.bashrc` and `~/.profile` handling:
