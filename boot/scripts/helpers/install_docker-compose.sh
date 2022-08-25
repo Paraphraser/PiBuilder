@@ -291,7 +291,6 @@ if [ -z "$WHERE" ] ; then
       echo "   docker compose version"
       echo "You can check for later versions at $COMPOSE_HOME"
       echo "Docker documentation recommends adding the following to your .profile"
-      echo "   export COMPOSE_DOCKER_CLI_BUILD=1"
       echo "   export DOCKER_BUILDKIT=1"
       echo "Reference:"
       echo "   https://docs.docker.com/develop/develop-images/build_enhancements/#to-enable-buildkit-builds"
