@@ -1405,6 +1405,10 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-08-30
+
+	- When IPv6 is disabled, `exim4` writes messages to its panic log every day which also turn up in the system log. This change stops that from happening.
+
 * 2022-08-25
 
 	- Bump default version of docker-compose installed via script to v2.10.1
