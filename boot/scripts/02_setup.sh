@@ -77,7 +77,6 @@ try_patch "/etc/resolvconf.conf" "local name servers"
 
 # patch sysctl.conf to disable IPv6
 try_patch "/etc/sysctl.conf" "disable IPv6"
-try_patch "/etc/exim4/update-exim4.conf.conf" "stop exim4 paniclog messages (when IPv6 disabled)"
 
 # patch journald.conf to reduce endless docker-runtime mount messages
 try_patch "/etc/systemd/journald.conf" "less verbose journalctl"
