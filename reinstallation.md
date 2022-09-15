@@ -16,6 +16,7 @@ You can follow these instructions even if you did not use PiBuilder to build you
 
 	- [Option 1: let `apt` do the work](#composeByApt)
 	- [Option 2: upgrade docker-compose by hand](#composeByHand)
+	- [Option 3: go back to letting `apt` do the work](#recomposeByApt)
 
 <hr>
 
@@ -148,21 +149,33 @@ $ sudo apt upgrade
 
 The problem with letting `apt` do the work is there seem to be significant delays between new versions of docker-compose being released on GitHub and making their way into the `apt` repositories.
 
-At the time of writing (2022-08-15):
+At the time of writing (2022-09-15):
 
-* the `apt` version is v2.6.0. It was released on 2022-05-31.
-* the [releases page](https://github.com/docker/compose/releases) has advanced through v2.6.1, v2.7.0, v2.8.0, v2.9.0, v2.10.0 and v2.10.1.
+* the `apt` version is v2.10.2. It was released on 2022-08-27.
+* the [releases page](https://github.com/docker/compose/releases) has advanced to v2.11.1.
 
 If you need a more-recent version of docker-compose, proceed like this:
 
 ```bash
 $ cd ~/PiBuilder/boot/scripts/helpers
 $ ./uninstall_docker-compose.sh
-$ sudo ./install_docker-compose.sh v2.10.1
+$ sudo ./install_docker-compose.sh v2.11.1
 ```
 
 Notes:
 
-1. Replace "v2.9.0" with whatever version you need. The leading "v" is required.
+1. Replace "v2.11.1" with whatever version you need. The leading "v" is required.
 2. This uninstall/upgrade sequence can also be used to downgrade to any v2.x.x.
 3. Once you have used the `install_docker-compose.sh` script to upgrade docker-compose, the [`apt` method](#composeByApt) will no longer work. If you want to revert to the `apt` method, you will need the [nuclear option](#nuclearOption). 
+
+### <a name="recomposeByApt"></a>Option 3: go back to letting `apt` do the work
+
+You've tried [upgrading docker-compose by hand](#composeByHand) but you've decided to go back to [letting `apt` do the work](#composeByApt):
+
+```bash
+$ cd ~/PiBuilder/boot/scripts/helpers
+$ ./uninstall_docker-compose.sh
+$ ./install_docker-compose-plugin.sh
+```
+
+Thereafter, an `apt update` followed by an `apt upgrade` will update `docker-compose-plugin` as and when a new version is released via the `apt` repositories. This is significantly slower than the speed with which new releases appear on the [releases page](https://github.com/docker/compose/releases). The release schedule for `docker-compose-plugin` appears to be tied to the release schedule for `docker-ce`.
