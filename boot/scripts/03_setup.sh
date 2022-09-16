@@ -44,8 +44,10 @@ netcat
 nmap
 python3-pip
 python3-dev
+python3-virtualenv
 rlwrap
 ruby
+software-properties-common
 sqlite3
 sshfs
 subversion

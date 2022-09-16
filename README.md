@@ -70,6 +70,7 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 	- [Search function – `supporting_file()`](#searchForItem)
 	- [Patch function – `try_patch()`](#searchForPatch)
+	- [Folder merge function – `try_merge()`](#searchForMerge)
 
 - [Preparing your own patches](#patchPreparation)
 
@@ -835,6 +836,7 @@ The script:
 * Optionally sets up local DNS.
 * Disables IPv6.
 * Alters `/etc/systemd/journald.conf` to reduce endless docker-runtime mount messages.
+* Merges the contents of `/etc/nework` (eg to define custom network interfaces such as VLANs).
 * Optionally changes virtual memory swapping (see [`VM_SWAP `](#handleVMswap)).
 * Reboots.
 
@@ -1000,6 +1002,54 @@ The `try_patch()` function has two common use patterns:
 	```bash
 	if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
 		sudo dpkg-reconfigure -f noninteractive locales
+	fi
+	```
+
+### <a name="searchForMerge"></a>Folder merge function – `try_merge()`
+
+The `try_merge()` function takes two arguments:
+
+1. A path beginning with a `/` where the `/` means "the `support` directory".
+2. A comment string summarising the purpose of the merge.
+
+For example:
+
+```bash
+try_merge "/etc/network" "set up custom interfaces"
+```
+
+The merge algorithm invokes `supporting_file()` to see if the source path can be found. In this example, that would be:
+
+```
+/boot/scripts/support/etc/network
+```
+
+Calling `supporting_file()` implies two candidates will be considered:
+
+```
+/boot/scripts/support/etc/network@«hostname»
+/boot/scripts/support/etc/network
+``` 
+
+The *host-specific* form is given precedence over the *general* form.
+
+`supporting_file()` will return successfully if the above path exists and is either a file or a non-empty directory. `try_merge()` then insists that both the source and target paths lead to *directories*. If both are directories then `rsync` is called to perform a non-overwriting merge, and the result code returned by `rsync` becomes the result code returned by `try_merge()`.
+
+If any pf the preliminary tests fail, `rsync` is not called and the result code is set to indicate failure.
+
+The `try_merge()` function has two common use patterns:
+
+* unconditional invocation where there are no actions that depend on the success of the merge. For example:
+
+	```bash
+	try_merge "/etc/network" "set up custom interfaces"
+	``` 
+
+* conditional invocation where subsequent actions depend on the success of the merge. For example:
+
+	```bash
+	if try_merge "/etc/network" "set up custom interfaces" ; then
+		sudo service networking restart
 	fi
 	```
 
@@ -1405,6 +1455,11 @@ If you want Supervised Home Assistant to work, reliably, it really needs to be i
 
 ## <a name="changeLog"></a>Change Summary
 
+* 2022-09-16
+
+	- Adds [`try_merge()`](#searchForMerge) function and employs it [Script 02](#docScript02) to conditionally merge the `/etc/network` folder. This can be used to customise network interfaces such as setting up VLANs.
+	- Adds `python3-virtualenv` and `software-properties-common` to the list of packages installed by [Script 03](#docScript03). The former is now an IOTstack dependency. The latter is in anticipation of Python 3.10.
+ 
 * 2022-08-30
 
 	- When IPv6 is disabled, `exim4` writes messages to its panic log every day which also turn up in the system log. This change stops that from happening.

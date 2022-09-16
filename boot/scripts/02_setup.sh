@@ -81,6 +81,9 @@ try_patch "/etc/sysctl.conf" "disable IPv6"
 # patch journald.conf to reduce endless docker-runtime mount messages
 try_patch "/etc/systemd/journald.conf" "less verbose journalctl"
 
+# merge network directory if one exists
+try_merge "/etc/network" "customising network interfaces"
+
 # handle change of controlling variable name from "DISABLE_VM_SWAP" to "VM_SWAP":
 #
 #  if VM_SWAP present, the value (default|disable|automatic) prevails.

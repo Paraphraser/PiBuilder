@@ -240,6 +240,69 @@ try_patch() {
 }
 
 
+# a function to find a patch directory for the supplied $1 argument and,
+# if one exists, attempt to merge its contents with the implied target
+#
+# Parameter $1: path to the folder to be merged (eg /etc/ppp) will
+#               look for either:
+#                  /boot/scripts/support/etc/ppp@host
+#                  /boot/scripts/support/etc/ppp
+# Parameter $2: a comment string describing the merge
+#
+#  Return code: if BOTH the source and target indicated by $1 exist AND
+#               are directories then:
+#               1. rsync is invoked to merge the two directories; an
+#               2. the return code is rsync's return code.
+#               Otherwise 1 if either/both the source and target
+#               do not exist or are not directories.
+#
+# Outputs comments indicating whether the patch was found and applied,
+# found and not applied successfully, or not found.
+#
+# Can be called in two forms:
+# 1.  try_merge "/etc/ppp" "merging /etc/ppp directors"
+# 2.  if try_merge "/etc/ppp" "merging /etc/ppp directors" ; then
+#        --some conditional actions here--
+#     fi
+
+try_merge() {
+
+   local MERGEDIR
+
+   # does file-system object exist for the target in $1 ?
+   if MERGEDIR="$(supporting_file "$1")" ; then
+
+      echo "[MERGE] $1 - $2"
+
+      # yes! are it and the target both directories?
+      if [ -d "$MERGEDIR" -a -d "$1" ] ; then
+
+         # yes! supporting_file() has already determined that the
+         # source directory is not empty so try to merge
+         echo "[MERGE] calling rsync to perform non-overwriting merge"
+
+         # merge without overwriting. The trailing "/" on MERGEDIR is
+         # required. The filtering gets rid of macOS artifacts.
+         sudo rsync -rv --ignore-existing --exclude=".DS_Store" --exclude="._*" "$MERGEDIR"/ "$1"
+
+         # return rsync's result code
+         return $?
+
+      fi
+
+      echo "[MERGE] skipped - both $MERGEDIR and $1 must be directories"
+
+   else
+
+      # no source directory found
+      echo "[MERGE] skipped - no non-empty merge directory found for $1"
+
+   fi
+
+   return 1
+
+}
+
 # a function to "source":
 # 1. the pibuilder-options script
 # 2. a prolog based on the script name. For example:
