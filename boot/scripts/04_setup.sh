@@ -85,8 +85,21 @@ echo "Setting groups required for docker and bluetooth"
 sudo usermod -G docker -a $USER
 sudo usermod -G bluetooth -a $USER
 
-echo "Installing IOTstack dependencies"
-sudo pip3 install -U ruamel.yaml==0.16.12 blessed
+# the menu now has some specific structural requirements for its dependencies
+echo "Removing any Python dependencies which may conflict with the IOTstack menu"
+for P in virtualenv ruamel.yaml blessed ; do
+   sudo pip3 uninstall -y "$P"
+   pip3 uninstall -y "$P"
+done
+
+# the menu now has its own requirements list - process that
+echo "Satisfying IOTstack menu requirements"
+pip3 install -U -r "$HOME/IOTstack/requirements-menu.txt"
+
+# and, just on the off-chance that this script is being run to reinstall
+# docker and docker-compose, in which case the virtual environment might
+# already exist, clobber that so it will be recreated when the menu runs
+sudo rm -rf "$HOME/IOTstack/.virtualenv-menu"
 
 # set cmdline options if possible
 TARGET="/boot/cmdline.txt"

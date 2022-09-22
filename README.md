@@ -80,6 +80,10 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 - [Keeping in sync with GitHub](#moreGit)
 - [Routine Maintenance](#sysMaintenance)
+
+	- [Maintaining docker and docker-compose](#dockerMaintenance)
+	- [Maintaining the IOTstack menu's runtime environment](#menuMaintenance)
+
 - [Beware of chickens and eggs](#chickenEgg)
 
 - [Some words about SSH](#aboutSSH)
@@ -1323,7 +1327,19 @@ Now you are in sync with GitHub.
 
 ## <a name="sysMaintenance"></a>Routine Maintenance
 
+### <a name="dockerMaintenance"></a>Maintaining docker and docker-compose
+
 Read [Maintaining docker + docker-compose](reinstallation.md) if you need to upgrade or reinstall either/both docker and docker-compose.
+
+### <a name="menuMaintenance"></a> Maintaining the IOTstack menu's runtime environment
+
+The change to running the menu in a Python virtual environment seems to be causing some problems. One example is:
+
+```
+⠋ModuleNotFoundError: No module named 'virtualenv.activation.xonsh'
+```
+
+If the menu will not launch properly, please follow the instructions in [Menu maintenance](reset_menu_enviroment.md).
 
 ## <a name="chickenEgg"></a>Beware of chickens and eggs
 
@@ -1454,6 +1470,13 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-09-22
+
+	- Bump default version of docker-compose installed via script to v2.11.1.
+	- Add comments to header of `install_docker-compose-plugin.sh` so its purpose is clear.
+	- Add `reset_menu_enviroment.sh` script and associated documentation to try to reset Python environment so menu will run post [PR560](https://github.com/SensorsIot/IOTstack/pull/560).
+	- Related changes to 04 script.
 
 * 2022-09-16
 
