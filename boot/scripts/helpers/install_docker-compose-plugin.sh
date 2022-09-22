@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+#
+# Uses apt to install docker-compose-plugin and sets up a symlink
+# such that
+#   /usr/local/bin/docker-compose
+# points to
+#   /usr/libexec/docker/cli-plugins/docker-compose
+#
+# Thereafter, whenever docker-compose-plugin is updated by apt, the
+# symlink will still be in place and either "docker-compose" or
+# "docker compose" will launch the same version of the binary.
+#
+
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
 
