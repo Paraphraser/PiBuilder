@@ -838,7 +838,13 @@ The script:
 * Applies the recommended `allowinterfaces eth*,wlan*` patch.
 * Applies [Does your Raspberry Pi's Wireless Interface freeze?](https://gist.github.com/Paraphraser/305f7c70e798a844d25293d496916e77). Only probes interfaces that are defined, are active, and obtain their IP addresses via DHCP.
 * Optionally sets up local DNS.
-* Disables IPv6.
+* Customises sysctl. PiBuilder supports two methods:
+
+	- A patch file for `/etc/sysctl.conf`. This is the legacy method (deprecated).
+	- A folder named `/etc/sysctl.d` which is [merged](searchForMerge). This is the modern method. The only rule to follow is that only files with the `.conf` extension are processed.
+
+	PiBuilder defaults to providing `/etc/sysctl.d/local.conf` which contains instructions to disable IPv6.
+
 * Alters `/etc/systemd/journald.conf` to reduce endless docker-runtime mount messages.
 * Merges the contents of `/etc/nework` (eg to define custom network interfaces such as VLANs).
 * Optionally changes virtual memory swapping (see [`VM_SWAP `](#handleVMswap)).
@@ -1470,6 +1476,11 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-10-11
+
+	- Bump default version of docker-compose installed via script to v2.11.2.
+	- Support `/etc/sysctl.d` merging in addition to `/etc/sysctl.conf` patching. Previous default patch to disable IPv6 is now applied via `/etc/sysctl.d/local.conf`.
 
 * 2022-09-22
 

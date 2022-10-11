@@ -75,8 +75,13 @@ fi
 # patch resolvconf.conf for local DNS and domain name
 try_patch "/etc/resolvconf.conf" "local name servers"
 
-# patch sysctl.conf to disable IPv6
-try_patch "/etc/sysctl.conf" "disable IPv6"
+# sysctl customisations 
+# Step 1: check for sysctl.conf and apply it if found. That edits
+#         /etc/sysctl.conf directly. This is the legacy approach.
+# Step 2: check for sysctl.d. If it is found, copy any files found
+#         inside it (no overwrite). This is the modern approach.
+try_patch "/etc/sysctl.conf" "patching sysctl.conf"
+try_merge "/etc/sysctl.d" "customising sysctl.d"
 
 # patch journald.conf to reduce endless docker-runtime mount messages
 try_patch "/etc/systemd/journald.conf" "less verbose journalctl"
