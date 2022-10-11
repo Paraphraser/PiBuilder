@@ -71,3 +71,4 @@ for CANDIDATE in $(which -a $TARGET) ; do
 done
 
 echo "With any luck, all versions of $TARGET have been nuked."
+echo "If you also un-installed docker, you MUST now reboot."
