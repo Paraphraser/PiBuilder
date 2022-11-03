@@ -333,6 +333,9 @@ The file supplied with PiBuilder looks like this:
 # - skip full upgrade in the 01 script.
 SKIP_FULL_UPGRADE=false
 
+# - skip firmware in the 01 script.
+SKIP_EEPROM_UPGRADE=false
+
 # - preference for kernel. Only applies to 32-bit installations. If
 #   true, adds "arm_64bit=1" to /boot/config.txt
 PREFER_64BIT_KERNEL=false
@@ -380,6 +383,14 @@ You **can** set the right hand sides of the following variables:
 * <a name="localCC"></a>`LOCALCC`to your two-character country code. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootCC).
 * <a name="localTZ"></a>`LOCALTZ` to a valid country and city combination. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootTZ).
 * <a name="skipFullUpgrade"></a>`SKIP_FULL_UPGRADE` to `true`. This prevents [Script 01](#docScript01) from performing a "full upgrade", which may be appropriate if you want to test against a base release of Raspberry Pi OS.
+* <a name="skipFirmwareUpgrade"></a>`SKIP_EEPROM_UPGRADE` to `true`. This prevents [Script 01](#docScript01) from updating your Raspberry Pi's firmware. If set to `false` (the default), [Script 01](#docScript01) runs:
+
+	```
+	$ rpi-eeprom-update
+	```
+	
+	If and only if the response includes "UPDATE AVAILABLE" is a firmware update applied. The EEPROM is updated during the reboot at the end of [Script 01](#docScript01). The process adds extra time to the normal reboot cycle so please be patient. 
+
 * <a name="prefer64BitKernel"></a>`PREFER_64BIT_KERNEL` to `true`. This only applies to 32-bit versions of Raspbian.
 * <a name="handleVMswap"></a>`VM_SWAP` to:
 
@@ -815,7 +826,8 @@ The script:
 * Ensures `~/.local/bin` exists.
 * If the operating system is Raspbian Buster, adds support for fetching `libseccomp2` as a backport (needed for Alpine-based Docker images).
 * Runs an OS update.
-* Runs an OS full-upgrade followed by an autoremove unless [`SKIP_FULL_UPGRADE`](#skipFullUpgrade) is `true`.
+* Runs an OS full-upgrade unless [`SKIP_FULL_UPGRADE`](#skipFullUpgrade) is `true`, in which case the script falls back to a normal OS upgrade.
+* Runs an OS auto-remove to clean up obsolete packages that otherwise produce reminders.
 * Optionally replaces `/etc/ssh` with a preset.
 * Optionally sets up locale(s).
 * Optionally enables the 64-bit kernel (see [`PREFER_64BIT_KERNEL`](#prefer64BitKernel)).
@@ -826,6 +838,7 @@ The script:
 	- WiFi country code  (if [`LOCALCC`](#localCC) is enabled)
 	- TimeZone  (if [`LOCALTZ`](#localTZ) is enabled)
 
+* If [`SKIP_EEPROM_UPGRADE`](#skipFullUpgrade) is `false`, checks whether a firmware update is available and sets it up to be applied on the next reboot.
 * Optionally changes «hostname» (if [newhostname](#newHostname) argument is provided)
 * Reboots
 
@@ -1476,6 +1489,17 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-11-03
+
+	- Adds check for firmware upgrade to [Script 01](#docScript01) plus `SKIP_EEPROM_UPGRADE` option to bypass the upgrade. See [All3DP tutorial](https://all3dp.com/2/raspberry-pi-4-firmware-update-tutorial/) for background.
+	- Changes definition of `SKIP_FULL_UPGRADE` as follows:
+
+		- if `false`, performs `sudo apt full-upgrade -y`;
+		- if a value other than `false`, performs `sudo apt upgrade -y`
+		- unconditionally performs `sudo apt autoremove -y`
+
+	- Bump default version of docker-compose installed via script to v2.12.2.
 
 * 2022-10-11
 

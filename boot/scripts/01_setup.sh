@@ -54,11 +54,17 @@ fi
 echo "Running sudo apt update"
 sudo apt update
 
+# normal behaviour is a full upgrade but can fall back to normal upgrade
 if [ "$SKIP_FULL_UPGRADE" = "false" ] ; then
    echo "Running sudo apt full-upgrade -y"
    sudo apt full-upgrade -y
-   sudo apt autoremove -y
+else
+   echo "Running sudo apt upgrade -y"
+   sudo apt upgrade -y
 fi
+
+# remove any junk so we don't get reminders
+sudo apt autoremove -y
 
 # apply any preset for /etc/ssh
 if SOURCE="$(supporting_file "/etc/ssh/etc-ssh-backup.tar.gz")" ; then
@@ -146,6 +152,26 @@ fi
 # (it can be removed later if need be, eg using raspi-config.
 if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
    sudo dpkg-reconfigure -f noninteractive locales
+fi
+
+# has the user given permission for an EEPROM upgrade?
+if [ "$SKIP_EEPROM_UPGRADE" = "false" ] ; then
+
+   # yes! is an upgrade available?
+   if [ $(sudo rpi-eeprom-update | grep -c "*** UPDATE AVAILABLE ***") -gt 0 ] ; then
+
+      # yes! proceed
+      echo "Updating Raspberry Pi Firmware"
+      sudo rpi-eeprom-update -d -a
+      echo "Note: the next reboot may take a little longer than expected"
+
+   else
+   
+      # no! advise
+      echo "Note: Raspberry Pi Firmware is up-to-date"
+
+   fi
+
 fi
 
 # does the host name need to be updated?
