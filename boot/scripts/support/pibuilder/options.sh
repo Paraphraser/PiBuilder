@@ -53,4 +53,4 @@ PREFER_64BIT_KERNEL=false
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
-SQLITEVERSION="sqlite-autoconf-3390200"
+SQLITEVERSION="sqlite-autoconf-3400000"
