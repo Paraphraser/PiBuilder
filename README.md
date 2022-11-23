@@ -15,10 +15,13 @@ PiBuilder can't possibly be a "one size fits all" for all possible Raspberry Pi 
 I have tested PiBuilder on:
 
 * Raspberry Pi 3B+, 4B and Zero W2 hardware
-* 32-bit versions of Raspberry Pi OS (aka Raspbian) "Buster" and "Bullseye"
-* 64-bit version of "Bullseye".
+* 32-bit versions of Raspberry Pi OS (aka Raspbian) Buster and Bullseye
+* 64-bit version of Raspberry Pi OS Bullseye
+* 64-bit version of Debian Bullseye running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Parallels. See [running on other platforms](#runOtherPlatform).
 
-The scripts will *probably* work on other Raspberry Pi hardware but I have no idea about other hardware platforms (eg Nuc) or operating systems (eg Debian). I have nothing against either non- Raspberry Pi hardware or operating systems. I can only test with what I have.
+The scripts will *probably* work on other Raspberry Pi hardware but I have no idea about other hardware platforms or operating systems. I have nothing against either non- Raspberry Pi hardware or operating systems. I can only test with what I have.
+
+The scripts make use of tools which are specific to the Raspberry Pi (eg `raspi-config`). When the relevant tool is not available, the scripts simply bypass the step.
 
 ## <a name="toc"></a>Contents
 
@@ -95,6 +98,8 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 - [Some words about VNC](#aboutVNC)
 
 - [About Supervised Home Assistant](#hassioBackground)
+
+- [Running on other platforms](#runOtherPlatform)
 
 - [Change Summary](#changeLog)
 
@@ -1488,7 +1493,128 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
+## <a name="runOtherPlatform"></a>Running on other platforms
+
+This section documents my experience running PiBuilder against an [AMD64](https://www.debian.org/distrib/netinst) image (`.iso` file) of Debian Bullseye running under Parallels on an Intel Mac. It may be useful if you are trying to run PiBuilder on:
+
+* hardware that is not a Raspberry Pi; and/or
+* an operating system that is not Raspberry Pi OS.
+
+I wanted to mimic *the Raspberry Pi experience* as closely as possible. That implies "headless" connecting only via SSH, with no need for any of the Parallels "integration" such as the ability to drag-and-drop between macOS and the Debian guest system.
+
+To get the OS running, I followed [Installing Debian Linux on your Mac using Parallels Desktop](https://kb.parallels.com/124110), save for the following exceptions:
+
+* At step 6, I chose "Install" rather than "Graphical Install".
+* I did not proceed beyond step 10.
+
+I named the system "testbian" and the default user "pi". The installation process also asks for a password for the "root" user, which is needed for the `su` command below.
+
+To complete step 9 of the Parallels process, I used SSD to connect to the guest system from macOS Terminal. That implies the need to accept SSH's [TOFU pattern](#tofudef):
+
+``` bash
+$ ssh pi@testbian.local
+$ su
+# apt-get clean
+…      other commands from step 9
+```
+
+While logged-in as "root", I also took the opportunity to give "pi" the ability to execute `sudo` commands, and then finished with a reboot, which is step 10 of the Parallels instructions:
+
+```
+# /sbin/usermod -aG sudo pi
+# echo "pi  ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/pi
+# /usr/sbin/reboot
+```
+
+After the reboot, I reconnected, installed Git, cloned PiBuilder and ran the first script:
+
+``` bash
+$ ssh pi@testbian.local
+$ sudo apt install -y git
+$ git clone https://github.com/Paraphraser/PiBuilder
+$ ./PiBuilder/boot/scripts/01_setup.sh 
+```
+
+The optional «newhostname» argument to the `01_setup.sh` script is ignored because it depends on `raspi-config` which is not available. The same applies to:
+
+* Pi camera options (`ENABLE_PI_CAMERA')
+* 64-bit kernel option (`PREFER_64BIT_KERNEL`
+* WiFi country-code option (`LOCALCC`)
+* Local time-zone option (`LOCALTZ`); and
+* Updating the Raspberry Pi EEPROM.
+
+The remaining scripts can be completed in order, with reboots or logouts at the end of each script:
+
+``` bash
+$ ./PiBuilder/boot/scripts/02_setup.sh 
+$ ./PiBuilder/boot/scripts/03_setup.sh 
+$ ./PiBuilder/boot/scripts/04_setup.sh 
+$ ./PiBuilder/boot/scripts/05_setup.sh 
+```
+ 
+In the `02_setup.sh` script, the `VM_SWAP` options are ignored.
+
+Compared with a vanilla install of Raspberry Pi OS, I noticed the following omissions from a vanilla install of Debian:
+
+* git (needs to be installed by hand if PiBuilder is to be cloned directly onto the new system)
+* rsync (now installed by `01_setup.sh`
+* tree (added to `03_setup.sh`)
+
+There may be others.
+
+Next, I ran `iotstack_restore` to load a backup taken earlier in the day on my "live" Raspberry Pi:
+
+``` bash
+$ iotstack_restore 2022-11-23_1100.iot-hub
+```
+
+I edited the just-restored `docker-compose.yml` to:
+
+1. Remove all containers except Portainer-CE, Mosquitto, InfluxDB, Node-RED and Grafana.
+2. Deactivate the Node-RED device mappings as follows:
+
+	``` yaml
+	x-devices:
+	  - "/dev/ttyAMA0:/dev/ttyAMA0"
+	  - "/dev/vcio:/dev/vcio"
+	  - "/dev/gpiomem:/dev/gpiomem"
+	```
+	
+	The `x-` prefix deactivates the clause.
+
+Then I brought up the stack:
+
+```
+$ docker images
+REPOSITORY               TAG       IMAGE ID       CREATED          SIZE
+iotstack-nodered         latest    3dd2852b8468   10 seconds ago   538MB
+iotstack-mosquitto       latest    aaff81eb15db   52 seconds ago   16.8MB
+grafana/grafana          latest    eb4a939d5821   12 hours ago     342MB
+portainer/portainer-ce   latest    5f11582196a4   2 days ago       287MB
+influxdb                 1.8       064158037146   7 days ago       308MB
+
+$ for I in iotstack-nodered iotstack-mosquitto portainer/portainer-ce influxdb:1.8 grafana/grafana ; do echo -n "$I: " ; docker image inspect $I | jq .[0].Architecture ; done
+iotstack-nodered: "amd64"
+iotstack-mosquitto: "amd64"
+portainer/portainer-ce: "amd64"
+influxdb:1.8: "amd64"
+grafana/grafana: "amd64"
+
+$ docker ps
+CONTAINER ID   IMAGE                    COMMAND                  CREATED              STATUS                        PORTS                                                      NAMES
+e1c0ab944e7c   grafana/grafana:latest   "/run.sh"                About a minute ago   Up About a minute (healthy)   0.0.0.0:3000->3000/tcp                                     grafana
+78e47141789f   iotstack-nodered         "./entrypoint.sh"        About a minute ago   Up About a minute (healthy)   0.0.0.0:1880->1880/tcp                                     nodered
+820e15bed543   portainer/portainer-ce   "/portainer"             About a minute ago   Up About a minute             0.0.0.0:8000->8000/tcp, 0.0.0.0:9000->9000/tcp, 9443/tcp   portainer-ce
+addfa7e969b8   iotstack-mosquitto       "/docker-entrypoint.…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:1883->1883/tcp                                     mosquitto
+c2c9340afbc2   influxdb:1.8             "/entrypoint.sh infl…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:8086->8086/tcp                                     influxdb
+```
+
 ## <a name="changeLog"></a>Change Summary
+
+* 2022-11-23
+
+	- First cut at supporting platforms other than Raspberry Pi and/or Raspberry Pi OS.
+	- Default version of SQLite bumped to 3400000.
 
 * 2022-11-03
 

@@ -55,6 +55,7 @@ sysstat
 tcpdump
 time
 traceroute
+tree
 uuid-runtime
 wget
 BASE_PACKAGES

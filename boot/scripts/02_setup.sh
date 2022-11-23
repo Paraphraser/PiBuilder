@@ -30,7 +30,7 @@ fi
 # try to set the default language
 if [ -n "$LOCALE_LANG" ] ; then
    echo "Setting default language to $LOCALE_LANG"
-   sudo update-locale "LANG=$LOCALE_LANG"
+   sudo /usr/sbin/update-locale "LANG=$LOCALE_LANG"
 fi
 
 # tell dhcpcd and docker not to fight
@@ -97,7 +97,8 @@ try_merge "/etc/network" "customising network interfaces"
 #     if DISABLE_VM_SWAP omitted or false, VM_SWAP=default
 #
 [ -z "$VM_SWAP" ] && [ "$DISABLE_VM_SWAP" = "true" ] && VM_SWAP=disable
-VM_SWAP="${VM_SWAP:-automatic}"
+is_raspberry_pi && VM_SWAP="${VM_SWAP:-automatic}" || VM_SWAP="default"
+
 
 # now, how should VM be handled?
 case "$VM_SWAP" in
@@ -105,7 +106,7 @@ case "$VM_SWAP" in
    "disable" )
 
       # is swap turned on?
-      if [ -n "$(swapon -s)" ] ; then
+      if [ -n "$(/usr/sbin/swapon -s)" ] ; then
 
          # yes! just disable it without changing the config
          echo "Disabling virtual memory swapping"
@@ -121,7 +122,7 @@ case "$VM_SWAP" in
       if [ -e "/sys/class/block/mmcblk0" ] ; then
 
          # yes, is SD! is swap turned on?
-         if [ -n "$(swapon -s)" ] ; then
+         if [ -n "$(/usr/sbin/swapon -s)" ] ; then
 
             # yes! just disable it without changing the config
             echo "Running from SD card - disabling virtual memory swapping"
@@ -133,7 +134,7 @@ case "$VM_SWAP" in
       else
 
          # no, not SD. turn off swap if it is enabled
-         [ -n "$(swapon -s)" ] &&  sudo dphys-swapfile swapoff
+         [ -n "$(/usr/sbin/swapon -s)" ] &&  sudo dphys-swapfile swapoff
 
          # try to patch the swap file setup
          if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
@@ -151,7 +152,7 @@ case "$VM_SWAP" in
 
    *)
       # catch-all implying "default" meaning "leave everything alone"
-      echo "Virtual memory system left at Raspberry Pi OS defaults"
+      echo "Virtual memory system left at OS defaults"
       ;;
 
 esac
@@ -161,4 +162,4 @@ run_pibuilder_epilog
 
 echo "$SCRIPT complete - rebooting..."
 sudo touch /boot/ssh
-sudo reboot
+sudo /usr/sbin/reboot

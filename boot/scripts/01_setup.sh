@@ -27,9 +27,12 @@ echo "Taking a baseline copy of /etc"
 sudo cp -a /etc /etc-baseline
 
 # copy important files in /boot
-echo "Taking baseline copies of cmdline.txt and config.txt"
-sudo cp /boot/cmdline.txt /boot/cmdline.txt.baseline
-sudo cp /boot/config.txt /boot/config.txt.baseline
+for TARGET in cmdline.txt config.txt ; do
+   if [ -e "/boot/$TARGET" ] ; then
+      echo "Taking baseline copy of $TARGET"
+      sudo cp "/boot/$TARGET" "/boot/$TARGET.baseline"
+   fi
+done
 
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
@@ -63,6 +66,10 @@ else
    sudo apt upgrade -y
 fi
 
+# ensure basics available on non-Raspbian systems
+echo "Satisfying PiBuilder dependencies"
+sudo apt install -y git rsync
+
 # remove any junk so we don't get reminders
 sudo apt autoremove -y
 
@@ -89,110 +96,144 @@ fi
 echo "Removing all /etc/ssh presets"
 sudo rm -rf $SUPPORT/etc/ssh
 
-# see if 64-bit kernel should be enabled
-TARGET="/boot/config.txt"
-APPEND="arm_64bit=1"
-# is the kernel already 64-bit?
-if [ ! "$(uname -m)" = "aarch64" ] ; then
-  # no! is the 64-bit kernel preferred?
-  if [ "$PREFER_64BIT_KERNEL" = "true" ] ; then
-     echo "Enabling 64-bit kernel"
-     sudo sed -i.bak "$ a $APPEND" "$TARGET"
-  fi
-fi
+if is_raspberry_pi ; then
 
-# see if Raspberry Pi ribbon-cable camera should be enabled
-case "$(running_OS_release)+$ENABLE_PI_CAMERA" in
+   # see if 64-bit kernel should be enabled
+   TARGET="/boot/config.txt"
+   APPEND="arm_64bit=1"
+   # is the kernel already 64-bit?
+   if [ ! "$(uname -m)" = "aarch64" ] ; then
+     # no! is the 64-bit kernel preferred?
+     if [ "$PREFER_64BIT_KERNEL" = "true" ] ; then
+        echo "Enabling 64-bit kernel"
+        sudo sed -i.bak "$ a $APPEND" "$TARGET"
+     fi
+   fi
 
-   "buster+legacy" ) ;&
-   "buster+true" )
-      echo "Enabling Raspberry Pi ribbon-cable camera"
-      sudo raspi-config nonint do_camera 0
-      ;;
+   # see if Raspberry Pi ribbon-cable camera should be enabled
+   case "$(running_OS_release)+$ENABLE_PI_CAMERA" in
 
-   "bullseye+legacy" )
-      echo "Enabling Raspberry Pi ribbon-cable camera in legacy mode"
-      sudo raspi-config nonint do_legacy 0
-      ;;
+      "buster+legacy" ) ;&
+      "buster+true" )
+         echo "Enabling Raspberry Pi ribbon-cable camera"
+         sudo raspi-config nonint do_camera 0
+         ;;
 
-   "bullseye+true" )
-      echo "Enabling Raspberry Pi ribbon-cable camera in bullseye mode"
-      sudo raspi-config nonint do_camera 0
-      ;;
+      "bullseye+legacy" )
+         echo "Enabling Raspberry Pi ribbon-cable camera in legacy mode"
+         sudo raspi-config nonint do_legacy 0
+         ;;
 
-   *)
-      echo "Raspberry Pi ribbon-cable camera not enabled"
-      ;;
+      "bullseye+true" )
+         echo "Enabling Raspberry Pi ribbon-cable camera in bullseye mode"
+         sudo raspi-config nonint do_camera 0
+         ;;
 
-esac
+      *)
+         echo "Raspberry Pi ribbon-cable camera not enabled"
+         ;;
 
-# run the script epilog if it exists (best to run before rasp-config)
-run_pibuilder_epilog
+   esac
 
-# boot to console (no desktop GUI)
-# hints from https://discord.com/channels/638610460567928832/638610461109256194/792694778613202966
-echo "Setting boot behaviour to console (no GUI)"
-sudo raspi-config nonint do_boot_behaviour B1
+   # run the script epilog if it exists (best to run before rasp-config)
+   run_pibuilder_epilog
 
-# set/override WiFi country code as an option
-if [ -n "$LOCALCC" ] ; then
-   echo "Setting WiFi country code to $LOCALCC"
-   sudo raspi-config nonint do_wifi_country "$LOCALCC"
-fi
+   # boot to console (no desktop GUI)
+   # hints from https://discord.com/channels/638610460567928832/638610461109256194/792694778613202966
+   echo "Setting boot behaviour to console (no GUI)"
+   sudo raspi-config nonint do_boot_behaviour B1
 
-# set timezone if provided and what is in effect are different
-if [ -n "$LOCALTZ" -a "$LOCALTZ" != "$(cat /etc/timezone)" ] ; then 
-   echo "Setting time-zone to $LOCALTZ"
-   sudo raspi-config nonint do_change_timezone "$LOCALTZ"
-fi
+   # set/override WiFi country code as an option
+   if [ -n "$LOCALCC" ] ; then
+      echo "Setting WiFi country code to $LOCALCC"
+      sudo raspi-config nonint do_wifi_country "$LOCALCC"
+   fi
 
-# try to establish locales - seems best to do this last. Note the patch
-# should always retain "en_GB.UTF-8" so we don't pull the rug out from
-# beneath anything (like Python) that already knows the default language
-# (it can be removed later if need be, eg using raspi-config.
-if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
-   sudo dpkg-reconfigure -f noninteractive locales
-fi
+   # set timezone if provided and what is in effect are different
+   if [ -n "$LOCALTZ" -a "$LOCALTZ" != "$(cat /etc/timezone)" ] ; then 
+      echo "Setting time-zone to $LOCALTZ"
+      sudo raspi-config nonint do_change_timezone "$LOCALTZ"
+   fi
 
-# has the user given permission for an EEPROM upgrade?
-if [ "$SKIP_EEPROM_UPGRADE" = "false" ] ; then
+   # try to establish locales. Any patch should always retain
+   # "en_GB.UTF-8" so we don't pull the rug out from beneath anything
+   # (like Python) that already knows the default language
+   # (it can be removed later if need be, eg using raspi-config.
+   if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
+      sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
+   fi
 
-   # yes! is an upgrade available?
-   if [ $(sudo rpi-eeprom-update | grep -c "*** UPDATE AVAILABLE ***") -gt 0 ] ; then
+   # has the user given permission for an EEPROM upgrade?
+   if [ "$SKIP_EEPROM_UPGRADE" = "false" ] ; then
 
-      # yes! proceed
-      echo "Updating Raspberry Pi Firmware"
-      sudo rpi-eeprom-update -d -a
-      echo "Note: the next reboot may take a little longer than expected"
+      # yes! is an upgrade available?
+      if [ $(sudo rpi-eeprom-update | grep -c "*** UPDATE AVAILABLE ***") -gt 0 ] ; then
 
-   else
+         # yes! proceed
+         echo "Updating Raspberry Pi Firmware"
+         sudo rpi-eeprom-update -d -a
+         echo "Note: the next reboot may take a little longer than expected"
+
+      else
    
-      # no! advise
-      echo "Note: Raspberry Pi Firmware is up-to-date"
+         # no! advise
+         echo "Note: Raspberry Pi Firmware is up-to-date"
+
+      fi
+
+   fi
+
+   # does the host name need to be updated?
+   if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
+
+      # yes! set the host name (produces errors)
+      echo "Setting machine name to $HOSTNAME"
+      sudo raspi-config nonint do_hostname "$HOSTNAME"
+      WARN_TRUST_RESET="true"
+
+   fi
+
+   # has anything been done to invalidate known_hosts on the support host?
+   if [ "$WARN_TRUST_RESET" = "true" ] ; then
+
+      # maybe - advise accordingly
+      echo "Remember to do ssh-keygen -R $SAVE_HOSTNAME.local"
+      echo "Reconnect using ssh $USER@$HOSTNAME.local"
+
+   fi
+
+else
+
+   echo "PiBuilder appears to be running on non-Raspberry Pi OS !"
+
+   echo "The following PiBuilder options have been ignored:"
+   echo "   ENABLE_PI_CAMERA"
+   [ "$PREFER_64BIT_KERNEL" = "true" ] && echo "   PREFER_64BIT_KERNEL"
+   [ -n "$LOCALCC" ] && echo "   LOCALCC"
+   [ -n "$LOCALTZ" ] && echo "   LOCALTZ"
+   [ "$SKIP_EEPROM_UPGRADE" = "false" ] && echo "   SKIP_EEPROM_UPGRADE"
+
+   echo "Boot behaviour is unchanged (OS default)"
+   [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] && echo "Hostname not changed".
+
+   # run the script epilog if it exists (best to run early)
+   run_pibuilder_epilog
+
+   # it may be possible to set locales
+   if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
+      sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
+   fi
+
+   if [ "$WARN_TRUST_RESET" = "true" ] ; then
+
+      # maybe - advise accordingly
+      echo "Remember to do ssh-keygen -R $SAVE_HOSTNAME.local"
+      echo "Reconnect using ssh $USER@$SAVE_HOSTNAME.local"
 
    fi
 
 fi
 
-# does the host name need to be updated?
-if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
-
-   # yes! set the host name (produces errors)
-   echo "Setting machine name to $HOSTNAME"
-   sudo raspi-config nonint do_hostname "$HOSTNAME"
-   WARN_TRUST_RESET="true"
-
-fi
-
-# has anything been done to invalidate known_hosts on the support host?
-if [ "$WARN_TRUST_RESET" = "true" ] ; then
-
-   # maybe - advise accordingly
-   echo "Remember to do ssh-keygen -R $SAVE_HOSTNAME.local"
-   echo "Reconnect using ssh $USER@$HOSTNAME.local"
-
-fi
-
 echo "$SCRIPT complete - rebooting..."
 sudo touch /boot/ssh
-sudo reboot
+sudo /usr/sbin/reboot

@@ -106,6 +106,16 @@ is_running_OS_64bit() {
 }
 
 
+# a function to check if running on a Raspberry Pi. There may be better
+# ways of doing this but the presence of /usr/bin/raspi-config seems to
+# be a reasonable proxy
+is_raspberry_pi() {
+   if [ -x "/usr/bin/raspi-config" ] ; then
+      return 0
+   fi
+   return 1
+}
+
 # a function to find a supporting file or folder proposed in the $1
 # parameter.
 #

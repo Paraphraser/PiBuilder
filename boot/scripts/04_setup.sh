@@ -82,8 +82,8 @@ else
 fi
 
 echo "Setting groups required for docker and bluetooth"
-sudo usermod -G docker -a $USER
-sudo usermod -G bluetooth -a $USER
+sudo /usr/sbin/usermod -G docker -a $USER
+sudo /usr/sbin/usermod -G bluetooth -a $USER
 
 # the menu now has some specific structural requirements for its dependencies
 echo "Removing any Python dependencies which may conflict with the IOTstack menu"
@@ -122,4 +122,4 @@ run_pibuilder_epilog
 # reboot (applies usermods and any cmdline.txt changes)
 echo "$SCRIPT complete - rebooting..."
 sudo touch /boot/ssh
-sudo reboot
+sudo /usr/sbin/reboot
