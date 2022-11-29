@@ -166,7 +166,7 @@ Notes:
 
 1. Replace "v2.11.1" with whatever version you need. The leading "v" is required.
 2. This uninstall/upgrade sequence can also be used to downgrade to any v2.x.x.
-3. Once you have used the `install_docker-compose.sh` script to upgrade docker-compose, the [`apt` method](#composeByApt) will no longer work. If you want to revert to the `apt` method, you will need the [nuclear option](#nuclearOption). 
+3. Once you have used the `install_docker-compose.sh` script to upgrade docker-compose, the [`apt` method](#composeByApt) will no longer work. If you want to revert to the `apt` method, you will need [option 3](#recomposeByApt). 
 
 ### <a name="recomposeByApt"></a>Option 3: go back to letting `apt` do the work
 
