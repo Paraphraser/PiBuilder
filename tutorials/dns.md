@@ -10,7 +10,8 @@ There are many variations on this theme. This tutorial covers:
 
 <hr>
 
-## <a name="autoDNS"> Automatic DNS configuration </a>
+<a name="autoDNS"></a>
+## Automatic DNS configuration
 
 Out of the box, a fresh Raspberry Pi OS installation assumes that a DHCP server will provide:
 
@@ -40,9 +41,11 @@ You can confirm that your Raspberry Pi is using the expected DNS server(s) by ru
 $ cat /etc/resolv.conf
 ```
 
-## <a name="staticDNS"> Static DNS configurations </a>
+<a name="staticDNS"></a>
+## Static DNS configurations
 
-### <a name="otherhostDNS"> DNS server is a different host </a>
+<a name="otherhostDNS"></a>
+### DNS server is a different host
 
 Make the following assumptions:
 
@@ -137,7 +140,8 @@ Proceed like this:
 
 	The next time you build a Raspberry Pi using PiBuilder, your resolver configuration will be set automatically.
 
-### <a name="localhostDNS"> DNS server is this Raspberry Pi </a>
+<a name="localhostDNS"></a>
+### DNS server is this Raspberry Pi
 
 This is appropriate if your Raspberry Pi is running a DNS server (eg BIND9), either as a native install or in a container running in Host Mode.
 
@@ -149,7 +153,8 @@ Follow [DNS server is a different host](#otherhostDNS) but, instead of adding a 
 #name_servers=127.0.0.1
 ```
 
-## <a name="baselineReference"> Reference versions of files </a>
+<a name="baselineReference"></a>
+## Reference versions of files
 
 At the time of writing (November 2021), these were the baseline versions of `/etc/resolvconf.conf` on Buster and Bullseye.
 

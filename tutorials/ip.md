@@ -1,6 +1,7 @@
 # Configuring Static IP addresses on Raspbian
 
-## <a name="keyAssumption"> Critical assumption </a>
+<a name="keyAssumption"></a>
+## Critical assumption
 
 This tutorial assumes the Raspberry Pi OS running on your Raspberry Pi was built using PiBuilder. If this assumption holds then:
 
@@ -11,7 +12,8 @@ If this assumption does not hold, this tutorial may not produce the expected res
 
 If you are unsure about the situation on your Raspberry Pi, you can compare what you see with the [reference versions](#baselineReference).
 
-## <a name="staticIP"> Static IP Address configuration </a>
+<a name="staticIP"></a>
+## Static IP Address configuration
 
 Assume you want to configure your Raspberry Pi like this:
 
@@ -104,7 +106,8 @@ Assume you want to configure your Raspberry Pi like this:
 
 	The next time you build a Raspberry Pi using PiBuilder, your static IP address configuration will be set automatically.
 
-## <a name="baselineReference"> Reference versions of files </a>
+<a name="baselineReference"></a>
+## Reference versions of files
 
 ### `/etc/dhcpcd.conf` - baseline
 

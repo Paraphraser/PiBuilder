@@ -1,6 +1,7 @@
 # PiBuilder
 
-## <a name="introduction"></a>Introduction
+<a name="introduction"></a>
+## Introduction
 
 This project documents my approach to building Raspberry Pi operating systems to support [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack).
 
@@ -23,7 +24,8 @@ The scripts will *probably* work on other Raspberry Pi hardware but I have no id
 
 The scripts make use of tools which are specific to the Raspberry Pi (eg `raspi-config`). When the relevant tool is not available, the scripts simply bypass the step.
 
-## <a name="toc"></a>Contents
+<a name="toc"></a>
+## Contents
 
 - [Definitions](#definitions)
 - [Build process summary](#buildProcessSummary)
@@ -103,7 +105,8 @@ The scripts make use of tools which are specific to the Raspberry Pi (eg `raspi-
 
 - [Change Summary](CHANGELOG.md)
 
-## <a name="definitions"></a>Definitions
+<a name="definitions"></a>
+## Definitions
 
 * "your support host" means the system where you have cloned the PiBuilder repository. It will usually be a Mac or PC.
 * <a name="tildePiBuilder"></a>"`~/PiBuilder`" means the path to the directory where you have cloned the PiBuilder repository from GitHub onto your support host. The directory does not have to be in your home directory on your support host. It can be anywhere.
@@ -111,7 +114,8 @@ The scripts make use of tools which are specific to the Raspberry Pi (eg `raspi-
 * "«hostname»" is a placeholder meaning "the name you chose for your Raspberry Pi".
 * "«username»" is a placeholder meaning "the account name you use to login to your Raspberry Pi".
 
-## <a name="buildProcessSummary"></a>Build process summary
+<a name="buildProcessSummary"></a>
+## Build process summary
 
 1. [Download this repository](#downloadRepo).
 2. [Download the imaging tool](#downloadTool).
@@ -128,9 +132,11 @@ Please don't be put off by the length of this README document. You can start usi
 
 Later, when you start to customise your Raspberry Pi, you will realise that you might have trouble remembering all the steps if you ever have to rebuild your Raspberry Pi in a hurry (failed SD card; magic smoke; operator error). That's when the true power of PiBuilder will start to become apparent. You can dig into the how-to when you are ready.
 
-## <a name="buildProcessDetailed"></a>The build process in detail
+<a name="buildProcessDetailed"></a>
+## The build process in detail
 
-### <a name="downloadRepo"></a>Download this repository
+<a name="downloadRepo"></a>
+### Download this repository
 
 1. Download this repository from GitHub:
 
@@ -151,13 +157,15 @@ Later, when you start to customise your Raspberry Pi, you will realise that you 
 
 	A dedicated branch helps you to keep your own changes separate from any changes made to the master version on GitHub, and makes it a bit simpler to manage merging if a change you make conflicts with a change coming from GitHub.
 
-### <a name="downloadTool"></a>Download the imaging tool
+<a name="downloadTool"></a>
+### Download the imaging tool
 
 I use and recommend [Raspberry Pi Imager](https://www.raspberrypi.com/software/). The instructions below assume you are using Raspberry Pi Imager.
 
 An alternative is [Balena Etcher](https://www.balena.io/etcher/).
 
-### <a name="chooseImage"></a>Choose and download a base image
+<a name="chooseImage"></a>
+### Choose and download a base image
 
 The most recent Raspberry Pi OS can always be found at:
 
@@ -191,9 +199,11 @@ If you don't see "OK", start over!
 
 > If your first attempt was a *direct* download of the image, consider trying the *indirect* method using a torrent.
 
-### <a name="burnImage"></a>Configure and transfer Raspbian image to SD or SSD
+<a name="burnImage"></a>
+### Configure and transfer Raspbian image to SD or SSD
 
-#### <a name="burnGUI"></a> GUI method (Raspberry Pi Imager)
+<a name="burnGUI"></a>
+#### GUI method (Raspberry Pi Imager)
 
 The steps are:
 
@@ -254,7 +264,8 @@ The steps are:
 
 9. Click <kbd>WRITE</kbd> and respond to any system prompts to transfer the prepared image to your media.
 
-#### <a name="burnClassic"></a> Classic method (files on boot partition)
+<a name="burnClassic"></a>
+#### Classic method (files on boot partition)
 
 The "classic" method involves creating files that are placed on the boot partition where Raspberry Pi OS can find them at boot time, and then act on the instructions they contain. You can use this method with [Raspberry Pi Imager](https://www.raspberrypi.com/software/), [Balena Etcher](https://www.balena.io/etcher) or any other tool for transferring images to boot media.
 
@@ -312,9 +323,11 @@ where both arguments are required and should be enclosed in quote marks:
 
 The script prompts you, twice, to enter the PSK for the WiFi network, and then generates `wpa_supplicant.conf` in your working directory. You need to move that file to the PiBuilder `boot` folder, so that it winds up on the `boot` partition of your image.
 
-### <a name="configPiBuilder"></a>PiBuilder configuration
+<a name="configPiBuilder"></a>
+### PiBuilder configuration
 
-#### <a name="configOptions"></a>Configure PiBuilder installation options
+<a name="configOptions"></a>
+#### Configure PiBuilder installation options
 
 Use a text editor to open:
 
@@ -438,7 +451,8 @@ You **can** set the right hand sides of the following variables:
 
 * `SQLITEYEAR` and `SQLITEVERSION` let you choose the values which govern the version of SQLite that is installed, if you run the optional [Script 06](#docScript06). See the [releases](https://www.sqlite.org/download.html) page.
 
-##### <a name="perHostConfigOptions"></a>per-host PiBuilder installation options
+<a name="perHostConfigOptions"></a>
+##### per-host PiBuilder installation options
 
 The file:
 
@@ -455,7 +469,8 @@ $ cp options.sh options.sh@«hostname»
 
 At run time, PiBuilder will give preference to an options file where the `@` suffix matches the name of the host.
 
-#### <a name="configHome"></a>Configure home directory
+<a name="configHome"></a>
+#### Configure home directory
 
 PiBuilder assumes «username» equals "pi". If you choose a different «username», you *might* need to take special care with the following folder and its contents:
 
@@ -497,7 +512,8 @@ Note:
 
 * This duplication is *optional*, not *essential*. If PiBuilder is not able to find a specific home folder for «username», it falls back to using "pi" as the source of files being copied into the `/home/«username»` folder on your Raspberry Pi.
 
-##### <a name="configGit"></a>Git user configuration
+<a name="configGit"></a>
+##### Git user configuration
 
 The file at the path:
 
@@ -532,9 +548,11 @@ Hint:
 
 You should only need to change `.gitconfig` in PiBuilder if you also change `.gitconfig` your home directory on your support host. Otherwise, the configuration can be re-used for all of your Raspberry Pis.
 
-### <a name="copyToBoot"></a>Copy required files to boot volume
+<a name="copyToBoot"></a>
+### Copy required files to boot volume
 
-#### <a name="copyToBootMac"></a> Linux/macOS: run `setup_boot_volume.sh`
+<a name="copyToBootMac"></a>
+#### Linux/macOS: run `setup_boot_volume.sh`
 
 You can use this method if your support host is Linux or macOS.
 
@@ -553,7 +571,8 @@ Notes:
 
 The script ejects the media.
 
-#### <a name="copyToBootWin"></a> Windows: copy by command
+<a name="copyToBootWin"></a>
+#### Windows: copy by command
 
 Re-insert the media (SD or SSD) so the "boot" volume mounts.
 
@@ -574,7 +593,8 @@ xcopy "C:\Documents and Settings\Andreas\Desktop\PiBuilder\boot\*" X:\ /E/H
 ```
 Eject the media.
 
-#### <a name="copyToBootGUI"></a> Any platform: copy using GUI
+<a name="copyToBootGUI"></a>
+#### Any platform: copy using GUI
 
 You should be able to use this method regardless of the operating system or Graphical User Interface (GUI) running on your support host.
 
@@ -595,7 +615,8 @@ The line marked "COPY" is telling you to:
 
 Eject the media.
 
-### <a name="bootRPi"></a>Boot your Raspberry Pi
+<a name="bootRPi"></a>
+### Boot your Raspberry Pi
 
 Transfer the media to your Raspberry Pi and apply power.
 
@@ -616,9 +637,11 @@ Your Raspberry Pi should be reachable on:
 
 These instructions assume you will use the multicast DNS name (ie `«hostname».local`) but you can substitute the other forms if those make more sense in your environment. 
 
-### <a name="runScripts"></a>Run the PiBuilder scripts in order
+<a name="runScripts"></a>
+### Run the PiBuilder scripts in order
 
-#### <a name="runScript01"></a>Script 01
+<a name="runScript01"></a>
+#### Script 01
 
 1. *On your support host:*
 
@@ -675,7 +698,8 @@ These instructions assume you will use the multicast DNS name (ie `«hostname».
 	```
 
 
-#### <a name="runScript02"></a>Script 02
+<a name="runScript02"></a>
+#### Script 02
 
 1. *On your support host:*
 
@@ -705,7 +729,8 @@ These instructions assume you will use the multicast DNS name (ie `«hostname».
 
 	The 02 script also disables IPv6 so, from this point onwards, you can omit the `-4` parameter from SSH commands.
 
-#### <a name="runScript03"></a>Script 03
+<a name="runScript03"></a>
+#### Script 03
 
 1. *On your support host:*
 
@@ -731,7 +756,8 @@ These instructions assume you will use the multicast DNS name (ie `«hostname».
 
 	The 03 script ends with a logout (not a reboot) so you can login again immediately.
 
-#### <a name="runScript04"></a>Script 04
+<a name="runScript04"></a>
+#### Script 04
 
 1. *On your support host:*
 
@@ -751,7 +777,8 @@ These instructions assume you will use the multicast DNS name (ie `«hostname».
 
 	The 04 script runs to completion and reboots your Raspberry Pi.
 
-#### <a name="runScript05"></a>Script 05
+<a name="runScript05"></a>
+#### Script 05
 
 1. *On your support host:*
 
@@ -786,7 +813,8 @@ These instructions assume you will use the multicast DNS name (ie `«hostname».
 	$ ./menu.sh
 	``` 
 
-#### <a name="runScript06"></a>Script 06 (optional)
+<a name="runScript06"></a>
+#### Script 06 (optional)
 
 This script is entirely optional. It rebuilds SQLite from source code. The version of SQLite you get from `apt install` doesn't have all the features you might expect if SQLite is your thing.
 
@@ -798,7 +826,8 @@ It is also OK to defer running this script until you have an actual need:
 $ /boot/scripts/06_setup.sh
 ```  
 
-## <a name="synopses"></a>Script summaries
+<a name="synopses"></a>
+## Script summaries
 
 Every script has the same basic scaffolding:
 
@@ -816,7 +845,8 @@ Every script has the same basic scaffolding:
 
 > When used in the context of shell scripts, the words "*source*", "*sourcing*" and "*sourced*" mean that the associated file is processed, inline, as though it were part of the original calling script. It is analogous to an "include" file.
 
-### <a name="docScript01"></a>Script 01
+<a name="docScript01"></a>
+### Script 01
 
 The script:
 
@@ -847,7 +877,8 @@ The script:
 * Optionally changes «hostname» (if [newhostname](#newHostname) argument is provided)
 * Reboots
 
-### <a name="docScript02"></a>Script 02
+<a name="docScript02"></a>
+### Script 02
 
 The script:
 
@@ -868,7 +899,8 @@ The script:
 * Optionally changes virtual memory swapping (see [`VM_SWAP `](#handleVMswap)).
 * Reboots.
 
-### <a name="docScript03"></a>Script 03
+<a name="docScript03"></a>
+### Script 03
 
 The script:
 
@@ -899,7 +931,8 @@ The script:
 
 * Ends with a logout.
 
-### <a name="docScript04"></a>Script 04
+<a name="docScript04"></a>
+### Script 04
 
 The script:
 
@@ -912,7 +945,8 @@ The script:
 
 * Reboots.
 
-### <a name="docScript05"></a>Script 05
+<a name="docScript05"></a>
+### Script 05
 
 The script:
 
@@ -923,13 +957,16 @@ The script:
 * Erases bash history.
 * Ends with a logout.
 
-### <a name="docScript06"></a>Script 06 (optional)
+<a name="docScript06"></a>
+### Script 06 (optional)
 
 This script is optional. It rebuilds SQLite from source code. The version you get from `apt install` doesn't have all the features you might want.
 
-## <a name="scriptSearch"></a>How PiBuilder scripts search for files, folders and patches
+<a name="scriptSearch"></a>
+## How PiBuilder scripts search for files, folders and patches
 
-### <a name="searchForItem"></a>Search function – `supporting_file()`
+<a name="searchForItem"></a>
+### Search function – `supporting_file()`
 
 PiBuilder's search function is called `supporting_file()`. Despite the name, it can search for both files and folders.
 
@@ -987,7 +1024,8 @@ if SOURCE="$(supporting_file "$TARGET")" ; then
 fi
 ``` 
 
-### <a name="searchForPatch"></a>Patch function – `try_patch()`
+<a name="searchForPatch"></a>
+### Patch function – `try_patch()`
 
 The `try_patch()` function takes two arguments:
 
@@ -1033,7 +1071,8 @@ The `try_patch()` function has two common use patterns:
 	fi
 	```
 
-### <a name="searchForMerge"></a>Folder merge function – `try_merge()`
+<a name="searchForMerge"></a>
+### Folder merge function – `try_merge()`
 
 The `try_merge()` function takes two arguments:
 
@@ -1081,11 +1120,13 @@ The `try_merge()` function has two common use patterns:
 	fi
 	```
 
-## <a name="patchPreparation"></a>Preparing your own patches
+<a name="patchPreparation"></a>
+## Preparing your own patches
 
 PiBuilder can *apply* patches for you, but you still need to *create* each patch.
 
-### <a name="patchTools"></a>Tools overview: *diff* and *patch*
+<a name="patchTools"></a>
+### Tools overview: *diff* and *patch*
 
 Understanding how patching works will help you to develop and test patches before handing them to PiBuilder. Assume:
 
@@ -1114,7 +1155,8 @@ That `patch` command will:
 1. copy «original» to «original».bak; and
 2. apply «patch» to «original» to convert it to «final».
 
-### <a name="patchSummary"></a>Basic process
+<a name="patchSummary"></a>
+### Basic process
 
 The basic process for creating a patch file for use in PiBuilder is:
 
@@ -1188,7 +1230,8 @@ The basic process for creating a patch file for use in PiBuilder is:
 	~/PiBuilder/boot/scripts/support/etc/resolvconf.conf.patch
 	```
 
-### <a name="patchTutorials"></a>Tutorials
+<a name="patchTutorials"></a>
+### Tutorials
 
 PiBuilder already has "hooks" in place for some common situations. All you need to do is prepare a patch file and PiBuilder will apply it the next time you build an operating system:
 
@@ -1202,7 +1245,8 @@ The next tutorial covers a situation where PiBuilder does not have a "hook". It 
 
 * [Restoring Buster-style log rotation for syslog](tutorials/logrotate.md)
 
-## <a name="moreGit"></a>Keeping in sync with GitHub
+<a name="moreGit"></a>
+## Keeping in sync with GitHub
 
 The instructions in [download this repository](#downloadRepo) recommended that you create a Git branch ("custom") to hold your customisations. If you did not do that, please do so now:
 
@@ -1349,13 +1393,16 @@ $ git commit -m "merged with GitHub updates"
 
 Now you are in sync with GitHub.
 
-## <a name="sysMaintenance"></a>Routine Maintenance
+<a name="sysMaintenance"></a>
+## Routine Maintenance
 
-### <a name="dockerMaintenance"></a>Maintaining docker and docker-compose
+<a name="dockerMaintenance"></a>
+### Maintaining docker and docker-compose
 
 Read [Maintaining docker + docker-compose](reinstallation.md) if you need to upgrade or reinstall either/both docker and docker-compose.
 
-### <a name="menuMaintenance"></a> Maintaining the IOTstack menu's runtime environment
+<a name="menuMaintenance"></a>
+### Maintaining the IOTstack menu's runtime environment
 
 The change to running the menu in a Python virtual environment seems to be causing some problems. One example is:
 
@@ -1365,7 +1412,8 @@ The change to running the menu in a Python virtual environment seems to be causi
 
 If the menu will not launch properly, please follow the instructions in [Menu maintenance](reset_menu_enviroment.md).
 
-## <a name="chickenEgg"></a>Beware of chickens and eggs
+<a name="chickenEgg"></a>
+## Beware of chickens and eggs
 
 Installing and configuring software on a Raspberry Pi (or any computer) involves quite a few chicken-and-egg situations. For example:
 
@@ -1399,9 +1447,11 @@ Chicken-and-egg!
 
 There is no substitute for thinking, planning and testing.
 
-## <a name="aboutSSH"></a>Some words about SSH
+<a name="aboutSSH"></a>
+## Some words about SSH
 
-### <a name="aboutEtcSSH"></a>About `/etc/ssh`
+<a name="aboutEtcSSH"></a>
+### About `/etc/ssh`
 
 Whenever you start from a clean Raspberry Pi OS image, the very first boot-up initialises:
 
@@ -1446,7 +1496,8 @@ Whether you do this for any or all of your hosts is entirely up to you. I have g
 
 If you want to learn how to set up password-less SSH access, see [IOTstackBackup SSH tutorial](https://github.com/Paraphraser/IOTstackBackup/blob/master/ssh_tutorial.md). Google is your friend if you want to go the next step and set up SSH certificates.
 
-### <a name="aboutDotSSH"></a>About `~/.ssh`
+<a name="aboutDotSSH"></a>
+### About `~/.ssh`
 
 The contents of `~/.ssh` carry the client identity (how «username» authenticates to target hosts), as distinct from the machine identity (how your Raspberry Pi proves itself to clients seeking to connect).
 
@@ -1458,7 +1509,8 @@ $ /boot/scripts/helpers/user_ssh_backup.sh
 
 and then restore the snapshot in the same way as Script 01 does for `/etc/ssh`. I haven't provided a solution in PiBuilder. You will have to come up with that for yourself.
 
-### <a name="snapshotSecurity"></a>Security of snapshots
+<a name="snapshotSecurity"></a>
+### Security of snapshots
 
 There is an assumption that it is "hard" for an unauthorised person to gain access to `etc/ssh` and, to a lesser extent, `~/.ssh`. How "hard" that actually is depends on a lot of things, not the least of which is whether you are in the habit of leaving terminal sessions unattended...
 
@@ -1466,13 +1518,15 @@ Nevertheless, it is important to be aware that the snapshots do contain sufficie
 
 I keep my snapshots on an encrypted volume. You may wish to do the same.
 
-## <a name="aboutVNC"></a>Some words about VNC
+<a name="aboutVNC"></a>
+## Some words about VNC
 
 PiBuilder disables VNC. To understand why, and to find instructions on how to enable VNC, please see:
 
 * [VNC + PiBuilder](tutorials/vnc.md)
 
-## <a name="hassioBackground"></a>About Supervised Home Assistant
+<a name="hassioBackground"></a>
+## About Supervised Home Assistant
 
 > The information below has been added to [IOTstack Pull Request 528](https://github.com/SensorsIot/IOTstack/pull/528) and should appear in the IOTstack documentation for Home Assistant once that Pull Request has been approved and applied.
 
@@ -1493,7 +1547,8 @@ Because of the self-updating nature of Supervised Home Assistant, your Raspberry
 
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
 
-## <a name="runOtherPlatform"></a>Running on other platforms
+<a name="runOtherPlatform"></a>
+## Running on other platforms
 
 This section documents my experience running PiBuilder against an [AMD64](https://www.debian.org/distrib/netinst) image (`.iso` file) of Debian Bullseye running under Parallels on an Intel Mac. It may be useful if you are trying to run PiBuilder on:
 

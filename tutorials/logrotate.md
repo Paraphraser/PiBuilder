@@ -155,13 +155,16 @@ Let's assume you have obtained those files and have given them the names:
 	* the two `.bak` files will be available to prepare new patches if you need to make any further changes; and
 	* your system will retain all the evidence of the patching activity.
  
-## <a name="baselineReference"> Reference versions of files </a>
+<a name="baselineReference"></a>
+## Reference versions of files
 
 At the time of writing (November 2021), these were the baseline versions of `/etc/logrotate.d/rsyslog` on Buster and Bullseye.
 
-### <a name="rsyslogBaseline"> `/etc/logrotate.d/rsyslog` </a>
+<a name="rsyslogBaseline"></a>
+### `/etc/logrotate.d/rsyslog`
 
-#### <a name="rsyslogBuster"> Raspbian Buster </a>
+<a name="rsyslogBuster"></a>
+#### Raspbian Buster
 
 ```
 /var/log/syslog
@@ -203,7 +206,8 @@ At the time of writing (November 2021), these were the baseline versions of `/et
 }
 ```
 
-#### <a name="rsyslogBullseye"> Raspbian Bullseye </a>
+<a name="rsyslogBullseye"></a>
+#### Raspbian Bullseye
 
 ```
 /var/log/syslog
@@ -233,7 +237,8 @@ At the time of writing (November 2021), these were the baseline versions of `/et
 }
 ```
 
-#### <a name="rsyslogPatch"> `rsyslog.patch` </a>
+<a name="rsyslogPatch"></a>
+#### `rsyslog.patch`
 
 The result of running:
 
@@ -255,9 +260,11 @@ $ cat rsyslog.patch
 > 
 ```
 
-### <a name="logrotateBullseye"> `/etc/logrotate.conf` - Raspbian Bullseye </a>
+<a name="logrotateBullseye"></a>
+### `/etc/logrotate.conf` - Raspbian Bullseye
 
-#### <a name="logrotateBaseline"> Baseline version - `logrotate.conf.bak` </a>
+<a name="logrotateBaseline"></a>
+#### Baseline version - `logrotate.conf.bak`
 
 ```
 # see "man logrotate" for details
@@ -285,7 +292,8 @@ include /etc/logrotate.d
 # system-specific logs may also be configured here.
 ```
 
-#### <a name="logrotateModified"> Modified version - `logrotate.conf` </a>
+<a name="logrotateModified"></a>
+#### Modified version - `logrotate.conf`
 
 ```
 # see "man logrotate" for details
@@ -316,7 +324,8 @@ include /etc/logrotate.d
 # system-specific logs may also be configured here.
 ```
 
-#### <a name="logrotatePatch"> `logrotate.conf.patch` </a>
+<a name="logrotatePatch"></a>
+#### `logrotate.conf.patch`
 
 The result of running:
 

@@ -1,6 +1,7 @@
 # VNC + console + PiBuilder
 
-## <a name="toc"></a>contents
+<a name="toc"></a>
+## contents
 
 - [why VNC and console support is not enabled by default](#theStory)
 - [enabling VNC: the magic incantation](#magicIncantation)
@@ -14,7 +15,8 @@
 - [changing your VNC password](#passwordChange)
 - [about `lxpanel`](#aboutlxpanel)
 
-## <a name="theStory"></a> why VNC and console support is not enabled by default
+<a name="theStory"></a>
+## why VNC and console support is not enabled by default
 
 A [thread on Discord](https://discord.com/channels/638610460567928832/638610461109256194/949203175758524499) began with the following post:
 
@@ -48,13 +50,15 @@ No! Far from it!
 
 It just means that, if you want VNC enabled on a system built by PiBuilder, you need to do it yourself *after* you have finished running PiBuilder's scripts.
 
-## <a name="magicIncantation"></a>enabling VNC: the magic incantation
+<a name="magicIncantation"></a>
+## enabling VNC: the magic incantation
 
 Note:
 
 * These instructions refer to `raspi-config`. That Python application is constantly evolving and is forever adding, removing and altering menu options. If the screen shots here differ from what you see on your own screen, you will have to follow your nose.
 
-### <a name="setPassword"></a>Step 1: create a VNC password
+<a name="setPassword"></a>
+### Step 1: create a VNC password
 
 The PiBuilder 01 script **used** to set the VNC password to be the same as the password for user "pi". It was convenient to do that in the 01 script because, at that point in the build process, the default login password of "raspberry" was likely to be in effect. It was highly desirable to force a change away from the default password so it was really a case of killing two birds with one stone.
 
@@ -86,7 +90,8 @@ The `set_vnc_password.sh` script takes no arguments. It does all the work of:
 
 You can use `set_vnc_password.sh` to initialise your first VNC password, or to change an existing VNC password.
 
-### <a name="setBootMode"></a>Step 2: change the boot mode to "boot to desktop with auto-login"
+<a name="setBootMode"></a>
+### Step 2: change the boot mode to "boot to desktop with auto-login"
 
 1. Run the command:
 
@@ -118,7 +123,8 @@ You can use `set_vnc_password.sh` to initialise your first VNC password, or to c
 
 3. Wait for the system to reboot. If your Raspberry Pi appears to hang, remove and re-connect the power.
 
-### <a name="setResolution"></a>Step 3: set the VNC screen resolution
+<a name="setResolution"></a>
+### Step 3: set the VNC screen resolution
 
 1. Run the command:
 
@@ -139,7 +145,8 @@ You can use `set_vnc_password.sh` to initialise your first VNC password, or to c
 
 3. You are returned to the `raspi-config` main menu.
 
-### <a name="enableService"></a>Step 4: enable the VNC service
+<a name="enableService"></a>
+### Step 4: enable the VNC service
 
 1. Assuming the `raspi-config` application is still running…
 
@@ -158,7 +165,8 @@ You can use `set_vnc_password.sh` to initialise your first VNC password, or to c
 
 3. Wait for the system to reboot. If your Raspberry Pi appears to hang, remove and re-connect the power.
 
-## <a name="connectVNC"></a>connecting over VNC
+<a name="connectVNC"></a>
+## connecting over VNC
 
 The basic URL is:
 
@@ -176,11 +184,13 @@ The `«port»` number defaults to 5900 and can usually be omitted. You should be
 
 Alternatively, you may see a screen with a login dialog. That is what would happen if you chose boot mode B3 (Desktop, requiring user to login) in [Step 2: change the boot mode to "boot to desktop with auto-login"](#setBootMode). In that case, enter a valid username (eg "pi") and password.
 
-## <a name="passwordChange"></a>changing your VNC password
+<a name="passwordChange"></a>
+## changing your VNC password
 
 The process for changing your password is the same as setting it up in the first place. See [Step 1: create a VNC password](#setPassword).
 
-## <a name="aboutlxpanel"></a>about `lxpanel`
+<a name="aboutlxpanel"></a>
+## about `lxpanel`
 
 As well as avoiding hangs on reboot, setting the Raspberry Pi boot mode to "Console" stops the `lxpanel` daemon from launching at boot time.
 

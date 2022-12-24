@@ -20,11 +20,13 @@ You can follow these instructions even if you did not use PiBuilder to build you
 
 <hr>
 
-## <a name="caveat"></a>General caveats
+<a name="caveat"></a>
+## General caveats
 
 It's important to realise that, sometimes, things just get so messed up under the hood of a Raspberry Pi that a complete rebuild is your best solution. If you try these instructions but you still can't resolve the problem, it's likely that a complete rebuild is in your future. That is, of course, PiBuilder's raison d'être.
 
-## <a name="preparation"></a>Preparation
+<a name="preparation"></a>
+## Preparation
 
 Clone PiBuilder onto your Raspberry Pi:
 
@@ -40,9 +42,11 @@ $ cd ~/PiBuilder
 $ git pull origin master
 ```
 
-## <a name="nuclearOption"></a>The nuclear option – getting a clean slate
+<a name="nuclearOption"></a>
+## The nuclear option – getting a clean slate
 
-### <a name="uninstalling"></a>Uninstalling docker, docker-compose
+<a name="uninstalling"></a>
+### Uninstalling docker, docker-compose
 
 1. Is any part of IOTstack running? If yes, run:
 
@@ -88,7 +92,8 @@ $ git pull origin master
 	* It is safe to run both of these `uninstall_` commands even if you are not sure whether docker and docker-compose are installed.
 	* The reboot is **important**. Trying to re-install docker without first doing a reboot risks creating a mess on your system.
 
-### <a name="reinstalling"></a>Re-installing docker, docker-compose
+<a name="reinstalling"></a>
+### Re-installing docker, docker-compose
 
 PiBuilder's `04_setup.sh` script installs docker and docker-compose:
 
@@ -108,7 +113,8 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-## <a name="upgradingDocker"></a>Upgrading docker
+<a name="upgradingDocker"></a>
+## Upgrading docker
 
 After Docker has been installed by the `04_setup.sh` script, it is upgraded via `apt`. You can use the standard system maintenance commands:
 
@@ -122,7 +128,8 @@ Note:
 
 * If an `apt upgrade` installs a new version of `docker`, that *will* restart your stack. That's why the `apt list` command is in the middle - so you can see whether `docker` will be upgraded and decide whether to proceed or defer the upgrade.
 
-## <a name="upgradingCompose"></a>Upgrading docker-compose
+<a name="upgradingCompose"></a>
+## Upgrading docker-compose
 
 This is a bit complicated. Start by running this command:
 
@@ -136,7 +143,8 @@ If the answer is 1.29.2 or earlier then you should follow the steps above at:
  
 If you have just run the `04_setup.sh` script (either because you have just done a PiBuilder installation or because you were following these instructions) then docker-compose will be at version 2.x.x.
 
-### <a name="composeByApt"></a>Option 1: let `apt` do the work
+<a name="composeByApt"></a>
+### Option 1: let `apt` do the work
 
 Once docker-compose has been installed by the `04_setup.sh` script, it can be upgraded via `apt` so you can use the standard system maintenance commands:
 
@@ -145,7 +153,8 @@ $ sudo apt update
 $ sudo apt upgrade
 ```
 
-### <a name="composeByHand"></a>Option 2: upgrade docker-compose by hand
+<a name="composeByHand"></a>
+### Option 2: upgrade docker-compose by hand
 
 The problem with letting `apt` do the work is there seem to be significant delays between new versions of docker-compose being released on GitHub and making their way into the `apt` repositories.
 
@@ -168,7 +177,8 @@ Notes:
 2. This uninstall/upgrade sequence can also be used to downgrade to any v2.x.x.
 3. Once you have used the `install_docker-compose.sh` script to upgrade docker-compose, the [`apt` method](#composeByApt) will no longer work. If you want to revert to the `apt` method, you will need [option 3](#recomposeByApt). 
 
-### <a name="recomposeByApt"></a>Option 3: go back to letting `apt` do the work
+<a name="recomposeByApt"></a>
+### Option 3: go back to letting `apt` do the work
 
 You've tried [upgrading docker-compose by hand](#composeByHand) but you've decided to go back to [letting `apt` do the work](#composeByApt):
 

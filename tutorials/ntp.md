@@ -7,7 +7,8 @@
 
 <hr>
 
-## <a name="theCase"> The case for using local time-servers </a>
+<a name="theCase"></a>
+## The case for using local time-servers
 
 Out of the box, Raspbian gets its time from NTP servers in the debian.pool.ntp.org domain. You can confirm this via:
 
@@ -78,7 +79,8 @@ round-trip min/avg/max/stddev = 16.912/17.491/17.958/0.336 ms
 
 317ms vs 17ms round-trip times? No contest, really.
 
-## <a name="findNTPservers"> Finding your NTP pool servers </a>
+<a name="findNTPservers"></a>
+## Finding your NTP pool servers
 
 Unless you have good reasons to do otherwise, "your NTP pool servers" generally means "servers in your own country".
 
@@ -103,7 +105,8 @@ Once you have identified the pool servers for your country, arrange them in spac
 0.au.pool.ntp.org 1.au.pool.ntp.org 2.au.pool.ntp.org 3.au.pool.ntp.org
 ```
 
-## <a name="configRPi"> Configuring Raspbian </a>
+<a name="configRPi"></a>
+## Configuring Raspbian
 
 Login to your Raspberry Pi device. Change your working directory and make a backup of the baseline *timesyncd.conf* file:
 
@@ -164,7 +167,8 @@ The confirmation you are looking for in the output from the third command is a l
 SystemNTPServers=0.au.pool.ntp.org 1.au.pool.ntp.org 2.au.pool.ntp.org 3.au.pool.ntp.org
 ```
 
-## <a name="createPatch"> Create the patch </a>
+<a name="createPatch"></a>
+## Create the patch
 
 1. Prepare the patch file:
 

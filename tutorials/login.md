@@ -19,7 +19,8 @@
 - [cron](#cronjobs)
 - [compose profiles](#composeProfiles)
 
-## <a name="cliEnvironment"></a> the command-line environment
+<a name="cliEnvironment"></a>
+## the command-line environment
 
 There are many ways to execute commands on your Raspberry Pi. The most common methods are:
 
@@ -68,7 +69,8 @@ Key:
   
 > The same pattern applies to `/etc/profile` and `/etc/bash.bashrc`
 
-### <a name="profileCallsBashrc"></a> when `~/.bashrc` is sourced by `~/.profile`
+<a name="profileCallsBashrc"></a>
+### when `~/.bashrc` is sourced by `~/.profile`
 
 In the ✳️ case, the default version of `~/.profile` contains these lines:
 
@@ -84,7 +86,8 @@ fi
 
 If you remove those lines from `~/.profile` then `~/.bashrc` will not run when you SSH to the host. It is unwise to do this because most of your PATH is set up by `~/.bashrc`. Many commands will not execute as you expect if your PATH is not set up in the usual way.
 
-### <a name="shortStops"></a> when `~/.bashrc` short-stops
+<a name="shortStops"></a>
+### when `~/.bashrc` short-stops
 
 The "short-stop" behaviour of the ☑️ cases depends on the following lines of code in the default version of `~/.bashrc`:
 
@@ -102,7 +105,8 @@ esac
 
 The `return` statement is executed for any non-interactive shell.
 
-### <a name="bashrcSubdivisions"></a> subdividing `~/.bashrc`
+<a name="bashrcSubdivisions"></a>
+### subdividing `~/.bashrc`
 
 The overall effect of the `case` statement is to divide `~/.bashrc` into two parts:
 
@@ -113,7 +117,8 @@ If you ever wondered why you need to use full pathnames to run commands in your 
 
 The preamble section of the default version of `~/.bashrc` does not contain any commands but that doesn't mean you can't put commands into the preamble if you wish. One very good candidate for the preamble is adding `~/.local/bin` to your PATH.
 
-### <a name="baselineProfiles"></a> default versions of `~/.bashrc` and `~/.profile`
+<a name="baselineProfiles"></a>
+### default versions of `~/.bashrc` and `~/.profile`
 
 Each new user account is initialised by copying these files:
 
@@ -122,7 +127,8 @@ Each new user account is initialised by copying these files:
 
 If you ever make a mess of your own `~/.profile` or `~/.bashrc`, you can always obtain pristine copies from `/etc/skel`.
 
-## <a name="heuristic"></a> rule of thumb: prefer `~/.bashrc`
+<a name="heuristic"></a>
+## rule of thumb: prefer `~/.bashrc`
 
 As you can see from the [table above](#whenTable), `~/.bashrc` has better coverage than `~/.profile` so that makes `~/.bashrc` far more useful.
 
@@ -131,7 +137,8 @@ It then boils down to *when* you want a given command to be run:
 * if you *always* want a command to run then put it in the `~/.bashrc` preamble;
 * otherwise put it in the `~/.bashrc` postamble.
 
-## <a name="pibuilder"></a> PiBuilder
+<a name="pibuilder"></a>
+## PiBuilder
 
 Out of the box, PiBuilder:
 
@@ -142,7 +149,8 @@ Out of the box, PiBuilder:
 	- Enabling `DOCKER_BUILDKIT=1` - see [enable buildkit builds](https://docs.docker.com/develop/develop-images/build_enhancements/#to-enable-buildkit-builds).
 	- Setting `COMPOSE_PROFILES` to your host name - see [compose profiles](#composeProfiles).
 
-### <a name="appendDotProfile"></a> if you want to append to `~/.profile`
+<a name="appendDotProfile"></a>
+### if you want to append to `~/.profile`
 
 Remembering that `~/PiBuilder` means "the path to the directory where you have cloned the PiBuilder repository from GitHub onto your support host", if you simply create a file at:
 
@@ -152,7 +160,8 @@ Remembering that `~/PiBuilder` means "the path to the directory where you have c
 
 then the contents of that file will be appended to the default `~/.profile` when the 05 script runs.
 
-### <a name="totalControl"></a> if you want total control
+<a name="totalControl"></a>
+### if you want total control
 
 PiBuilder supports two environment variables:
 
@@ -181,7 +190,8 @@ Each variable can have the following values:
 	> I don't want to overstate this problem. Changes to the defaults are rare. You won't need to keep a constant watch on `/etc/skel`.		
 * any value other than `append` or `replace` will bypass any `~/.profile` and/or `~/.bashrc` action even if the relevant files are present in `/boot/scripts/support/home/pi` when the 05 script runs.
 
-### <a name="referenceProfiles"></a> reference versions of `~/.bashrc` and `~/.profile`
+<a name="referenceProfiles"></a>
+### reference versions of `~/.bashrc` and `~/.profile`
 
 The PiBuilder tutorials folder contains two reference implementations which you are welcome to adopt, adapt to your own circumstances, and then have PiBuilder implement them automatically on each build by setting the action variables to `replace`.
 
@@ -190,7 +200,8 @@ The PiBuilder tutorials folder contains two reference implementations which you 
 
 Between them, these two scripts mean your shell environment will always be as similar as is possible, no matter how you connect to your Raspberry Pi.
 
-#### <a name="tidyPATH"></a> useful function: `tidyPATH`
+<a name="tidyPATH"></a>
+#### useful function: `tidyPATH`
 
 Both `~/.profile` and `~/.bashrc` (and their corresponding versions in `/etc`) change your PATH variable several times. Your PATH usually winds up with duplicates for `/usr/bin` and `/usr/sbin`, and it is easy to find yourself having added `~/.local/bin` more than once.
 
@@ -235,7 +246,8 @@ How it works:
 5. The `-n` test either initialises the new path with the first candidate to emerge or appends subsequent candidates to the new path, separated by colons, maintaining the original order.
 6. The final `echo` returns the updated path.
 
-## <a name="cronjobs"></a> cron
+<a name="cronjobs"></a>
+## cron
 
 This is a special case. No profile scripts are run when `cron` spawns a job. You can set environment variables in the header section of your `crontab` but variable expansion (eg expecting `$HOME` to expand to `/home/pi`) does not work and neither does sourcing scripts from the header section. 
 
@@ -262,7 +274,8 @@ Having said all that, if your sole objective is to add `~/.local/bin` to your PA
 */5  *    *    *    *   ./home/pi/.local/bin/run-some-command.sh
 ```
 
-## <a name="composeProfiles"></a> compose profiles
+<a name="composeProfiles"></a>
+## compose profiles
 
 A good example of the use of profiles is a "live" vs "test" scenario. Suppose you have two Raspberry Pis, both running IOTstack:
 
