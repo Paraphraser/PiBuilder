@@ -100,6 +100,13 @@ if SOURCE="$(supporting_file "$SUPPORT_HOME/$TARGET")" ; then
    cp "$SOURCE" "$HOME/$TARGET"
 fi
 
+TARGET="/etc/docker/daemon.json"
+if SOURCE="$(supporting_file "$TARGET")" ; then
+   echo "Installing $SOURCE"
+   sudo touch "$TARGET"
+   sudo cp "$SOURCE" "$TARGET"
+fi
+
 # run the script epilog if it exists
 run_pibuilder_epilog
 

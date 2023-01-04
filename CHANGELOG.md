@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2023-01-04
+
+	- add capability for installing `/etc/docker/daemon.json`
+	- Bump default version of docker-compose installed via script to v2.14.2 
+
 * 2022-11-27
 
 	- Change log split to dedicated file.
