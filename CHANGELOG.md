@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-01-07
+
+	- Bump default version of docker-compose installed via script to v2.15.0 (for S474N)
+
 * 2023-01-04
 
 	- add capability for installing `/etc/docker/daemon.json`
