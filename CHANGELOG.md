@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-02-09
+
+	- Bump default version of docker-compose installed via script to v2.16.0
+
 * 2023-01-10
 
 	- Bump default version of docker-compose installed via script to v2.15.1 (for S474N)
