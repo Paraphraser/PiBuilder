@@ -150,6 +150,29 @@ case "$VM_SWAP" in
       fi
       ;;
 
+   "custom" )
+
+      # try to patch the swap file setup
+      if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
+
+         # patch success! turn off swap if it is enabled
+         [ -n "$(/usr/sbin/swapon -s)" ] &&  sudo dphys-swapfile swapoff
+
+         # apply configuration
+         sudo dphys-swapfile setup
+
+         # re-enable swap (reboot occurrs soon)
+         sudo dphys-swapfile swapon
+
+      else
+
+         echo "Warning: VM_SWAP=$VM_SWAP but unable to patch /etc/dphys-swapfile"
+         echo "         Virtual memory system left at OS defaults"
+
+      fi
+
+      ;;
+
    *)
       # catch-all implying "default" meaning "leave everything alone"
       echo "Virtual memory system left at OS defaults"

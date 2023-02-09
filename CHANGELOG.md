@@ -3,6 +3,8 @@
 * 2023-02-09
 
 	- Bump default version of docker-compose installed via script to v2.16.0
+	- Bump SQLite to version 3400100
+	- Adds `VMSWAP=custom` to support custom VM configurations
 
 * 2023-01-10
 

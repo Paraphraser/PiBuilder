@@ -368,6 +368,10 @@ PREFER_64BIT_KERNEL=false
 #         is twice real RAM, with a maximum limit of 2GB. In practice,
 #         this will usually result in 2GB of swap space. You should
 #         consider this if your Pi boots from SSD.
+#      VM_SWAP=custom
+#         applies whatever patching instructions are found in:
+#            ./support/etc/dphys-swapfile.patch
+#         Same as "automatic" but does not check if running from SD.
 #      VM_SWAP=default
 #         the Raspberry Pi OS defaults apply. In practice, this means
 #         swap is enabled and the swap space is 100MB.
@@ -393,7 +397,7 @@ PREFER_64BIT_KERNEL=false
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
-SQLITEVERSION="sqlite-autoconf-3390100"
+SQLITEVERSION="sqlite-autoconf-3400100"
 ```
 
 You **can** set the right hand sides of the following variables:
@@ -416,7 +420,16 @@ You **can** set the right hand sides of the following variables:
 	- `automatic`:
 
 		- If the Pi is running from an SD card, this is the same as `disable`.
-		- If the Pi is not running from an SD card, the script changes the swap configuration in `/etc/dphys-swapfile` so that swap size is calculated in two steps. First, the amount of real RAM is doubled (eg a 2GB Raspberry Pi 4 will be doubled to 4GB) and then a maximum limit of 2GB will be applied. This calculation will result in a 2GB swap file for any Raspberry Pi with 1GB or more of real RAM. This is the recommended option if your Raspberry Pi boots from SSD or HD.
+		- If the Pi is not running from an SD card, the script changes the swap configuration in `/etc/dphys-swapfile` so that swap size is calculated in two steps:
+
+			1. The amount of real RAM is doubled (eg a 2GB Raspberry Pi 4 will be doubled to 4GB);
+			2. A maximum limit of 2GB is applied.
+
+			This calculation will result in a 2GB swap file for any Raspberry Pi with 1GB or more of real RAM. This is the recommended option if your Raspberry Pi boots from SSD or HD.
+
+			Rules 1 and 2 are implemented by the `./etc/dphys-swapfile.patch` supplied with PiBuilder. If you change or override that file then whatever rules your patch imposes will be implemented by `automatic`.
+			
+	- `custom` is equivalent to `automatic` but it does not check if your system is running from SD. If you want to enable swap on an SD system, this or "default" are the options to use.
 
 	- `default` makes no changes to the virtual memory system. The current Raspberry Pi OS defaults enable virtual memory swapping with a swap file size of 100MB. This is perfectly workable on systems with 4GB of RAM or more.
 

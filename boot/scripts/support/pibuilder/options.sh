@@ -28,6 +28,10 @@ PREFER_64BIT_KERNEL=false
 #         is twice real RAM, with a maximum limit of 2GB. In practice,
 #         this will usually result in 2GB of swap space. You should
 #         consider this if your Pi boots from SSD.
+#      VM_SWAP=custom
+#         applies whatever patching instructions are found in:
+#            ./support/etc/dphys-swapfile.patch
+#         Same as "automatic" but does not check if running from SD.
 #      VM_SWAP=default
 #         the Raspberry Pi OS defaults apply. In practice, this means
 #         swap is enabled and the swap space is 100MB.
@@ -53,4 +57,4 @@ PREFER_64BIT_KERNEL=false
 #only used if you run the script. These should be kept up-to-date:
 #      https://www.sqlite.org/download.html
 SQLITEYEAR="2022"
-SQLITEVERSION="sqlite-autoconf-3400000"
+SQLITEVERSION="sqlite-autoconf-3400100"
