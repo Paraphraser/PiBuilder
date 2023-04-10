@@ -49,7 +49,7 @@ if [ -d $PARENT ] ; then
    echo ""
    if [ ! "$NEW_PASSWORD" = "$CHK_PASSWORD" ] ; then
       echo "Passwords do not match!"
-      exit -1
+      exit 1
    fi
    
    # set the password into the template (changes ownership to root)

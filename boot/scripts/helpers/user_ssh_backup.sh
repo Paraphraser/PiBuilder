@@ -15,7 +15,7 @@ case "$(uname -s)" in
 
   *)
     echo "Running unsupported operating system"
-    exit -1
+    exit 1
     ;;
 
 esac
@@ -28,7 +28,7 @@ if [ -z "$RUNTAG" ] ; then
    echo "An appropriate runtag can't be determined from the hostname"
    echo "(The hostname may not be set)"
    echo "Try again but pass the name for this host as a parameter"
-   exit -1
+   exit 1
    
 fi
 

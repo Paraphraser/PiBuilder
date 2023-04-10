@@ -24,7 +24,7 @@ read -s -p "Re-enter password: " CHK_PASSWORD
 echo ""
 if [ ! "$NEW_PASSWORD" = "$CHK_PASSWORD" ] ; then
    echo "Passwords do not match!"
-   exit -1
+   exit 1
 fi
 
 # encrypt the password

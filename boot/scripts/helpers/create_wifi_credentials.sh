@@ -35,7 +35,7 @@ read -s -p "Re-enter password: " CHK_PSK
 echo ""
 if [ ! "$PSK" = "$CHK_PSK" ] ; then
    echo "Passwords do not match!"
-   exit -1
+   exit 1
 fi
 
 # generate the credentials

@@ -43,7 +43,7 @@ esac
 
 if [ $USAGE -ne 0 ] ; then
    echo "Usage: $SCRIPT path_to_mountpoint_of_raspbian_boot_partition"
-   exit -1
+   exit 1
 fi
 
 # does the boot source exist?

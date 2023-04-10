@@ -13,7 +13,7 @@
 #
 
 # should not run as root
-[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
+[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit 1
 
 # the name of this script is
 SCRIPT=$(basename "$0")
@@ -34,7 +34,7 @@ fi
 # no arguments supported
 if [ "$#" -gt 0 ]; then
     echo "Usage: $SCRIPT"
-    exit -1
+    exit 1
 fi
 
 # expected location of plugin when apt does the job

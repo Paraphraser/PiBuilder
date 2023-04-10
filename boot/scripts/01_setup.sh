@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # should not run as root
-[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
+[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit 1
 
 # the name of this script is
 SCRIPT=$(basename "$0")

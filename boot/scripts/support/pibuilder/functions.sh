@@ -47,7 +47,7 @@ install_packages() {
       echo "Retry the errant installations listed below by hand, and"
       echo "then re-run $SCRIPT"
       cat "$RETRIES"
-      exit -1
+      exit 1
 
    fi
 
