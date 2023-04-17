@@ -92,9 +92,14 @@ else
    
 fi
 
-# remove all ssh presets from boot volume
-echo "Removing all /etc/ssh presets"
-sudo rm -rf $SUPPORT/etc/ssh
+# is this script running from /boot ?
+if [[ "$WHERE" == "/boot/"* ]] ; then
+
+   # yes! remove all ssh presets from boot volume
+   echo "Removing all /etc/ssh presets"
+   sudo rm -rf $SUPPORT/etc/ssh
+
+fi
 
 if is_raspberry_pi ; then
 
