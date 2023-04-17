@@ -235,5 +235,12 @@ else
 fi
 
 echo "$SCRIPT complete - rebooting..."
+
+echo "If the Raspberry Pi does not seem to reboot cleanly, it is OK to remove"
+echo "and re-apply power. A normal reboot takes about 30-40 seconds. A good"
+echo "test of whether the Pi has hung is if you can 'ping' the Pi but ssh says"
+echo "'Connection refused' when you try to connect. Hanging seems to be a"
+echo "side-effect of setting locales."
+
 sudo touch /boot/ssh
 sudo /usr/sbin/reboot
