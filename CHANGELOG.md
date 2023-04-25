@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-04-25
+
+	- Rename SQLite installation script from `06_setup.sh` to `install_sqlite.sh` in the `helpers` subdirectory.
+
 * 2023-04-21
 
 	- Bump default version of docker-compose installed via script to v2.17.3

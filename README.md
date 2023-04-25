@@ -60,7 +60,6 @@ The scripts make use of tools which are specific to the Raspberry Pi (eg `raspi-
 		- [Script 03](#runScript03)
 		- [Script 04](#runScript04)
 		- [Script 05](#runScript05)
-		- [Script 06 (optional)](#runScript06)
 
 - [Script summaries](#synopses)
 
@@ -69,7 +68,6 @@ The scripts make use of tools which are specific to the Raspberry Pi (eg `raspi-
 	- [Script 03](#docScript03)
 	- [Script 04](#docScript04)
 	- [Script 05](#docScript05)
-	- [Script 06 (optional)](#docScript06)
 
 - [How PiBuilder scripts search for files, folders and patches](#scriptSearch)
 
@@ -100,6 +98,8 @@ The scripts make use of tools which are specific to the Raspberry Pi (eg `raspi-
 - [Some words about VNC](#aboutVNC)
 
 - [About Supervised Home Assistant](#hassioBackground)
+
+- [Installing SQLite](#installSqlite)
 
 - [Running on other platforms](#runOtherPlatform)
 
@@ -393,11 +393,6 @@ PREFER_64BIT_KERNEL=false
 #   See PiBuilder "login" tutorial
 #DOT_BASHRC_ACTION=append
 #DOT_PROFILE_ACTION=append
-
-#only used if you run the script. These should be kept up-to-date:
-#      https://www.sqlite.org/download.html
-SQLITEYEAR="2022"
-SQLITEVERSION="sqlite-autoconf-3400100"
 ```
 
 You **can** set the right hand sides of the following variables:
@@ -461,8 +456,6 @@ You **can** set the right hand sides of the following variables:
 		- *Bullseye* the legacy camera system is loaded rather than the native version. In other words, Bullseye's camera system behaves like Buster and earlier. This is the setting to use if downstream applications have not been updated to use Bullseye's native camera system. 
 
 * `DOT_BASHRC_ACTION` and `DOT_PROFILE_ACTION` both default to `append`. Allowable values if uncommented are `append`, `replace` and `skip`. See [Login Profiles: `~/.bashrc` and `~/.profile`](tutorials/login.md) tutorial for more information on how to use these options.
-
-* `SQLITEYEAR` and `SQLITEVERSION` let you choose the values which govern the version of SQLite that is installed, if you run the optional [Script 06](#docScript06). See the [releases](https://www.sqlite.org/download.html) page.
 
 <a name="perHostConfigOptions"></a>
 ##### per-host PiBuilder installation options
@@ -826,19 +819,6 @@ These instructions assume you will use the multicast DNS name (ie `«hostname».
 	$ ./menu.sh
 	``` 
 
-<a name="runScript06"></a>
-#### Script 06 (optional)
-
-This script is entirely optional. It rebuilds SQLite from source code. The version of SQLite you get from `apt install` doesn't have all the features you might expect if SQLite is your thing.
-
-If you have no plans to run SQLite and/or don't need its more advanced features, just skip this step.
-
-It is also OK to defer running this script until you have an actual need:
-
-```bash
-$ /boot/scripts/06_setup.sh
-```  
-
 <a name="synopses"></a>
 ## Script summaries
 
@@ -969,11 +949,6 @@ The script:
 * Copies placeholder configuration files for `rclone` and IOTstackBackup into `~/.config`
 * Erases bash history.
 * Ends with a logout.
-
-<a name="docScript06"></a>
-### Script 06 (optional)
-
-This script is optional. It rebuilds SQLite from source code. The version you get from `apt install` doesn't have all the features you might want.
 
 <a name="scriptSearch"></a>
 ## How PiBuilder scripts search for files, folders and patches
@@ -1559,6 +1534,15 @@ Raspberry Pi OS is a Debian *derivative* and it is becoming increasingly clear t
 Because of the self-updating nature of Supervised Home Assistant, your Raspberry Pi might be happily running Supervised Home Assistant plus IOTstack one day, and suddenly start misbehaving the next day, simply because Supervised Home Assistant assumed it was in total control of your Raspberry Pi.
 
 If you want Supervised Home Assistant to work, reliably, it really needs to be its own dedicated appliance. If you want IOTstack to work, reliably, it really needs to be kept well away from Supervised Home Assistant. If you want both Supervised Home Assistant and IOTstack, you really need two Raspberry Pis.
+
+<a name="installSqlite"></a>
+## Installing SQLite
+
+The installation script for SQLite used to be named `06_setup.sh`. It was always optional. It has been renamed as a helper script. To install SQLite:
+
+```bash
+$ ~/PiBuilder/boot/scripts/helpers/install_sqlite.sh
+```
 
 <a name="runOtherPlatform"></a>
 ## Running on other platforms

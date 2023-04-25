@@ -53,8 +53,3 @@ PREFER_64BIT_KERNEL=false
 #   See PiBuilder "login" tutorial
 #DOT_BASHRC_ACTION=append
 #DOT_PROFILE_ACTION=append
-
-#only used if you run the script. These should be kept up-to-date:
-#      https://www.sqlite.org/download.html
-SQLITEYEAR="2023"
-SQLITEVERSION="sqlite-autoconf-3410200"

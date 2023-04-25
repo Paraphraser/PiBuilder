@@ -6,9 +6,6 @@
 # the name of this script is
 SCRIPT=$(basename "$0")
 
-# where is this script is running?
-WHERE=$(dirname "$(realpath "$0")")
-
 if [ "$#" -gt 0 ]; then
     echo "Usage: $SCRIPT"
     exit 1
@@ -17,12 +14,9 @@ fi
 # this script should terminate on errors
 set -e
 
-# declare path to support directory and import common functions
-SUPPORT="$WHERE/support"
-. "$SUPPORT/pibuilder/functions.sh"
-
-# import user options and run the script prolog - if they exist
-run_pibuilder_prolog
+# set defaults but permit overrides by caller
+SQLITEYEAR="${SQLITEYEAR:-2023}"
+SQLITEVERSION="${SQLITEVERSION:-sqlite-autoconf-3410200}"
 
 # construct download URL
 SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITEVERSION.tar.gz"
@@ -65,8 +59,5 @@ sudo make install
 echo "Cleaning up"
 cd $HOME
 rm -rf $DOWNLOAD
-
-# run the script epilog if it exists
-run_pibuilder_epilog
 
 echo "Success!"
