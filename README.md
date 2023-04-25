@@ -254,11 +254,11 @@ The steps are:
 
 		- enter your WiFi network name in [J].
 		- enter your WiFi password in [K].
-		- <a name="firstBootCC"></a>use the popup menu [L] to select your country code.
+		- use the popup menu [L] to select your country code.
 
 			> Your support host may pre-populate some or all of these fields.
 
-	- Enable [M] and then use the popup menus <a name="firstBootTZ"></a>[N] and [O] to set appropriate values.
+	- Enable [M] and then use the popup menus [N] and [O] to set appropriate values.
 	- Disable [P]. You need to leave the boot partition mounted for the next step.
 	- Click [Q] to <kbd>SAVE</kbd> your settings.
 
@@ -340,14 +340,6 @@ The file supplied with PiBuilder looks like this:
 ```bash
 # this file is "sourced" in all build scripts.
 
-# - country-code for WiFi
-#   normally set in Raspberry Pi Imager - will override if made active
-#LOCALCC="AU"
-
-# - local time-zone
-#   normally set in Raspberry Pi Imager - will override if made active
-#LOCALTZ="Etc/UTC"
-
 # - skip full upgrade in the 01 script.
 SKIP_FULL_UPGRADE=false
 
@@ -397,8 +389,6 @@ PREFER_64BIT_KERNEL=false
 
 You **can** set the right hand sides of the following variables:
 
-* <a name="localCC"></a>`LOCALCC`to your two-character country code. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootCC).
-* <a name="localTZ"></a>`LOCALTZ` to a valid country and city combination. If enabled, this will override the corresponding value set in [Raspberry Pi Imager](#firstBootTZ).
 * <a name="skipFullUpgrade"></a>`SKIP_FULL_UPGRADE` to `true`. This prevents [Script 01](#docScript01) from performing a "full upgrade", which may be appropriate if you want to test against a base release of Raspberry Pi OS.
 * <a name="skipFirmwareUpgrade"></a>`SKIP_EEPROM_UPGRADE` to `true`. This prevents [Script 01](#docScript01) from updating your Raspberry Pi's firmware. If set to `false` (the default), [Script 01](#docScript01) runs:
 
@@ -860,12 +850,7 @@ The script:
 * Optionally sets up locale(s).
 * Optionally enables the 64-bit kernel (see [`PREFER_64BIT_KERNEL`](#prefer64BitKernel)).
 * Optionally enables the Raspberry Pi ribbon-cable camera (see [`ENABLE_PI_CAMERA`](#enablePiCam)).
-* Sets raspi-config options:
-
-	- boot to console (see [VNC + console + PiBuilder](tutorials/vnc.md) if you want to understand the reason for this)
-	- WiFi country code  (if [`LOCALCC`](#localCC) is enabled)
-	- TimeZone  (if [`LOCALTZ`](#localTZ) is enabled)
-
+* Sets raspi-config option to boot to console (see [VNC + console + PiBuilder](tutorials/vnc.md) if you want to understand the reason for this).
 * If [`SKIP_EEPROM_UPGRADE`](#skipFullUpgrade) is `false`, checks whether a firmware update is available and sets it up to be applied on the next reboot.
 * Optionally changes «hostname» (if [newhostname](#newHostname) argument is provided)
 * Reboots
@@ -1590,9 +1575,7 @@ $ ./PiBuilder/boot/scripts/01_setup.sh
 The optional «newhostname» argument to the `01_setup.sh` script is ignored because it depends on `raspi-config` which is not available. The same applies to:
 
 * Pi camera options (`ENABLE_PI_CAMERA')
-* 64-bit kernel option (`PREFER_64BIT_KERNEL`
-* WiFi country-code option (`LOCALCC`)
-* Local time-zone option (`LOCALTZ`); and
+* 64-bit kernel option (`PREFER_64BIT_KERNEL` ; and
 * Updating the Raspberry Pi EEPROM.
 
 The remaining scripts can be completed in order, with reboots or logouts at the end of each script:

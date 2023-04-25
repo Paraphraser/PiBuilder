@@ -3,6 +3,7 @@
 * 2023-04-25
 
 	- Rename SQLite installation script from `06_setup.sh` to `install_sqlite.sh` in the `helpers` subdirectory.
+	- Support for `LOCALCC` and `LOCALTZ` withdrawn in favour of setting via Raspberry Pi Imager.
 
 * 2023-04-21
 

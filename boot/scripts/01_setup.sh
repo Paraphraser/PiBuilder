@@ -148,18 +148,6 @@ if is_raspberry_pi ; then
    echo "Setting boot behaviour to console (no GUI)"
    sudo raspi-config nonint do_boot_behaviour B1
 
-   # set/override WiFi country code as an option
-   if [ -n "$LOCALCC" ] ; then
-      echo "Setting WiFi country code to $LOCALCC"
-      sudo raspi-config nonint do_wifi_country "$LOCALCC"
-   fi
-
-   # set timezone if provided and what is in effect are different
-   if [ -n "$LOCALTZ" -a "$LOCALTZ" != "$(cat /etc/timezone)" ] ; then 
-      echo "Setting time-zone to $LOCALTZ"
-      sudo raspi-config nonint do_change_timezone "$LOCALTZ"
-   fi
-
    # try to establish locales. Any patch should always retain
    # "en_GB.UTF-8" so we don't pull the rug out from beneath anything
    # (like Python) that already knows the default language
@@ -214,8 +202,6 @@ else
    echo "The following PiBuilder options have been ignored:"
    echo "   ENABLE_PI_CAMERA"
    [ "$PREFER_64BIT_KERNEL" = "true" ] && echo "   PREFER_64BIT_KERNEL"
-   [ -n "$LOCALCC" ] && echo "   LOCALCC"
-   [ -n "$LOCALTZ" ] && echo "   LOCALTZ"
    [ "$SKIP_EEPROM_UPGRADE" = "false" ] && echo "   SKIP_EEPROM_UPGRADE"
 
    echo "Boot behaviour is unchanged (OS default)"
