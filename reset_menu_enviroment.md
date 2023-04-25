@@ -1,4 +1,10 @@
-# Menu maintenance
+# IOTstack menu maintenance
+
+The change to running the menu in a Python virtual environment seems to be causing some problems. One example is:
+
+```
+ModuleNotFoundError: No module named 'virtualenv.activation.xonsh'
+```
 
 The IOTstack menu can be a bit of a moving target. Whether the menu works properly or not can depend on:
 
