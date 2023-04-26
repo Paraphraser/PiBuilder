@@ -200,6 +200,7 @@ supporting_file() {
 #                  /boot/scripts/support/etc/rc.local.patch@host
 #                  /boot/scripts/support/etc/rc.local.patch
 # Parameter $2: a comment string describing the patch
+# Parameter $3: optional. If true, returm success even if patch fails
 #
 # Return code = 0 if the patch is found and can be applied, 1 otherwise.
 #
@@ -235,6 +236,14 @@ try_patch() {
 
          # no! report failure
          echo "[PATCH] FAILED to apply $PATCH to $1 - $2"
+
+         # ignore errors?
+         if [ "$3" = "true" ] ; then
+
+            # yes! return success
+            return 0
+
+         fi
 
       fi
 

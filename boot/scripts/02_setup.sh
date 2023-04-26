@@ -27,10 +27,22 @@ if [ -d "/etc/ssh.old" ] ; then
    sudo rm -rf /etc/ssh.old
 fi
 
+# try to establish locales. Any patch should always retain
+# "en_GB.UTF-8" so we don't pull the rug out from beneath anything
+# (like Python) that already knows the default language
+# (it can be removed later if need be, eg using raspi-config.
+if try_patch "/etc/locale.gen" "setting locales (ignore errors)" true ; then
+   sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
+fi
+
 # try to set the default language
 if [ -n "$LOCALE_LANG" ] ; then
-   echo "Setting default language to $LOCALE_LANG"
-   sudo /usr/sbin/update-locale "LANG=$LOCALE_LANG"
+   if [ $(grep -c "^${LOCALE_LANG}" /etc/locale.gen) -gt 0 ] ; then
+      echo "Setting default language to $LOCALE_LANG"
+      sudo /usr/sbin/update-locale "LANG=$LOCALE_LANG"
+   else
+      echo "$LOCALE_LAN not active in /etc/locale.gen - unable to apply"
+   fi
 fi
 
 # tell dhcpcd and docker not to fight

@@ -1,5 +1,11 @@
 # PiBuilder Change Summary
 
+* 2023-04-26
+
+	- Support third (optional, boolean) argument to `try_patch()`. If true, the function will return success even if the patching operation fails.
+	- Better support for `LOCALE_LANG` on non-Pi hosts. If the language defined by `LOCALE_LANG` is active in `/etc/locale.gen` (either because that's the default or because a patch was successful in making it active) then that language will be made the default.
+	- All language setting now occurs in 02 script. 
+
 * 2023-04-25
 
 	- Rename SQLite installation script from `06_setup.sh` to `install_sqlite.sh` in the `helpers` subdirectory.

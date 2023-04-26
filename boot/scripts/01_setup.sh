@@ -148,14 +148,6 @@ if is_raspberry_pi ; then
    echo "Setting boot behaviour to console (no GUI)"
    sudo raspi-config nonint do_boot_behaviour B1
 
-   # try to establish locales. Any patch should always retain
-   # "en_GB.UTF-8" so we don't pull the rug out from beneath anything
-   # (like Python) that already knows the default language
-   # (it can be removed later if need be, eg using raspi-config.
-   if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
-      sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
-   fi
-
    # has the user given permission for an EEPROM upgrade?
    if [ "$SKIP_EEPROM_UPGRADE" = "false" ] ; then
 
@@ -186,15 +178,6 @@ if is_raspberry_pi ; then
 
    fi
 
-   # has anything been done to invalidate known_hosts on the support host?
-   if [ "$WARN_TRUST_RESET" = "true" ] ; then
-
-      # maybe - advise accordingly
-      echo "Remember to do ssh-keygen -R $SAVE_HOSTNAME.local"
-      echo "Reconnect using ssh $USER@$HOSTNAME.local"
-
-   fi
-
 else
 
    echo "PiBuilder appears to be running on non-Raspberry Pi OS !"
@@ -207,21 +190,17 @@ else
    echo "Boot behaviour is unchanged (OS default)"
    [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] && echo "Hostname not changed".
 
-   # run the script epilog if it exists (best to run early)
+   # run the script epilog if it exists
    run_pibuilder_epilog
 
-   # it may be possible to set locales
-   if try_patch "/etc/locale.gen" "setting locales (ignore errors)" ; then
-      sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
-   fi
+fi
 
-   if [ "$WARN_TRUST_RESET" = "true" ] ; then
+# has anything been done to invalidate known_hosts on the support host?
+if [ "$WARN_TRUST_RESET" = "true" ] ; then
 
-      # maybe - advise accordingly
-      echo "Remember to do ssh-keygen -R $SAVE_HOSTNAME.local"
-      echo "Reconnect using ssh $USER@$SAVE_HOSTNAME.local"
-
-   fi
+   # maybe - advise accordingly
+   echo "Remember to do ssh-keygen -R $SAVE_HOSTNAME.local"
+   echo "Reconnect using ssh $USER@$HOSTNAME.local"
 
 fi
 
