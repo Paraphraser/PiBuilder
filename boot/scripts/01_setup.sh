@@ -83,6 +83,7 @@ if SOURCE="$(supporting_file "/etc/ssh/etc-ssh-backup.tar.gz")" ; then
    sudo chown root:root /etc/ssh
    sudo chmod 755 /etc/ssh
    sudo tar --same-owner -xzf "$SOURCE" -C /etc/ssh
+   sudo systemctl restart sshd ssh
    WARN_TRUST_RESET="true"
 
 else
@@ -174,6 +175,7 @@ if is_raspberry_pi ; then
       # yes! set the host name (produces errors)
       echo "Setting machine name to $HOSTNAME"
       sudo raspi-config nonint do_hostname "$HOSTNAME"
+      sudo systemctl restart sshd ssh
       WARN_TRUST_RESET="true"
 
    fi
