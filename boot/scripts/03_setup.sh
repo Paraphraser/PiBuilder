@@ -124,9 +124,7 @@ if try_patch "/etc/systemd/timesyncd.conf" "local time-servers" ; then
 fi
 
 TARGET="/etc/udev/rules.d"
-if SOURCE="$(supporting_file "$TARGET")" ; then
-   echo "Adding USB device rules"
-   sudo cp -n "$SOURCE"/* "$TARGET"
+if try_merge "$TARGET" "USB device rules" ; then
    sudo chown root:root "$TARGET"/*
    sudo chmod 644 "$TARGET"/*
 fi
