@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-05-15
+
+	- Fix bug in tidyPATH() function.
+
 * 2023-04-27
 
 	- Support third (optional, boolean) argument to `try_patch()`. If true, the function will return success even if the patching operation fails.

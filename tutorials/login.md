@@ -213,12 +213,13 @@ The following function can be a useful addition to your `~/.bashrc`. It should b
 
 ```
 tidyPATH() {
-   local REPATH P PE
+   local REPATH CKPATH P PE
    for P in ${PATH//:/ }; do
       PE=$(eval echo "$P")
       [ -L "$PE" ] && PE=$(realpath "$PE")
-      if [[ ! "$REPATH" =~ "$PE" && -d "$PE" ]] ; then
+      if [[ ! "$CKPATH" =~ ":$PE:" && -d "$PE" ]] ; then
          [ -n "$REPATH" ] && REPATH="$REPATH:$PE" || REPATH="$PE"
+         CKPATH="$CKPATH:$PE:"
       fi
    done
    echo "$REPATH"
