@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-05-17
+
+	- Bump default version of docker-compose installed via script to v2.18.0
+
 * 2023-05-15
 
 	- Fix bug in tidyPATH() function.
