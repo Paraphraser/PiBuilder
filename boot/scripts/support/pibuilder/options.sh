@@ -1,14 +1,15 @@
-# this file is "sourced" in all build scripts.
+# this file is "sourced" in all build scripts. In the release version,
+# all variables are commented-out and shown with their default values.
 
 # - skip full upgrade in the 01 script.
-SKIP_FULL_UPGRADE=false
+#SKIP_FULL_UPGRADE=false
 
 # - skip firmware in the 01 script.
-SKIP_EEPROM_UPGRADE=false
+#SKIP_EEPROM_UPGRADE=false
 
 # - preference for kernel. Only applies to 32-bit installations. If
 #   true, adds "arm_64bit=1" to /boot/config.txt
-PREFER_64BIT_KERNEL=false
+#PREFER_64BIT_KERNEL=false
 
 # - preference for handling virtual memory swapping. Three options:
 #      VM_SWAP=disable

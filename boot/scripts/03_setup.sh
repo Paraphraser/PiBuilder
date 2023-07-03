@@ -40,7 +40,7 @@ jq
 libffi-dev
 libreadline-dev
 mosquitto-clients
-netcat
+netcat-openbsd
 nmap
 python3-pip
 python3-dev
@@ -68,7 +68,6 @@ cryptsetup
 dirmngr
 gnupg-agent
 gnupg2
-hopenpgp-tools
 openssl
 pcscd
 python3-gnupg
@@ -78,6 +77,11 @@ secure-delete
 yubikey-manager
 yubikey-personalization
 CRYPTO_PACKAGES
+
+# hopenpgp-tools is not available on bookworm 
+if ! is_running_OS_release bookworm ; then
+   echo "hopenpgp-tools" >>"$PACKAGES"
+fi
 
 install_packages "$PACKAGES"
 
@@ -135,12 +139,22 @@ git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 echo "Protective creation of sub-folders which should be user-owned"
 mkdir -p "$HOME/IOTstack/backups" "$HOME/IOTstack/services"
 
+# I will put in a pull request to remove pins from the requirements
+# files in the IOTstack directory. For now, this hack serves the
+# same purpose
+if is_running_OS_release bookworm ; then
+   echo "Removing pins from IOTstack Python requirements files"
+   sed -i.bak 's/==.*//' \
+      "$HOME/IOTstack/requirements-menu.txt" \
+      "$HOME/IOTstack/requirements-mkdocs.txt"
+fi
+
 echo "Cloning IOTstackAliases"
 git clone https://github.com/Paraphraser/IOTstackAliases.git ~/.local/IOTstackAliases
 
 echo "Installing rclone and shell yaml support"
 curl https://rclone.org/install.sh | sudo bash
-sudo pip3 install -U shyaml
+pip3 install -U $PIBUILDER_PYTHON_OPTIONS shyaml
 
 echo "Cloning and installing IOTstackBackup"
 git clone https://github.com/Paraphraser/IOTstackBackup.git ~/.local/IOTstackBackup
@@ -149,7 +163,7 @@ git clone https://github.com/Paraphraser/IOTstackBackup.git ~/.local/IOTstackBac
 TARGET="$HOME/IOTstack/requirements-mkdocs.txt"
 if [ -e "$TARGET" ] ; then
    echo "Adding mkdocs support (eg mkdocs serve -a 0.0.0.0:8765)" 
-   pip3 install -r "$TARGET"
+   pip3 install $PIBUILDER_PYTHON_OPTIONS -r "$TARGET"
 fi
 
 # run the script epilog if it exists

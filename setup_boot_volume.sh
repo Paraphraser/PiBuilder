@@ -25,7 +25,8 @@ case "$#" in
 
   0 )
     if [ $isMacOS ] ; then
-       BOOTTARGET="/Volumes/boot"
+       [ -d "/Volumes/boot" ] && BOOTTARGET="/Volumes/boot"
+       [ -d "/Volumes/bootfs" ] && BOOTTARGET="/Volumes/bootfs"
     else
        USAGE=1
     fi

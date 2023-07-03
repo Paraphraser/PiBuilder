@@ -43,6 +43,7 @@ echo "Initialising empty user directories for SSH, GnuPG, etc"
 chmod 700 "$HOME/.gnupg" "$HOME/.ssh"
 [ ! -d "$HOME/.local/bin" ] && mkdir -p "$HOME/.local/bin"
 
+# backports support for libseccomp2 (64-bit date/time) in buster
 if is_running_OS_release buster ; then
    echo "Adding Debian Buster Backports support (for libseccomp2)"
    sudo apt-key adv \
@@ -54,16 +55,27 @@ if is_running_OS_release buster ; then
    fi
 fi
 
+# support upgrading from bullseye to bookworm
+if is_running_OS_release bullseye ; then
+   if [ "$DEBIAN_BOOKWORM_UPGRADE" = "true" ] ; then
+      echo "Editing apt sources to point to Debian 12 (bookworm"
+      sudo sed -i.bak 's/bullseye/bookworm/g' /etc/apt/sources.list
+      echo "Forcing Full Upgrade"
+      SKIP_FULL_UPGRADE=false
+   fi
+fi
+
 echo "Running sudo apt update"
 sudo apt update
 
-# normal behaviour is a full upgrade but can fall back to normal upgrade
-if [ "$SKIP_FULL_UPGRADE" = "false" ] ; then
-   echo "Running sudo apt full-upgrade -y"
-   sudo apt full-upgrade -y
-else
+# default behaviour is a full upgrade (ie SKIP_FULL_UPGRADE is either
+# unset or anything other than "true")
+if [ "$SKIP_FULL_UPGRADE" = "true" ] ; then
    echo "Running sudo apt upgrade -y"
    sudo apt upgrade -y
+else
+   echo "Running sudo apt full-upgrade -y"
+   sudo apt full-upgrade -y
 fi
 
 # ensure basics available on non-Raspbian systems
@@ -150,7 +162,7 @@ if is_raspberry_pi ; then
    sudo raspi-config nonint do_boot_behaviour B1
 
    # has the user given permission for an EEPROM upgrade?
-   if [ "$SKIP_EEPROM_UPGRADE" = "false" ] ; then
+   if [ "$SKIP_EEPROM_UPGRADE" != "true" ] ; then
 
       # yes! is an upgrade available?
       if [ $(sudo rpi-eeprom-update | grep -c "*** UPDATE AVAILABLE ***") -gt 0 ] ; then

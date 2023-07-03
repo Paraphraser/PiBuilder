@@ -33,14 +33,38 @@ if [ "$(uname -s)" !=  "Linux" -o -z "$(which apt)" -o -z "$(which pip3)" ] ; th
 
 fi
 
+running_OS_release() {
+   if [ -e "/etc/os-release" ] ; then
+      . "/etc/os-release"
+      if [ -n "$VERSION_CODENAME" ] ; then
+         echo "$VERSION_CODENAME"
+         return 0
+      fi
+   fi
+   echo "unknown"
+   return 1
+}
+
+is_running_OS_release() {
+   if [ "$(running_OS_release)" = "$1" ] ; then
+      return 0
+   fi 
+   return 1
+}
+
+if is_running_OS_release bookworm ; then
+   echo "Note: pip3 installs will bypass externally-managed environment check"
+   PIBUILDER_PYTHON_OPTIONS="--break-system-packages"
+fi
+
 # step 1 - remove any versions installed via apt
 echo "Attempting to remove any versions managed by 'apt'"
 sudo apt -y remove $TARGET $TARGET_PLUGIN
 
 # step 2 - remove any python versions
 echo "Attempting to remove any versions installed by 'pip3'"
-sudo pip3 uninstall -y $TARGET
-pip3 uninstall -y $TARGET
+sudo pip3 uninstall -y $PIBUILDER_PYTHON_OPTIONS $TARGET
+pip3 uninstall -y $PIBUILDER_PYTHON_OPTIONS $TARGET
 
 # candidate directories where modern plugin versions might be installed
 read -r -d '' INSTALL_DIRS <<-EOF

@@ -1,5 +1,21 @@
 # PiBuilder Change Summary
 
+* 2023-07-03
+
+	- First pass at supporting Debian Bookworm. A test build can start with:
+
+		1. Go to the [Raspberry Pi OS downloads](https://www.raspberrypi.com/software/operating-systems/) page.
+		2. Find the "Raspberry Pi OS (64-bit)" grouping (half way down the page).
+		3. Download "Raspberry Pi OS with desktop" May 3rd 2023.
+
+		The expected filename is `2023-05-03-raspios-bullseye-arm64.img.xz`
+		
+	- To build based on Bookworm:
+
+		```
+		$ DEBIAN_BOOKWORM_UPGRADE=true /boot/scripts/01_setup.sh {«hostname»}
+		```
+		
 * 2023-07-01
 
 	- Bump default version of docker-compose installed via script to v2.19.1
