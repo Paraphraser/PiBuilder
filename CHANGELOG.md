@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-07-12
+
+	- Bump default version of docker-compose installed via script to v2.20.0
+
 * 2023-07-03
 
 	- First pass at supporting Debian Bookworm. A test build can start with:
@@ -99,7 +103,7 @@
 
 * 2022-11-03
 
-	- Adds check for firmware upgrade to [Script 01](#docScript01) plus `SKIP_EEPROM_UPGRADE` option to bypass the upgrade. See [All3DP tutorial](https://all3dp.com/2/raspberry-pi-4-firmware-update-tutorial/) for background.
+	- Adds check for firmware upgrade to 01 Script plus `SKIP_EEPROM_UPGRADE` option to bypass the upgrade. See [All3DP tutorial](https://all3dp.com/2/raspberry-pi-4-firmware-update-tutorial/) for background.
 	- Changes definition of `SKIP_FULL_UPGRADE` as follows:
 
 		- if `false`, performs `sudo apt full-upgrade -y`;
@@ -122,8 +126,8 @@
 
 * 2022-09-16
 
-	- Adds [`try_merge()`](#searchForMerge) function and employs it [Script 02](#docScript02) to conditionally merge the `/etc/network` folder. This can be used to customise network interfaces such as setting up VLANs.
-	- Adds `python3-virtualenv` and `software-properties-common` to the list of packages installed by [Script 03](#docScript03). The former is now an IOTstack dependency. The latter is in anticipation of Python 3.10.
+	- Adds `try_merge()` function and employs it 02 script to conditionally merge the `/etc/network` folder. This can be used to customise network interfaces such as setting up VLANs.
+	- Adds `python3-virtualenv` and `software-properties-common` to the list of packages installed by 03 script. The former is now an IOTstack dependency. The latter is in anticipation of Python 3.10.
  
 * 2022-08-30
 
@@ -138,7 +142,7 @@
 
 	- Improvements to `~/.bashrc` and `~/.profile` handling:
 
-		- Add [tutorial](tutorials/login.md).
+		- Add [tutorial](./docs/login.md).
 		- Add reference versions of login documents.
 		- Support `DOT_PROFILE_ACTION` and `DOT_BASHRC_ACTION` options with values `append` and `replace`.
 
@@ -160,7 +164,7 @@
 
 	   Together, "automatic" should then handle the majority of situations correctly.
 	   
-	- Move SAMBA discussion to [tutorial document](tutorials/samba.md).
+	- Move SAMBA discussion to [tutorial document](./docs/samba.md).
 	- Remove cautionary words about full 64-bit Bullseye. The wording was never *intended* to direct users to the 32-bit system but it seemed to be having that effect.
 	- Adds a note to the 01 script detail explaining the change of boot mode (which is noticeable if the Pi is connected to an HDMI screen).
 
@@ -170,7 +174,7 @@
 
 * 2022-07-04
 
-	- Explains how to set up [credentials files on boot partition](#burnClassic) and provides helper scripts to assist with the process. This an alternative to using Raspberry Pi Imager.
+	- Explains how to set up credentials files on boot partition and provides helper scripts to assist with the process. This an alternative to using Raspberry Pi Imager.
 
 * 2022-06-29
 
@@ -192,7 +196,7 @@
 
 	- The "convenience script" (`https://get.docker.com | sudo sh`) for installing `docker` also installs `docker-compose-plugin`. That, in turn, means that = both `docker` and `docker-compose-plugin` are maintained by regular `apt update ; apt upgrade`.
 	- The `04_setup.sh` script now takes advantage of this arrangement and creates a symlink in `/usr/local/bin` so that both the *command* (`docker-compose`) and *plugin* (`docker compose`) forms work from a single binary.
-	- [Maintaining docker + docker-compose](reinstallation.md) updated to explain the above.
+	- [Maintaining docker + docker-compose](./docs/reinstallation.md) updated to explain the above.
 	- `upgrade_docker-compose.sh` reduced to help text pointing to revised documentation.
  	- `uninstall_docker-compose.sh` adjusted to also remove the `docker-compose-plugin` package.
 	- `DOCKER_COMPOSE_VERSION` and `DOCKER_COMPOSE_ARCHITECTURE` removed from `options.sh`.
@@ -219,7 +223,7 @@
 
 * 2022-05-06
 
-	- All docker, docker-compose maintenance activities (remove, re-install, upgrade) moved to [Maintaining docker + docker-compose](reinstallation.md).
+	- All docker, docker-compose maintenance activities (remove, re-install, upgrade) moved to [Maintaining docker + docker-compose](./docs/reinstallation.md).
 
 * 2022-05-02
 
@@ -271,7 +275,7 @@
 
 * 2022-04-06
 
-	- Withdraw all support for Supervised Home Assistant. See [About Supervised Home Assistant](#hassioBackground) for more information.
+	- Withdraw all support for Supervised Home Assistant. See [About Supervised Home Assistant](./docs/home-assistant.md) for more information.
 
 * 2022-04-05
 
