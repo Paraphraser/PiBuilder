@@ -90,6 +90,62 @@ is_running_OS_release() {
 }
 
 
+# a function to return the OS build level
+# Example:
+#   running_OS_build
+# returns a string representing the common name used to refer to
+# distinctive flavours of build
+running_OS_build() {
+
+   # determine the build stage
+   local BUILDSTAGE=$(tail -1 /boot/issue.txt | cut -d "," -f 4 | tr -d "[:space:]")
+
+   # vector on answer
+   case "$BUILDSTAGE" in
+
+      "stage1" )
+         echo "minimal"
+         ;;
+
+      "stage2" )
+         echo "lite"
+         ;;
+
+      "stage3" )
+         echo "desktop"
+         ;;
+
+      "stage4" )
+         echo "normal"
+         ;;
+
+      "stage5" )
+         echo "full"
+         ;;
+
+      *)
+         echo "unknown"
+         return -1
+         ;;
+
+   esac
+
+}
+
+
+# a function to check whether the running OS was based on a particular
+# build stage. Example:
+#   is_running_OS_build lite
+# returns true if and only if the result of running_OS_build matches
+# the expected argument in $1, otherwise returns false
+is_running_OS_build() {
+   if [ "$(running_OS_build)" = "$1" ] ; then
+      return 0
+   fi
+   return 1
+}
+
+
 # a function to check whether the system as a whole is 64-bit.
 # That means both a 64-bit kernel and 64-bit-capable user space.
 # Example:

@@ -52,27 +52,14 @@ It's your Raspberry Pi so you can edit the files in `/etc` if you wish but best 
 
 The <a name="whenTable"></a>table below summarises when the two scripts in your home directory are run:
 
-Event                        | `~/.profile` | `~/.bashrc`  |
------------------------------|:------------:|:------------:|
-launch Terminal from desktop |❌            |✅            |
-ssh host                     |✅            |✳️            |
-ssh host command             |❌            |☑️            |
-scp to/from host             |❌            |☑️            |
-cron job                     |❌            |❌            |
-
-Key:
-
-* ✅ script runs to completion.
-* ✳️ `~/.bashrc` is sourced by `~/.profile`, runs to completion, and control returns to `~/.profile`.
-* ☑️ script runs but short-stops.
-* ❌ script does not run.
+![](./images/profile-vs-bashrc.jpg)
   
 > The same pattern applies to `/etc/profile` and `/etc/bash.bashrc`
 
 <a name="profileCallsBashrc"></a>
 ### when `~/.bashrc` is sourced by `~/.profile`
 
-In the ✳️ case, the default version of `~/.profile` contains these lines:
+In the `ssh «hostname»` case, the default version of `~/.profile` contains these lines:
 
 ```
 # if running bash
@@ -87,9 +74,9 @@ fi
 If you remove those lines from `~/.profile` then `~/.bashrc` will not run when you SSH to the host. It is unwise to do this because most of your PATH is set up by `~/.bashrc`. Many commands will not execute as you expect if your PATH is not set up in the usual way.
 
 <a name="shortStops"></a>
-### when `~/.bashrc` short-stops
+### when `~/.bashrc` starts but exits immediately
 
-The "short-stop" behaviour of the ☑️ cases depends on the following lines of code in the default version of `~/.bashrc`:
+The "short-stop" behaviour of these cases depends on the following lines of code in the default version of `~/.bashrc`:
 
 ```
 … preamble …
@@ -236,14 +223,18 @@ It can be called:
 
 * in `~/.bashrc` before the short-stop exit
 * at the end of `~/.bashrc`
-* at the end of `~/.profile`
+* at the end of `~/.profile` where it should be gated like this:
+
+	```
+	[ "$(type -t tidyPATH)" = "function" ] && export PATH=$(tidyPATH)
+	```
 
 How it works:
 
 1. The `${PATH//:/ }` construct starts with the existing PATH variable and replaces the colon separators with spaces. This makes it *for loop*-friendly and capable of iteration to decompose it back to its constituent parts.
 2. `$(eval echo "$P")` expands any embedded shortcuts like `~`.
 3. The `-L` operator tests for symbolic links and `realpath` chases symlink chains to arrive at the actual final library folder, if it exists.
-4. The `=~` operator checks for duplicates and ensures the candidate both exists and is a directory.
+4. The line with the `=~` operator checks for duplicates and ensures the candidate both exists and is a directory.
 5. The `-n` test either initialises the new path with the first candidate to emerge or appends subsequent candidates to the new path, separated by colons, maintaining the original order.
 6. The final `echo` returns the updated path.
 

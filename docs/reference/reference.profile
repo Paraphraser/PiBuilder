@@ -26,5 +26,5 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-# path cleanup - assumes tidyPATH() defined in .bashrc
-export PATH=$(tidyPATH)
+# path cleanup - depends on tidyPATH - won't exist if this is console
+[ "$(type -t tidyPATH)" = "function" ] && export PATH=$(tidyPATH)

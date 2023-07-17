@@ -1,9 +1,44 @@
 # PiBuilder Change Summary
 
+* 2023-07-17
+
+	- Major documentation restructure:
+
+		- Rather than cloning PiBuilder onto your support host, then copying the contents of `~/PiBuilder/boot` to the `/boot` partition such that scripts are run like this:
+
+			```
+			$ /boot/scripts/01_setup.sh «new host name»
+			$ /boot/scripts/02_setup.sh
+			…
+			```
+
+			the focus is on cloning PiBuilder onto the Raspberry Pi and running the scripts like this:
+		
+			```
+			$ ~/PiBuilder/boot/scripts/01_setup.sh «new host name»
+			$ ~/PiBuilder/boot/scripts/02_setup.sh
+			…
+			```
+
+			The older mechanism still works but the newer mechanism is more straightforward when trying to use PiBuilder in situations where the `/boot` partition does not exist (eg Proxmox, Parallels, non-Pi hardware).
+			
+			The new approach can also be used with customised builds. Instead of cloning PiBuilder onto your Pi from GitHub, you:
+			
+			1. Clone PiBuilder onto your support host from GitHub.
+			2. Customise PiBuilder on your support host.
+			3. Clone the customised instance onto your Pi from your support host.
+
+		- Main README simplified and aimed at first-time users.
+		- Customisation documentation moved to "advanced" README.
+		- Acknowledgement: Andreas suggested this change of approach.
+
+	- Explain how to enable SAMBA sharing of home directory.
+	- Rewrite VNC documentation and explain how to install TightVNC as an alternative to RealVNC.
+
 * 2023-07-12
 
 	- Bump default version of docker-compose installed via script to v2.20.0
-
+			
 * 2023-07-03
 
 	- First pass at supporting Debian Bookworm. A test build can start with:
