@@ -73,7 +73,7 @@ It is important to realise that the changing the boot mode to "Console" actually
 
 In addition to these server-side issues, I have also had trouble using the VNC client built into the macOS "Connect to Server…" command to connect with RealVNC-based services on Raspberry Pis. While that's a macOS-specific issue, taken together with the other problems, it suggests more development work might be needed before the Raspberry Pi's implementation of RealVNC can be considered "industrial strength".
 
-I have yet to experience equivalent problems with [TightVNC}(https://www.tightvnc.com). In addition, connecting to TightVNC-based services from macOS "just works". Right out of the box. That is why I recommend it.
+I have yet to experience equivalent problems with [TightVNC](https://www.tightvnc.com). In addition, connecting to TightVNC-based services from macOS "just works". Right out of the box. That is why I recommend it.
 
 Bottom line: RealVNC and PiBuilder are neither mutually exclusive nor incompatible. It's your machine so it's your decision. If you want RealVNC enabled on a system built by PiBuilder, you just need to do it yourself *after* PiBuilder has finished.
 
