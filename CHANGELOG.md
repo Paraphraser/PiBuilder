@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2023-07-30
+
+	- Expand [Configuring Static IP addresses on Raspbian](./docs/ip.md) to clarify use of `domain_name_servers` field in `dhcpcd.conf`. This follows on from a misunderstanding revealed in a discussion on [Discord](https://discord.com/channels/638610460567928832/638610461109256194/1134819901626925159).
+	- Adds how-to for setting up a Pi as an authoritative DNS server.
+
 * 2023-07-19
 
 	- Bump default version of docker-compose installed via script to v2.20.1

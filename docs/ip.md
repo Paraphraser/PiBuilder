@@ -1,5 +1,23 @@
 # Configuring Static IP addresses on Raspbian
 
+<a name="keyQuestion"></a>
+## Before you start
+
+Please ask yourself *why* you want to use a static IP address on your Raspberry Pi.
+
+A Raspberry Pi running IOTstack has a *server* role so it definitely needs a *predictable* IP address but, usually, that is best accomplished via a *static binding* in your DHCP server.
+
+> A *static binding* means the DHCP server always assigns the same IP address for a given MAC address (Ethernet or WiFi). It has the same effect as a *static IP address* but all configuration occurs in your DHCP server.
+
+In general, there are only two reasons why a Raspberry Pi would ever need a static IP address hard-coded into the Pi itself:
+
+1. The Raspberry Pi is functioning as a Domain Name Server; or
+2. The Raspberry Pi is functioning as a router.
+
+If you are trying to set up a Raspberry Pi as a router, you will probably be working in `/etc/networks` and you shouldn't be relying upon any information in this document.
+
+So that leaves the situation where you want to set up a DNS server. If that is what you are doing, read on. If not, you might find it beneficial to pause for a few moments and reconsider what you are actually trying to achieve.
+
 <a name="keyAssumption"></a>
 ## Critical assumption
 
@@ -19,13 +37,13 @@ Assume you want to configure your Raspberry Pi like this:
 
 * The IP address of the Ethernet interface should be 192.168.132.55
 * The IP address of the WiFi interface should be 192.168.132.56
-* The router on the subnet uses the IP address 192.168.132.1
 * The subnet mask is 255.255.255.0 which, in [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing), is a "/24" network
-* The Raspberry Pi is also acting as the local domain name server so it is appropriate to set the DNS to use the loopback address 127.0.0.1
+* The router on the subnet uses the IP address 192.168.132.1
+* The router on the subnet is configured to forward any DNS queries to your ISP (this is usually the default).
 
 1. Move to the correct directory:
 
-	```
+	``` bash
 	$ cd /etc
 	```
 
@@ -43,17 +61,24 @@ Assume you want to configure your Raspberry Pi like this:
 	interface eth0
 	static ip_address=192.168.132.55/24
 	static routers=192.168.132.1
-	static domain_name_servers=127.0.0.1
+	static domain_name_servers=192.168.132.1
 
 	interface wlan0
 	static ip_address=192.168.132.56/24
 	static routers=192.168.132.1
-	static domain_name_servers=127.0.0.1
+	static domain_name_servers=192.168.132.1
 	```
 
-	Note:
+	Notes:
 
 	* If you only want to set a static configuration for one interface, omit the lines for the other interface.
+	* The `domain_name_servers` field must point to a functioning DNS server which is capable of handling recursive queries. It can be any of the following:
+	
+		- The IP address of your router (eg 192.168.132.1), assuming your router is configured to forward DNS queries to your ISP;
+		- The IP address of another host on your local network where a DNS service is running; or
+		- The IP address of a well-known DNS service such as 8.8.8.8 (Google).
+
+	* If the Raspberry Pi where you are making these changes will be functioning as its own recursive Domain Name System server then you should consider omitting the `domain_name_servers` entries entirely and following the instructions in [Raspberry Pi runs its own DNS](#isOwnDNS).
 
 4. PiBuilder also installs:
 
@@ -85,14 +110,14 @@ Assume you want to configure your Raspberry Pi like this:
 
 6. Run the following commands and confirm that the IP addresses assigned to the interfaces reflect your expectations:
 
-	```
+	``` bash
 	$ ifconfig eth0
 	$ ifconfig wlan0
 	```
 
 7. Prepare two patches. Of necessity, static IP addresses are host-specific so a host-specific patch is appropriate:
 
-	```
+	``` bash
 	$ cd /etc
 	$ diff dhcpcd.conf.bak dhcpcd.conf >~/dhcpcd.conf.patch@$HOSTNAME
 	$ diff rc.local.bak rc.local >~/rc.local.patch@$HOSTNAME
@@ -105,6 +130,85 @@ Assume you want to configure your Raspberry Pi like this:
 	```
 
 	The next time you build a Raspberry Pi using PiBuilder, your static IP address configuration will be set automatically.
+
+<a name="isOwnDNS"></a>
+## Raspberry Pi runs its own DNS
+
+A properly functioning Domain Name System service capable of handling recursive queries is critical for any network. If you create your own DNS server **and** it does not function correctly then your Raspberry Pi will not be able to do things like run `apt update; apt upgrade` and will not be able to pull images from DockerHub.
+
+The typical off-the-shelf home router handles this requirement in a transparent fashion. When the router boots and connects to your ISP, it learns the IP addresses of the ISP's recursive DNS servers. As each client device on your LAN boots and makes a DHCP request, the router assigns an IP address and instructs the client to use the router for DNS queries. The router forwards client queries to the ISP's recursive DNS servers.
+
+Key point:
+
+* Ideally, DNS servers operate in pairs, so there is always a fallback.
+
+Assuming your Raspberry Pi is running DNS server software (eg BIND9 or Pi-hole), you can instruct the Pi to use itself for DNS by doing the following:
+
+1. Move into the `/etc` directory:
+
+	``` bash
+	$ cd /etc
+	```
+
+2. Make a backup copy of the resolver configuration, providing one does not exist already:
+
+	``` bash
+	$ [ -f "resolvconf.conf.bak" ] || sudo cp resolvconf.conf resolvconf.conf.bak
+	```
+
+3. Use `sudo` and your favourite text editor to edit `resolvconf.conf`. Add the following lines to the end of the file:
+
+	```
+	name_servers="127.0.0.1 192.168.132.57 8.8.8.8"
+	resolv_conf_local_only=NO
+	search_domains=your.domain.com
+	```
+	
+	Interpretation:
+	
+	* `name_servers=` is a quoted, ordered list of IP addresses, separated by spaces:
+
+		- `127.0.0.1` means "query **this** host first"; if that fails
+		- `192.168.132.57` means "query **another** host"; if that fails
+		- `8.8.8.8` means "forward the query to Google's well-known DNS server".
+
+		Above I made the point that DNS servers should operate in pairs. That's the purpose of `192.168.132.57` in this list. It's *another* host under your control that can answer the same queries as *this* host. If you **don't** have a second server then you should omit that IP address and use:
+		
+		```
+		name_servers="127.0.0.1 8.8.8.8"
+		```
+		
+		If you **do** have a second DNS server then it should be evident that the two servers need to refer to each other. In other words, when you configure the second DNS server, the second IP address in the list should refer to the first DNS server:
+		
+		```
+		name_servers="127.0.0.1 192.168.132.55 8.8.8.8"
+		```	
+				
+		You do not have to use `8.8.8.8` as the DNS server of last resort. You can use your ISP's name-servers, or other well-known servers such as Cloudflare's `1.1.1.1`. You are also not limited to just three entries in the list.
+		
+	* `resolv_conf_local_only=NO` permits the mixing of the localhost IP address `127.0.0.1` with the other IP addresses in the `name_servers=` list.
+		
+	* 	`search_domains=your.domain.com` should be replaced with the domain name for which your Raspberry Pi is authoritative. This feature allows you to use unqualified names like "iot-hub". If an unqualified name does not resolve to a host name then it will be treated as `iot-hub.your.domain.com` and forwarded to your DNS server.
+
+4. Restart the DNS resolver service:
+
+	``` bash
+	$ sudo resolvconf -u
+	```
+	
+5. Prepare a patch file:
+
+	``` bash
+	$ diff resolvconf.conf.bak resolvconf.conf >~/resolvconf.conf.patch@$HOSTNAME
+	```
+	
+6. Copy the patch file from your home directory to your custom clone of PiBuilder and place it in the directory:
+
+	```
+	~/PiBuilder/boot/scripts/support/etc/
+	```
+
+	On the next build of this host, the changes will be applied automatically.
 
 <a name="baselineReference"></a>
 ## Reference versions of files
