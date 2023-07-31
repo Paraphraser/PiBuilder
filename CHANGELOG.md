@@ -1,5 +1,13 @@
 # PiBuilder Change Summary
 
+* 2023-07-31
+
+	- Define meaning and usage of «guillemets» as placeholders.
+	- Expand example of calling 01 script with and without «hostname» argument.
+	- Sanitise «hostname» argument (lower-case letters, digits and hyphens)
+	- Mimic `raspi-config` method of changing hostname so it also works on non-Raspberry Pi (eg Debian, Proxmox VE).
+	- Simpler `cp -n` syntax for copying `resolvconf.conf`.
+
 * 2023-07-30
 
 	- Expand [Configuring Static IP addresses on Raspbian](./docs/ip.md) to clarify use of `domain_name_servers` field in `dhcpcd.conf`. This follows on from a misunderstanding revealed in a discussion on [Discord](https://discord.com/channels/638610460567928832/638610461109256194/1134819901626925159).

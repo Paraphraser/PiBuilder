@@ -150,11 +150,13 @@ Assuming your Raspberry Pi is running DNS server software (eg BIND9 or Pi-hole),
 	$ cd /etc
 	```
 
-2. Make a backup copy of the resolver configuration, providing one does not exist already:
+2. Make a backup copy of the resolver configuration, providing a backup does not exist already:
 
 	``` bash
-	$ [ -f "resolvconf.conf.bak" ] || sudo cp resolvconf.conf resolvconf.conf.bak
+	$ sudo cp -n resolvconf.conf resolvconf.conf.bak
 	```
+	
+	> the `-n` means that any existing `.bak` file will not be overwritten.
 
 3. Use `sudo` and your favourite text editor to edit `resolvconf.conf`. Add the following lines to the end of the file:
 

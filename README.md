@@ -27,8 +27,8 @@ The scripts are written in `bash` and there is a reasonable chance that they wil
 <a name="toc"></a>
 ## Contents
 
+- [About placeholders](#replaceme)
 - [Definitions](#definitions)
-
 - [The Build Process](#buildProcess)
 
 	- [Download Raspberry Pi Imager](#downloadImager)
@@ -49,12 +49,41 @@ The scripts are written in `bash` and there is a reasonable chance that they wil
 
 - [Resources](#relatedResources)
 
+<a name="replaceme"></a>
+## About placeholders
+
+Guillemets (the characters <kbd>«</kbd> and <kbd>»</kbd>&nbsp;) are used throughout this documentation to indicate placeholders where you should substitute actual values. The most common patterns are:
+
+* **without** other forms of surrounding quote mark. Example:
+
+	```
+	$ ssh «user»@«hostname»
+	```
+
+	This syntax means you should replace the entire placeholder, including the guillemets, with the actual value:
+
+	```
+	$ ssh pi@iot-hub
+	```
+
+* **with** other forms of surrounding quote mark. Example:
+
+	```
+	$ git add "«filename»" 
+	```
+
+	This means you should replace the entire placeholder, including the guillemets, with the actual value, while retaining the surrounding quote marks:
+	
+	```
+	$ git add "resolvconf.patch@iot-hub" 
+	```
+
 <a name="definitions"></a>
 ## Definitions
 
 * "your Raspberry Pi" means the Raspberry Pi device for which you are building an operating system using PiBuilder.
-* "«hostname»" is a placeholder meaning "the name you chose for your Raspberry Pi".
-* "«username»" is a placeholder meaning "the account name you use to login to your Raspberry Pi".
+* "«hostname»" is a [placeholder](#replaceme) meaning "the name you chose for your Raspberry Pi".
+* "«username»" is a [placeholder](#replaceme) meaning "the account name you use to login to your Raspberry Pi".
 * "your support host" means the system from which you connect to your Raspberry Pi using SSH. It will usually be a Mac or PC.
 
 <a name="buildProcess"></a>
@@ -234,23 +263,31 @@ $ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 
 	If you accepted the advice at [set hostname](#firstBootHostName), your Raspberry Pi's name will be `raspberrypi`. Now you should select a unique name for your Pi.
 
-	> Because it is adopted by multicast DNS, any name you choose must follow the DNS rules: letters (lower-case preferred), digits and hyphens (no underscores).
+	> Because it is adopted by multicast DNS, any name you choose must follow the DNS rules: lower-case letters, digits and hyphens (no underscores). The script enforces these rules by sanitising any non-compliant name.
 
-	You change your Raspberry Pi's name by passing the new «hostname» as an argument to the first script. The argument is optional. If you omit it, your Raspberry Pi will retain its current name.
+	You change your host's name by passing the new «hostname» as an argument to this script. The curly braces indicate that the `{«hostname»}` argument is **optional**. If you omit it, your host will retain its current name.
 
-	> Omitting the argument would be appropriate if you already chose a unique name at [set hostname](#firstBootHostName).
+	> Omitting the argument would be appropriate if you already chose a unique name using [Raspberry Pi Imager](#firstBootHostName), or if you are using PiBuilder in a non-Raspberry Pi environment such as a Debian or Proxmox installation where the hostname may have been set via other means.
 
 	Run the first script:
 
 	``` bash
 	$ ~/PiBuilder/boot/scripts/01_setup.sh {«hostname»}
 	```
+	
+	Examples:
+	
+	* change the host name:
 
-	For example:
+		``` bash
+		$ ~/PiBuilder/boot/scripts/01_setup.sh iot-hub
+		```
+		
+	* retain the existing host name:
 
-	``` bash
-	$ ~/PiBuilder/boot/scripts/01_setup.sh iot-hub
-	```
+		``` bash
+		$ ~/PiBuilder/boot/scripts/01_setup.sh
+		```
 
 	The 01 script runs to completion and reboots your Raspberry Pi. Rebooting disconnects your SSH session, returning you to your support host.
 

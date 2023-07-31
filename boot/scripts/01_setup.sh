@@ -18,6 +18,15 @@ SAVE_HOSTNAME="$HOSTNAME"
 # allow an optional argument to overwrite the hostname
 HOSTNAME="${1:-"$HOSTNAME"}"
 
+# does the host name appear to be changing?
+if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
+
+   # yes! sanitise the new name (only lower-case letters, digits, hyphens)
+   # (-dc = delete any characters in the complement of the set)
+   HOSTNAME=$(echo "$HOSTNAME" | tr -dc '[:alnum:]-' | tr '[:upper:]' '[:lower:]')
+
+fi
+
 # declare path to support directory and import common functions
 SUPPORT="$WHERE/support"
 . "$SUPPORT/pibuilder/functions.sh"
@@ -181,17 +190,6 @@ if is_raspberry_pi ; then
 
    fi
 
-   # does the host name need to be updated?
-   if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
-
-      # yes! set the host name (produces errors)
-      echo "Setting machine name to $HOSTNAME"
-      sudo raspi-config nonint do_hostname "$HOSTNAME"
-      sudo systemctl restart sshd ssh
-      WARN_TRUST_RESET="true"
-
-   fi
-
 else
 
    echo "PiBuilder appears to be running on non-Raspberry Pi OS !"
@@ -201,11 +199,34 @@ else
    [ "$PREFER_64BIT_KERNEL" = "true" ] && echo "   PREFER_64BIT_KERNEL"
    [ "$SKIP_EEPROM_UPGRADE" = "false" ] && echo "   SKIP_EEPROM_UPGRADE"
 
-   echo "Boot behaviour is unchanged (OS default)"
-   [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] && echo "Hostname not changed".
-
    # run the script epilog if it exists
    run_pibuilder_epilog
+
+fi
+
+# does the host name need to be updated?
+if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
+
+   # yes! mimic raspi-config approach
+   INIT="$(ps --no-headers -o comm 1)"
+   if [ "$INIT" = "systemd" ] && systemctl -q is-active dbus && ! ischroot; then
+      # note that "set-hostname" appears to be an older command with
+      # "hostname" becoming the norm. At the moment, "set-hostname"
+      # appears to be backwards compatible on all Debian flavours.
+      sudo hostnamectl set-hostname "$HOSTNAME"
+   else
+      echo "$HOSTNAME" > /etc/hostname
+   fi
+   sudo sed -i "s/127\.0\.1\.1.*$SAVE_HOSTNAME/127.0.1.1\t$HOSTNAME/g" /etc/hosts
+
+   # report
+   echo "Machine name changed from $SAVE_HOSTNAME to $HOSTNAME"
+
+   # kick ssh services
+   sudo systemctl restart sshd ssh
+
+   # remind user to remove old known hosts record
+   WARN_TRUST_RESET="true"
 
 fi
 
