@@ -22,15 +22,22 @@ is_running_OS_release() {
    return 1
 }
 
-if is_running_OS_release bookworm ; then
-   echo "Note: pip3 installs will bypass externally-managed environment check"
-   PIBUILDER_PYTHON_OPTIONS="--break-system-packages"
-fi
-
+IOTSTACK="$HOME/IOTstack"
 APT_DEPENDENCIES="python3-pip python3-dev python3-virtualenv"
 PIP_UNINSTALL="virtualenv ruamel.yaml blessed"
-REQUIREMENTS="$HOME/IOTstack/requirements-menu.txt"
-VIRTUALENV="$HOME/IOTstack/.virtualenv-menu"
+REQUIREMENTS="$IOTSTACK/requirements-menu.txt"
+VIRTUALENV="$IOTSTACK/.virtualenv-menu"
+
+if is_running_OS_release bookworm ; then
+
+   echo "Note: pip3 installs will bypass externally-managed environment check"
+   PIBUILDER_PYTHON_OPTIONS="--break-system-packages"
+
+   # while waiting for https://github.com/SensorsIot/IOTstack/pull/723
+   echo "Note: removing any version pins from Python requirements files"
+   sed -i 's/==.*//' "$REQUIREMENTS"
+
+fi
 
 echo -e "\n\nEnsuring apt directories are up-to-date..."
 sudo apt update

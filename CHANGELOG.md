@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2023-08-02
+
+	- After cloning the IOTstack repo in 03 script, create the `.new_install` marker file. This bypasses the somewhat misleading dialog about the repo not being up-to-date (after a clean clone it will, by definition, be in-sync with GitHub).
+	- Simulate effect of [PR723](https://github.com/SensorsIot/IOTstack/pull/723) when Bookworm is the running OS. This removes version pins from `requirements-menu.txt`, which is needed for a successful install on Bookworm. 
+
 * 2023-07-31
 
 	- Define meaning and usage of «guillemets» as placeholders.
