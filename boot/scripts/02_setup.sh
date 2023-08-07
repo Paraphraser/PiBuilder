@@ -31,7 +31,7 @@ fi
 # "en_GB.UTF-8" so we don't pull the rug out from beneath anything
 # (like Python) that already knows the default language
 # (it can be removed later if need be, eg using raspi-config.
-if try_patch "/etc/locale.gen" "setting locales (ignore errors)" true ; then
+if try_patch "/etc/locale.gen" "setting locales" ; then
    sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
 fi
 
