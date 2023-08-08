@@ -1,5 +1,14 @@
 # PiBuilder Change Summary
 
+* 2023-08-08
+
+	- Tested PiBuilder on Ubuntu Bookworm guest under Proxmox.
+	- Included mention of Debian Bookworm guest under Proxmox, tested previously.
+	
+* 2023-08-07
+
+	- Skip locales generation following a patch failure. Ubuntu already has many more locales enable by default than either Raspberry Pi OS or Debian so, if the desired locale is not among them, it's better to have users prepare custom patches that are actually relevant to their specific situations, rather than plough on and regenerate redundant locales (a lot of wasted build time for no gain).
+
 * 2023-08-02
 
 	- After cloning the IOTstack repo in 03 script, create the `.new_install` marker file. This bypasses the somewhat misleading dialog about the repo not being up-to-date (after a clean clone it will, by definition, be in-sync with GitHub).

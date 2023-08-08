@@ -19,9 +19,11 @@ I have tested PiBuilder on:
 * Raspberry Pi 3B+, 4B and Zero W2 hardware
 * 32-bit versions of Raspberry Pi OS (aka Raspbian) Buster and Bullseye
 * 64-bit version of Raspberry Pi OS Bullseye
-* 64-bit version of Debian Bullseye running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Parallels.
+* 64-bit version of Debian Bullseye running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Parallels
+* 64-bit version of Debian Bookworm running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Proxmox
+* 64-bit version of Ubuntu Bookworm running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Proxmox
 
-The scripts are written in `bash` and there is a reasonable chance that they will work on any Debian-based system. Any steps which have a specific dependency on the Raspberry Pi are skipped. Please see [Running on other platforms](./docs/running-on-other-platforms.md) for more information.
+The scripts are written in `bash` and there is a reasonable chance that they will work on any Debian- or Ubuntu-based system. Any steps which have a specific dependency on the Raspberry Pi are skipped. Please see [Running on other platforms](./docs/running-on-other-platforms.md) for more information.
 
 
 <a name="toc"></a>
