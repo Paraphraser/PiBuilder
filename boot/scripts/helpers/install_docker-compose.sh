@@ -74,7 +74,7 @@ if is_running_OS_release bookworm ; then
 fi
 
 # the default version of docker-compose at the moment is
-DOCKER_COMPOSE_VERSION_DEFAULT="v2.20.2"
+DOCKER_COMPOSE_VERSION_DEFAULT="v2.20.3"
 
 read -r -d '' COMPOSENOTES <<-EOM
 \n

@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-08-13
+
+	- Bump default version of docker-compose installed via script to v2.20.3
+
 * 2023-08-08
 
 	- Tested PiBuilder on Ubuntu Bookworm guest under Proxmox.
