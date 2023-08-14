@@ -54,6 +54,7 @@ control. Please open an issue at:
 EOM
 
 # install Docker
+# see https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script
 echo "Installing docker"
 curl -fsSL https://get.docker.com | sudo sh
 if [ $? -ne 0 ] ; then
