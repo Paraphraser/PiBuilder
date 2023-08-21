@@ -1,5 +1,11 @@
 # PiBuilder Change Summary
 
+* 2023-08-21
+
+	- Adds support for GRUB-based boots. Default patch disables IPv6.
+	- Improved handling of python3-ykman (not available on Buster).
+	- Bump SQLite version to 3420000.
+
 * 2023-08-13
 
 	- Bump default version of docker-compose installed via script to v2.20.3

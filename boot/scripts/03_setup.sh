@@ -83,16 +83,16 @@ if ! is_running_OS_release bookworm ; then
    echo "hopenpgp-tools" >>"$PACKAGES"
 fi
 
+# python3-ykman is not available on buster
+if ! is_running_OS_release buster ; then
+   echo "python3-ykman" >>"$PACKAGES"
+fi
+
 install_packages "$PACKAGES"
 
 # 02 disables IPv6 but exim4 is only installed as a by-product of
 # installing "at" - apply the fix here
 try_patch "/etc/exim4/update-exim4.conf.conf" "stop exim4 paniclog messages (when IPv6 disabled)"
-
-if is_running_OS_release bullseye ; then
-   echo "Adding OS-specific python3-ykman"
-   sudo apt install -y python3-ykman
-fi
 
 # samba support
 TARGET="/etc/samba/smb.conf"

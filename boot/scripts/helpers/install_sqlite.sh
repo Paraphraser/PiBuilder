@@ -16,7 +16,7 @@ set -e
 
 # set defaults but permit overrides by caller
 SQLITEYEAR="${SQLITEYEAR:-2023}"
-SQLITEVERSION="${SQLITEVERSION:-sqlite-autoconf-3410200}"
+SQLITEVERSION="${SQLITEVERSION:-sqlite-autoconf-3420000}"
 
 # construct download URL
 SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITEVERSION.tar.gz"

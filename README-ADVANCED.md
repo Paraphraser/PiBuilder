@@ -42,6 +42,7 @@ This document explains how to customise PiBuilder to your needs.
 	- [DHCP client daemon](#etc_dhcpcd_conf)
 	- [Docker daemon](#etc_docker_daemon)
 	- [System swap-file](#etc_dphys_swapfile)
+	- [GRUB](#etc_defaults_grub)
 	- [Locales](#etc_locales)
 	- [Network interfaces](#etc_network)
 	- [Network interface monitoring](#etc_rc_local)
@@ -709,6 +710,17 @@ $ sudo reboot
 You can always check if swapping is enabled using the `swapon -s` command. Silence means swapping is disabled.
 
 It is important to appreciate that VM swapping is not **bad**. Please don't disable swapping without giving it some thought. If you can afford to add an SSD, you'll get a better result with swapping enabled than if you stick with the SD and disable swapping.
+
+<a name="etc_defaults_grub"></a>
+### GRUB
+
+* Configuration directory: `/etc/default/grub.d`
+
+Raspberry Pi OS does not use GRUB so you should ignore this section if you are using PiBuilder on a Raspberry Pi.
+
+However, [GRUB](https://en.wikipedia.org/wiki/GNU_GRUB) (Grand Unified Bootloader) is common in other environments such as Debian native or Debian-in-Proxmox. In such cases, the contents of the PiBuilder configuration directory are merged with its equivalent on the system under construction, and then `update-grub` is invoked.
+
+The default content of `/etc/default/grub.d` supplied with PiBuilder disables IPv6 at boot time. It has the (intended) side-effect of preventing Network Manager from trying to manage IPv6 on any interface.
 
 <a name="etc_locales"></a>
 ### Locales
