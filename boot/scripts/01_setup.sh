@@ -67,7 +67,7 @@ fi
 # support upgrading from bullseye to bookworm
 if is_running_OS_release bullseye ; then
    if [ "$DEBIAN_BOOKWORM_UPGRADE" = "true" ] ; then
-      echo "Editing apt sources to point to Debian 12 (bookworm"
+      echo "Editing apt sources to point to Debian 12 (bookworm)"
       sudo sed -i.bak 's/bullseye/bookworm/g' /etc/apt/sources.list
       echo "Forcing Full Upgrade"
       SKIP_FULL_UPGRADE=false

@@ -27,6 +27,31 @@ if [ -d "/etc/ssh.old" ] ; then
    sudo rm -rf /etc/ssh.old
 fi
 
+# tell apt how to find hopenpgp-tools in bookworm
+if is_running_OS_release bookworm ; then
+
+	SOURCE_TARGET="/etc/apt/sources.list"
+	SOURCE_URL="deb http://ftp.debian.org/debian sid main"
+	PREF_TARGET="/etc/apt/preferences.d/00-sid"
+	PREF_CONTENT="$(mktemp -p /dev/shm/)"
+	cat <<-PREF >"$PREF_CONTENT"
+	Package: *
+	Pin: release n=sid
+	Pin-Priority: 10
+	PREF
+
+	if [ $(grep -c -e "$SOURCE_URL" "$SOURCE_TARGET") -eq 0 ] ; then
+
+		echo "Adding hopenpgp-tools support"
+		echo "$SOURCE_URL" | sudo tee -a "$SOURCE_TARGET" >/dev/null
+		sudo cp "$PREF_CONTENT" "$PREF_TARGET"
+		sudo chmod 644 "$PREF_TARGET"
+		sudo apt update
+
+	fi
+
+fi
+
 # try to establish locales. Any patch should always retain
 # "en_GB.UTF-8" so we don't pull the rug out from beneath anything
 # (like Python) that already knows the default language

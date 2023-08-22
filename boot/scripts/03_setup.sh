@@ -68,6 +68,7 @@ cryptsetup
 dirmngr
 gnupg-agent
 gnupg2
+hopenpgp-tools
 openssl
 pcscd
 python3-gnupg
@@ -78,10 +79,6 @@ yubikey-manager
 yubikey-personalization
 CRYPTO_PACKAGES
 
-# hopenpgp-tools is not available on bookworm 
-if ! is_running_OS_release bookworm ; then
-   echo "hopenpgp-tools" >>"$PACKAGES"
-fi
 
 # python3-ykman is not available on buster
 if ! is_running_OS_release buster ; then

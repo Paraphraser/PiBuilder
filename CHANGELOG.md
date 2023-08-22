@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-08-22
+
+	- Better handling of `hopenpgp-tools` on Bookworm, per [DrDuh PR386](https://github.com/drduh/YubiKey-Guide/pull/386).
+
 * 2023-08-21
 
 	- Adds support for GRUB-based boots. Default patch disables IPv6.
@@ -12,7 +16,7 @@
 
 * 2023-08-08
 
-	- Tested PiBuilder on Ubuntu Bookworm guest under Proxmox.
+	- Tested PiBuilder on Ubuntu Jammy guest under Proxmox.
 	- Included mention of Debian Bookworm guest under Proxmox, tested previously.
 	
 * 2023-08-07
