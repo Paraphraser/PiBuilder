@@ -2,6 +2,7 @@
 
 * 2023-08-31
 
+	- Add check for pre-existing IOTstack folder at start of 03 script.
 	- Bump default version of docker-compose installed via script to v2.21.0
 	- Adds `apt update` to start of 03 script to guard against any significant delays between running the 01 and 03 scripts.
 	- Adds check to 04 script to detect absence of the IOTstack folder. When doing a full PiBuilder run, the most likely reasons why the IOTstack folder will not exist are:

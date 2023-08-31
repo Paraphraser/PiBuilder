@@ -21,6 +21,29 @@ SUPPORT="$WHERE/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
+# canned general advisory if IOTstack already exists
+read -r -d "\n" IOTSTACKFAIL <<-EOM
+========================================================================
+The $HOME/IOTstack directory already exists. This script needs to
+clone IOTstack from GitHub but git won't clone into a directory that
+already exists. You should EITHER rename the existing folder:
+
+   mv ~/IOTstack ~/IOTstack.off
+
+OR delete the existing folder:
+
+   sudo rm -rf ~/IOTstack
+
+and then re-run this script.
+========================================================================
+EOM
+
+# sense IOTstack folder already exists
+if [ -d "$HOME/IOTstack" ] ; then
+   echo "$IOTSTACKFAIL"
+   exit 1
+fi
+
 # ensure apt caches are up-to-date (protects against any significant
 # delay between running this script and the 01 script)
 sudo apt update
