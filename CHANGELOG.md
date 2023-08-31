@@ -1,5 +1,16 @@
 # PiBuilder Change Summary
 
+* 2023-08-31
+
+	- Bump default version of docker-compose installed via script to v2.21.0
+	- Adds `apt update` to start of 03 script to guard against any significant delays between running the 01 and 03 scripts.
+	- Adds check to 04 script to detect absence of the IOTstack folder. When doing a full PiBuilder run, the most likely reasons why the IOTstack folder will not exist are:
+
+		* because one or more `apt install «package»` commands failed and the user didn't realise the 03 script is designed so that it can be run over and over until all dependencies are installed, after which 03 then clones IOTstack; or
+		* because the 04 script is being run in isolation, just to get docker and docker-compose installed and have the other IOTstack-specific spadework done (docker group, Python prerequistes, etc).
+
+	- Adds `-c` option (3 context lines) to patch generation in [NTP tutorial](docs/ntp.md). Needed so patches will succeed on both Bullseye and Bookworm.
+
 * 2023-08-22
 
 	- Better handling of `hopenpgp-tools` on Bookworm, per [DrDuh PR386](https://github.com/drduh/YubiKey-Guide/pull/386).

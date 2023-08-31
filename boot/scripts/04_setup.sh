@@ -24,6 +24,23 @@ run_pibuilder_prolog
 # add these to /boot/cmdline.txt
 CMDLINE_OPTIONS="cgroup_memory=1 cgroup_enable=memory"
 
+# canned general advisory if IOTstack doesn't exist
+read -r -d "\n" IOTSTACKFAIL <<-EOM
+========================================================================
+The $HOME/IOTstack directory does not exist. This is normally
+created by the 03 script when it clones IOTstack from GitHub. The most
+common explanation for the directory being missing is because the 03
+script did not complete normally, and the most common reason for that
+is due to one or more failures of "sudo apt install <package>". You
+need to keep re-running the 03 script until it completes normally.
+
+Another reason why the $HOME/IOTstack directory might not
+exist is because you are running this script simply to install docker
+and docker-compose but without running the preceding PiBuilder scripts.
+That's OK but you do need to clone IOTstack from GitHub first.
+========================================================================
+EOM
+
 # canned general advisory if docker install script returns an error
 read -r -d '' DOCKERFAIL <<-EOM
 ========================================================================
@@ -41,6 +58,7 @@ EOM
 COMPOSE_PLUGIN="/usr/libexec/docker/cli-plugins/docker-compose"
 COMPOSE_SYMLINK="/usr/local/bin/docker-compose"
 
+# canned general advisory if docker-compose can't be symlinked
 read -r -d '' COMPOSEFAIL <<-EOM
 ========================================================================
 $SCRIPT expects the docker convenience script to install docker-compose
@@ -52,6 +70,15 @@ control. Please open an issue at:
    https://github.com/Paraphraser/PiBuilder/issues
 ========================================================================
 EOM
+
+# make sure the IOTstack directory exists. This is done before running
+# the docker convenience script so that it is safe to either re-run
+# the 03 script until it completes, or bypass the check by cloning
+# the IOTstack repo
+if [ ! -d "$HOME/IOTstack" ] ; then
+   echo "$IOTSTACKFAIL"
+   exit 1
+fi
 
 # install Docker
 # see https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script
@@ -94,8 +121,11 @@ for P in virtualenv ruamel.yaml blessed ; do
 done
 
 # the menu now has its own requirements list - process that
-echo "Satisfying IOTstack menu requirements"
-pip3 install -U $PIBUILDER_PYTHON_OPTIONS -r "$HOME/IOTstack/requirements-menu.txt"
+TARGET="$HOME/IOTstack/requirements-menu.txt"
+if [ -e "$TARGET" ] ; then
+   echo "Satisfying IOTstack menu requirements" 
+   pip3 install $PIBUILDER_PYTHON_OPTIONS -r "$TARGET"
+fi
 
 # and, just on the off-chance that this script is being run to reinstall
 # docker and docker-compose, in which case the virtual environment might

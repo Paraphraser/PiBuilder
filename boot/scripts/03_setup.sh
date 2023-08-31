@@ -21,6 +21,10 @@ SUPPORT="$WHERE/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
+# ensure apt caches are up-to-date (protects against any significant
+# delay between running this script and the 01 script)
+sudo apt update
+
 if is_running_OS_release buster ; then
    echo "Installing updated libseccomp2 (for Alpine images)"
    sudo apt install libseccomp2 -t buster-backports
