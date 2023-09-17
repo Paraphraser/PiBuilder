@@ -454,6 +454,7 @@ $ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 	- [Domain Name System servers](./docs/dns.md)
 	- [Localisation options](./docs/locales.md)
 	- [Login profiles)](./docs/login.md)
+	- [Running IOTstack on Proxmox VE](./docs/running-on-proxmox-debian.md)
 	- [SAMBA](./docs/samba.md)
 	- [Static IP addresses](./docs/ip.md)
 	- [Syslog - restoring Buster-style rotation](./docs/logrotate.md)
