@@ -273,7 +273,7 @@ $ gpg --local-user $PRIVATE_KEY_ID --lsign-key DF9B9C49EAA9298432589D76DA87E80D6
 
 	* "Configure the network":
 
-		* At "Please enter the host name for this system", choose an appropriate name for this virtual `«guest_host»`. You can use letters (all lower case by convention), digits and dashes. For example "prx-iot".
+		* <a name="setHostName"></a>At "Please enter the host name for this system", choose an appropriate name for this virtual `«guest_host»`. You can use letters (all lower case by convention), digits and dashes. For example "prx-iot".
 
 			> Your DHCP server may suggest a host name.
 
@@ -444,6 +444,8 @@ Tip:
 	```
 	$ ./PiBuilder/boot/scripts/01_setup.sh
 	```
+	
+	There is no need to pass the `«guest_host»` argument to this script. You already entered the name for this host at ["Please enter the host name for this system"](#setHostName).
 
 <a name="runScript02"></a>
 ### Script 02
