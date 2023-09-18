@@ -20,8 +20,8 @@ I have tested PiBuilder on:
 * 32-bit versions of Raspberry Pi OS (aka Raspbian) Buster and Bullseye
 * 64-bit version of Raspberry Pi OS Bullseye
 * 64-bit version of Debian Bullseye running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Parallels
-* 64-bit version of Debian Bookworm running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Proxmox
-* 64-bit version of Ubuntu Bookworm running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Proxmox
+* 64-bit version of Debian Bookworm running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Proxmox&nbsp;VE (see [tutorial](./docs/running-on-proxmox-debian.md))
+* 64-bit version of Ubuntu Bookworm running in an [AMD64](https://www.debian.org/distrib/netinst) guest system under Proxmox&nbsp;VE
 
 The scripts are written in `bash` and there is a reasonable chance that they will work on any Debian- or Ubuntu-based system. Any steps which have a specific dependency on the Raspberry Pi are skipped. Please see [Running on other platforms](./docs/running-on-other-platforms.md) for more information.
 
@@ -269,7 +269,7 @@ $ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 
 	You change your host's name by passing the new «hostname» as an argument to this script. The curly braces indicate that the `{«hostname»}` argument is **optional**. If you omit it, your host will retain its current name.
 
-	> Omitting the argument would be appropriate if you already chose a unique name using [Raspberry Pi Imager](#firstBootHostName), or if you are using PiBuilder in a non-Raspberry Pi environment such as a Debian or Proxmox installation where the hostname may have been set via other means.
+	> Omitting the argument would be appropriate if you already chose a unique name using [Raspberry Pi Imager](#firstBootHostName), or if you are using PiBuilder in a non-Raspberry Pi environment such as a Debian or Proxmox&nbsp;VE installation where the hostname may have been set via other means.
 
 	Run the first script:
 
