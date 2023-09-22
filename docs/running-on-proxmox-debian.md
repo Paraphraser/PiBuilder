@@ -6,11 +6,7 @@ This tutorial walks you through the process of installing a Debian Bookworm gues
 
 - [Assumptions](#assumptions)
 - [Definitions](#definitions)
-- [Phase 1 - get installation media](#getISO)
-
-	- [verify installation media](#checkISO)
-	- [alternative installation method](#altMethod)
-
+- [Phase 1 - get installation media](#phaseGetISO)
 - [Phase 2 - construct Debian guest](#phaseConstructGuest)
 - [Phase 3 - guest user configuration](#phaseGuestConfig)
 - [Phase 4 - clone PiBuilder](#phaseClonePiBuilder)
@@ -44,172 +40,49 @@ Wherever you see any «guillemot» delimited placeholders in these instructions,
 
 * *placeholders for your guest system:*
 
-	- `«guest_host»` = the host name given to the guest system.
-	- `«guest_root_password»` = the password set for the root user during the installation of the guest.
-	- `«guest_user»` = the name of the ordinary user set during the installation of the guest.
+	- `«guest_host»` = the host name given to the guest system (eg `prx-iot`).
+	- `«guest_user»` = the account name of the ordinary user set during the installation of the guest (eg `alan`).
 	- `«guest_user_password»` = the password for `«guest_user»`.
 
-<a name="getISO"></a>
+<a name="phaseGetISO"></a>
 ## Phase 1 - get installation media
 
 This phase walks you through the process of downloading the installation media for Debian. You only need to complete the steps in this phase once. You will be able to construct any number of Debian Guest systems from the same installation media.
 
-> These instructions assume you will do the work on your Proxmox&nbsp;VE instance but you can also use a separate system. Just read through the steps below first, and then the [alternative installation method](#altMethod) discussion should make sense.
-
-The steps are:
-
-1. In a text editor window, prepare a command template containing the following three lines:
-
-	```
-	ISO_URL=
-	SUMS_URL=
-	SIGS_URL=
-	```
-
-2. Use your web browser to open [https://www.debian.org](https://www.debian.org).
-3. Click "Download". You should see something similar to this:
-
-	![Debian downloads page](./images/proxmox-download-debian.jpg)
-
-4. Right-click the link to the installer (<mark>A</mark>), and copy the URL to the clipboard. Switch to the text editor and paste the URL on the right hand side of `ISO_URL=`.
-5. Repeat the right-click, copy-and-paste process for:
-
-	- "SHA512SUMS" (<mark>B</mark>), paste against `SUMS_URL=`
-	- "Signature" (<mark>C</mark>), paste against `SIGS_URL=`.
-
-6. At the time of writing (September 2023), the completed command template looked like this:
-
-	```
-	ISO_URL=https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso
-	SUMS_URL=https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/SHA512SUMS
-	SIGS_URL=https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/SHA512SUMS.sign
-	```
-	
-	You will need the completed template in a few moments.
-
+1. Use your web browser to open [https://www.debian.org](https://www.debian.org).
+2. Click "Download". Your browser should begin downloading the latest Debian installer onto your support host (Linux, macOS, Windows). The file will have a name like `debian-12.1.0-amd64-netinst.iso`. This is generally referred to as *an `.iso`,* indicating that the file is in ISO9660 (Optical Disc) format. 
 7. Use your web browser to:
 
 	* Connect to your Proxmox&nbsp;VE instance on port 8006
 	* Login as root
 
-	Then:
+	Then. by reference to the screen-shot below:
+
+	![ISO images list](./images/proxmox-upload-local-iso.jpg)
+
+	* Select the "Server View" <mark>A</mark>
+	* Select your server by name <mark>B</mark> (the server in this example is named "bauxite")
+	* If the hierarchy is not expanded, expand it by clicking the &#xFE65; so it turns into &#x22C1; 
+	* Select the "local" storage option <mark>C</mark>
+	* Select the "ISO Images" grouping <mark>D</mark>
+	* Click the "Upload" button <mark>E</mark>
+
+	In the file selection dialog that opens:
 	
-	![Proxmox terminal](./images/proxmox-terminal.jpg)
-
-	* Select the "Server View" <mark>D</mark>
-	* Select your server by name <mark>E</mark> (the server in this example is named "bauxite")
-	* Select the "Shell" <mark>F</mark>
-
-8. At the command prompt <mark>G</mark>:
-
-	- change your working directory by running this command:
-
-		```
-		# cd /var/lib/vz/template/iso/
-		```
-
-	- paste the completed command template you prepared earlier and press <kbd>return</kbd>. The pasted commands set the `ISO_URL`, `SUMS_URL` and `SIGS_URL` environment variables.
-	- run this command:
-
-		```
-		# wget $SUMS_URL $SIGS_URL $ISO_URL
-		```
-
-	Assuming the downloads succeed, the result is three files:
-
-	1. `debian-12.1.0-amd64-netinst.iso` - the Debian installer in ISO9660 (Optical Disc) format;
-	2. `SHA512SUMS` a text file containing a list of 512-bit Secure Hashing Algorithm (SHA) hashes for the several `.iso` image variations available for Debian; and
-	3. `SHA512SUMS.sign` a GnuPG detached signature file for verifying that the `SHA512SUMS` file has not been tampered with. 
-
-<a name="checkISO"></a>
-### verify installation media
-
-Although you can skip this section and jump straight to [construct Debian guest](#phaseConstructGuest), you are encouraged to become familiar with the verification process so you can assure yourself that the `.iso` you have just downloaded is fit for purpose.
-
-1. At the command prompt <mark>G</mark>, attempt to confirm the authenticity of the `SHASUMS` file by verifying the digital signature:
-
-	```
-	# gpg --verify SHA512SUMS.sign SHA512SUMS
-	```
+	![ISO upload form](./images/proxmox-select-local-iso.jpg)
 	
-	The three most-likely responses are:
-	
-	* "Can't check signature: No public key" (most likely if you are doing this for the first time):
+	* Click the "Select File" button <mark>F</mark>
+	* Use the file picker to select the `.iso` you downloaded from [https://www.debian.org](https://www.debian.org).
 
-		```
-		gpg: Signature made Sun 23 Jul 2023 03:04:08 AM AEST
-		gpg:                using RSA key DF9B9C49EAA9298432589D76DA87E80D6294BE9B
-		gpg: Can't check signature: No public key
-		```
-		
-		In this case, you solve the problem by using the key's fingerprint (the hexadecimal string at the end of the second line) to download the missing public key from a key-server and add it to root's GnuPG keychain:
-		
-		```
-		# gpg --keyserver hkps://keyserver.ubuntu.com:443 --recv DF9B9C49EAA9298432589D76DA87E80D6294BE9B
-		```
-		
-		Then re-try the `gpg --verify` command above.
-		
-	* "Good signature" (most likely response once the public key has been installed):
+		> Ignore the `C:\fakepath` in the dialog
 
-		```
-		gpg: Signature made Sun 23 Jul 2023 03:04:08 AM AEST
-		gpg:                using RSA key DF9B9C49EAA9298432589D76DA87E80D6294BE9B
-		gpg: Good signature from "Debian CD signing key <debian-cd@lists.debian.org>" [unknown]
-		gpg: WARNING: This key is not certified with a trusted signature!
-		gpg:          There is no indication that the signature belongs to the owner.
-		```
-		
-		Seeing "Good signature" means that you can be assured that the detached signature was created using the private key matching the claimed public key **and** that the content of SHA512SUMS has not been modified since the signature was created. You can ignore both the "[unknown]" and the warning, and proceed to step 2.
-
-	* "BAD signature" (possible but fairly unlikely):
-
-		```
-		gpg: Signature made Sun 23 Jul 2023 03:04:08 AM AEST
-		gpg:                using RSA key DF9B9C49EAA9298432589D76DA87E80D6294BE9B
-		gpg: BAD signature from "Debian CD signing key <debian-cd@lists.debian.org>" [unknown]
-		```
-	
-		Seeing "BAD signature" means you should not trust the content of the SHA512SUMS file which, in turn, means you can't be certain that the 512-bit hashes it contains are reliable. You can either download a fresh copy of the SHA512SUMS and re-try the signature verification or you can accept some risk by ignoring the problem and proceeding to the next step.
-		
-		Note:
-		
-		* To help you judge the risk, keep in mind that many sites (eg [Raspberry Pi Foundation](https://www.raspberrypi.com/software/operating-systems/)) only publish cryptographic hashes and do not "sign" their hashes. If you routinely use such unsigned hashes to check that the corresponding disk images have not been altered, it is really no different to ignoring a "BAD signature" warning.
-		
-2. At the command prompt <mark>G</mark>, confirm that there is a cryptographic hash matching the `.iso`:
-
-	```
-	# grep debian-12.1.0-amd64-netinst.iso SHA512SUMS | shasum -a 512 -c
-	```
-
-	> The `grep` utility searches the `SHA512SUMS` file for the line containing "debian-12.1.0-amd64-netinst.iso". That line, which contains both the expected hash and the filename, is piped to the `shasum` utility which searches the working directory for the named file, recomputes the 512-bit hash, and compares its answer with the expected hash from the `SHA512SUMS` file.
-
-	If the hashes match, you will see:
-
-	```
-	debian-12.1.0-amd64-netinst.iso: OK
-	```
-
-	This attests that the `debian-12.1.0-amd64-netinst.iso` file has not been altered.
-
-<a name="altMethod"></a>
-### alternative installation method
-
-The instructions in this phase explained how to use the shell interface in the Proxmox&nbsp;VE GUI to download the installation media onto your Proxmox&nbsp;VE instance *directly*.
-
-However, there is nothing stopping you from doing the download and verification work on another computer, and then simply copying the `.iso` into the `/var/lib/vz/template/iso/` directory on your Proxmox&nbsp;VE instance.
-
-Downloading on a host where you have personal key(s) installed in your GnuPG keychain gives you the ability to silence the trust warnings by certifying the Debian public key with one of your own private keys. For example:
-
-```
-$ PRIVATE_KEY_ID=0x1234567890ABCDEF
-$ gpg --local-user $PRIVATE_KEY_ID --lsign-key DF9B9C49EAA9298432589D76DA87E80D6294BE9B
-```
-
-> If your private master key is protected with a passphrase, you will be asked to enter it to authorise the operation.
+	* Click the "Upload" button <mark>G</mark>
+	* The uploaded file will appear in the list <mark>H</mark>.
 
 <a name="phaseConstructGuest"></a>
 ## Phase 2 - construct Debian guest
+
+This phase walks you through the process of creating a Debian guest system. You can construct any number of Debian Guest systems from the installation media downloaded in the [previous phase](#phaseGetISO).
 
 ![Create virtual machine](./images/proxmox-create-vm.jpg)
 
@@ -217,33 +90,33 @@ $ gpg --local-user $PRIVATE_KEY_ID --lsign-key DF9B9C49EAA9298432589D76DA87E80D6
 
 	* Connect to your Proxmox&nbsp;VE instance on port 8006
 	* Login as root
-	* Select the "Pool View" <mark>H</mark>
-	* Click "Create VM" <mark>J</mark>
+	* Select the "Pool View" <mark>J</mark>
+	* Click "Create VM" <mark>K</mark>
 
-	> Ignore reference points <mark>K</mark>, <mark>L</mark> and <mark>M</mark>; we will come to those later. 
+	> Ignore reference points <mark>L</mark>, <mark>M</mark> and <mark>N</mark>; we will come to those later. 
 
 2. In the "Create Virtual Machine" dialog, work through the tabs in order, clicking <kbd>Continue</kbd> at the end of each:
 
 	* "General" tab:
 
-		- "Name" field: enter a name for your guest (eg "prx-iot")
+		- <a name="setGuestName"></a>"Name" field: enter a name for your guest (eg "prx-iot")
 
 	* "OS" tab:
 
 		- "ISO image" popup menu: select `debian-12.1.0-amd64-netinst.iso`
 
-		This is the image you downloaded in the [previous phase](#getISO).
+		This is the image you downloaded in the [previous phase](#phaseGetISO).
 
 	* "System" tab:
 
-		- accept all defaults
+		- "Qemu Agent" checkbox: enable.
 
 	* "Disks" tab:
 
 		- "Disk size (GiB)" field: the default is 32GB which is usually sufficient but you can adjust it as you see fit.
 		- "Discard" checkbox: enable this if your underlying physical storage media is a Solid State Disk (SSD).
 
-	* "CPU" tab
+	* "CPU" tab:
 
 		- "Cores" field: this defaults to a single core. At least two cores are recommended.
 
@@ -259,9 +132,9 @@ $ gpg --local-user $PRIVATE_KEY_ID --lsign-key DF9B9C49EAA9298432589D76DA87E80D6
 
 		- Click <kbd>Finish</kbd>
 
-3. Click the newly-created guest <mark>K</mark> to select it.
-4. Click the "Console" <mark>L</mark> to select the guest's console.
-5. Click the "Start Now" button <mark>M</mark>.
+3. Click the newly-created guest <mark>L</mark> to select it.
+4. Click the "Console" <mark>M</mark> to select the guest's console.
+5. Click the "Start Now" button <mark>N</mark>.
 6. The guest will boot from the installation `.iso`:
 
 	* Choose "Graphical install" and press <kbd>return</kbd>
@@ -269,21 +142,31 @@ $ gpg --local-user $PRIVATE_KEY_ID --lsign-key DF9B9C49EAA9298432589D76DA87E80D6
 
 		* "Select a language"
 		* "Select your location"
-		* "Configure the keyboard"
+		* "Configure the keyboard". Here's a tip from Andreas Spiess:
+
+			> Correct selection of your keyboard is **essential**. Otherwise, password entry might not work as you expect. For example, the German keyboard has <kbd>Y</kbd> and <kbd>Z</kbd> switched. You do not see your password as you type so you think it contains a Y but it's actually a Z.
 
 	* "Configure the network":
 
-		* <a name="setHostName"></a>At "Please enter the host name for this system", choose an appropriate name for this virtual `«guest_host»`. You can use letters (all lower case by convention), digits and dashes. For example "prx-iot".
+		* <a name="setHostName"></a>At "Please enter the host name for this system", choose an appropriate name for this virtual `«guest_host»`.
 
-			> Your DHCP server may suggest a host name.
+			Notes:
 
-		* At "Domain name", choose a domain name (if appropriate).
+			1. Your DHCP server may suggest a host name but you will almost certainly want to change it.
+			2. You can use letters (all lower case by convention), digits and dashes. For example "prx-iot".
+			3. The name you choose here can be the *same* as the one you chose in the [General](#setGuestName) tab of the Create Virtual Machine dialog, or it can be *different*.
+			4. The name you choose **here** is the name by which your guest system will be known. For example, if you choose "prx-iot" then the `$HOSTNAME` variable of your guest will be `prx-iot` and the guest system will be reachable via the multicast DNS name of `prx-iot.local`.
+
+		* At "Domain name", enter a domain name (if appropriate) or leave it blank.
 
 			> Your DHCP server may suggest a domain name.
 
 	* "Set up users and passwords":
 
-		* Set and confirm a `«guest_root_password»`.
+		* <a name="noRootPassword"></a>**Leave both root password fields empty**.
+
+			> If you do not assign a root password then the user you create in the next step will be given the ability to run `sudo`. This is similar to the privileges given to the default `pi` user on a Raspberry Pi. These instructions assume you accept this advice.
+
 		* <a name="setFullUserName"></a>At "Full name for the new user", enter the full (long) username for `«guest_user»` (eg "Alan Turing").
 		* <a name="setShortUserName"></a>At "Username for your account", either accept the default or enter a (short) username for `«guest_user»` (eg "alan").
 		* At "Choose a password for the new user", set and confirm a `«guest_user_password»`.
@@ -338,10 +221,17 @@ Note:
 
 Open a Terminal window on your support host (eg your Mac/PC). From the Terminal window:
 
-1. Login to the guest system:
+1. Ensure your SSH "known hosts" file is in a predictable state:
 
-	```
+	``` console
 	$ ssh-keygen -R «guest_host».local
+	```
+
+	You may get an error from this command. That's OK. It's simply a protective measure.
+
+2. Login to the guest system:
+
+	``` console
 	$ ssh -4 «guest_user»@«guest_host».local
 	```
 
@@ -349,79 +239,64 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 
 	Supply the `«guest_user_password»` when prompted.
 
-2. Become root:
+3. Confirm that you can execute commands using `sudo`:
 
-	```
-	$ su - root
-	#
-	```
-
-	Supply the `«guest_root_password»` when prompted.
-
-3. Install git:
-
-	```
-	# apt update
-	# apt install -y git
+	``` console
+	$ sudo echo "hello"
 	```
 
-4. Copy all of the following text to the clipboard, paste it into the Terminal window, and press <kbd>return</kbd>:
+	Supply the `«guest_user_password»` when prompted.
+	
+	Note:
+	
+	* If you are not able to execute commands using `sudo`, it probably means that you set a password for the root user, even though the [instructions](#noRootPassword) advised against doing that. Your best course of action is to destroy this guest system and start again.
 
-	```
-	add_privileges_for_user() {
-		echo "$1  ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/$1
-		usermod -G sudo -a $1
-		usermod -G adm -a $1
-	}
+4. Run the following commands, one at a time:
 
-	add_privileged_user() {
-		adduser --home /home/$1 --shell /bin/bash $1
-		add_privileges_for_user $1
-	}
-	```
-
-5. Replace `«guest_user»` in the first command below with the (short) username [you defined earlier](#setShortUserName), and then run both commands:
-
-	```
-	# add_privileges_for_user «guest_user»
-	# add_privileged_user admin
+	``` console
+	$ sudo apt update ; sudo apt install -y git
+	$ echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$USER" >/dev/null
+	$ sudo usermod -G adm -a $USER
+	$ exit
 	```
 
-	The first command sets your `«guest_user»` account so you can run the `sudo` command without needing a password (ie like the default situation on the Raspberry Pi). Please make sure to use the actual `«guest_user»` name (eg "alan"). You can't use `$USER` because you are running as root!
+	Explanation:
 
-	The second command defines an "admin" user. This is intended to be a backup administrator. It is a protective account in case you get locked out of your `«guest_user»` account. Choose sensible values when prompted, plus a password you can remember. The `admin` user will also have the ability to run `sudo` without needing a password.
-
-6. Logout as the root user by typing <kbd>control</kbd>+<kbd>d</kbd>. That drops you back to the `«guest_user»` account.
-7. Logout as the `«guest_user»` by typing <kbd>control</kbd>+<kbd>d</kbd>. Logging-out from the `«guest_user»` account is required before the privilege changes can take effect.
+	1. The first line installs `git`.
+	2. The second line gives the current user the ability to execute `sudo` commands without needing a password.
+	3. The third line adds the current user to the `adm` group (administration).
+	4. The `exit` command is the same as typing <kbd>control</kbd>+<kbd>d</kbd>. Logging-out from the `«guest_user»` account is required before the privilege changes can take effect.
  
+ 	After the next login, `«guest_user»` will have exactly the same privileges as the default `pi` user on a Raspberry Pi and, in particular, the ability to run `sudo` commands without a password prompt.
+
 <a name="phaseClonePiBuilder"></a>
 ## Phase 4 - clone PiBuilder
 
 1. Login to the guest system:
 
-	```
+	``` console
 	$ ssh -4 «guest_user»@«guest_host».local
 	```
 
 	Supply the `«guest_user_password»` when prompted.
 
-2. Verify that the user has the ability to run `sudo` without a password:
+2. Verify that the user has the ability to run `sudo` **without** a password:
 
-	```
-	$ sudo ls
+	``` console
+	$ sudo echo "hello"
 	```
 
 	> If you are prompted for a password to run the `sudo` command, go back to the [previous phase](#phaseGuestConfig) and check your work.
 
-2. Clone PiBuilder:
+3. Clone PiBuilder:
 
-	```
+	``` console
 	$ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 	```
 
 	> If you have customised a clone of PiBuilder which you want to use rather than the version on GitHub, adapt the URL appropriately.
 
-3. Logout (<kbd>control</kbd>+<kbd>d</kbd>).
+4. Logout (<kbd>control</kbd>+<kbd>d</kbd>).
 
 Tip:
 
@@ -435,16 +310,16 @@ Tip:
 
 1. Login to the guest:
 
-	```
+	``` console
 	$ ssh -4 «guest_user»@«guest_host».local
 	```
 
 2. Run the first script:
 
-	```
+	``` console
 	$ ./PiBuilder/boot/scripts/01_setup.sh
 	```
-	
+
 	There is no need to pass the `«guest_host»` argument to this script. You already entered the name for this host at ["Please enter the host name for this system"](#setHostName).
 
 <a name="runScript02"></a>
@@ -452,13 +327,13 @@ Tip:
 
 1. Login to the guest:
 
-	```
+	``` console
 	$ ssh -4 «guest_user»@«guest_host».local
 	```
 
 2. Run the second script:
 
-	```
+	``` console
 	$ ./PiBuilder/boot/scripts/02_setup.sh
 	```
 
@@ -467,7 +342,7 @@ Tip:
 
 1. Login to the guest:
 
-	```
+	``` console
 	$ ssh «guest_user»@«guest_host».local
 	```
 
@@ -475,7 +350,7 @@ Tip:
 
 2. Run the third script:
 
-	```
+	``` console
 	$ ./PiBuilder/boot/scripts/03_setup.sh
 	```
 
@@ -484,13 +359,13 @@ Tip:
 
 1. Login to the guest:
 
-	```
+	``` console
 	$ ssh «guest_user»@«guest_host».local
 	```
 
 2. Run the fourth script:
 
-	```
+	``` console
 	$ ./PiBuilder/boot/scripts/04_setup.sh
 	```
 
@@ -499,13 +374,13 @@ Tip:
 
 1. Login to the guest:
 
-	```
+	``` console
 	$ ssh «guest_user»@«guest_host».local
 	```
 
 2. Run the fifth script:
 
-	```
+	``` console
 	$ ./PiBuilder/boot/scripts/05_setup.sh
 	```
 
@@ -518,30 +393,30 @@ Tip:
 
 1. Login to the guest:
 
-	```
+	``` console
 	$ ssh «guest_user»@«guest_host».local
 	```
 
 2. The system is now ready for IOTstack. You can:
 
 	* EITHER restore a backup:
-	
-		```
+
+		``` console
 		$ iotstack_restore «runtag»
 		```
-	
+
 		Note:
-	
+
 		* Your ability to run `iotstack_restore` depends on having set up two files:
-	
+
 			- `~/.config/iotstack_backup/config.yml`
 			- `~/.config/rclone/rclone.conf`
-	
+
 			If you did not configure PiBuilder to do that for you, you will have to copy those two files into place now.
-	
+
 	* OR launch the menu like this:
-	
-		```
+
+		``` console
 		$ cd ~/IOTstack
 		$ ./menu.sh
 		```
