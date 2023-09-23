@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-09-23
+
+	- Bump default version of docker-compose installed via script to v2.22.0
+
 * 2023-09-22
 
 	- Incorporates feedback from Andreas on [tutorial](./docs/running-on-proxmox-debian.md).
