@@ -165,7 +165,10 @@ This phase walks you through the process of creating a Debian guest system. You 
 
 		* <a name="noRootPassword"></a>**Leave both root password fields empty**.
 
-			> If you do not assign a root password then the user you create in the next step will be given the ability to run `sudo`. This is similar to the privileges given to the default `pi` user on a Raspberry Pi. These instructions assume you accept this advice.
+			Key points:
+			
+			1. If you accept this advice and do not assign a root password then the user you create in the next step will be given the ability to run `sudo`. This is similar to the privileges given to the default `pi` user on a Raspberry Pi. These instructions assume you accept this advice.
+			2. If you ignore this advice and decide to assign a root password anyway then you should stop following these instructions.
 
 		* <a name="setFullUserName"></a>At "Full name for the new user", enter the full (long) username for `«guest_user»` (eg "Alan Turing").
 		* <a name="setShortUserName"></a>At "Username for your account", either accept the default or enter a (short) username for `«guest_user»` (eg "alan").
