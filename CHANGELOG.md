@@ -2,6 +2,7 @@
 
 * 2023-10-03
 
+	- Reset `exim4` paniclog if non-zero length.
 	- Expands [Proxmox tutorial](./docs/running-on-proxmox-debian.md) to discuss migrating an IOTstack instance (eg from a Raspberry Pi to a Debian guest).
 
 * 2023-09-23

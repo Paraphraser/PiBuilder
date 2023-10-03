@@ -118,6 +118,13 @@ install_packages "$PACKAGES"
 # installing "at" - apply the fix here
 try_patch "/etc/exim4/update-exim4.conf.conf" "stop exim4 paniclog messages (when IPv6 disabled)"
 
+# reset exim4 paniclog if non-zero length
+TARGET="/var/log/exim4/paniclog"
+if [ -s "$TARGET" ] ; then
+   echo "Resetting $TARGET"
+   cat /dev/null | sudo tee "$TARGET" >/dev/null
+fi
+
 # samba support
 TARGET="/etc/samba/smb.conf"
 if SOURCE="$(supporting_file "$TARGET")" ; then
