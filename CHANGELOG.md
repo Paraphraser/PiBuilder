@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-10-03
+
+	- Expands [Proxmox tutorial](./docs/running-on-proxmox-debian.md) to discuss migrating an IOTstack instance (eg from a Raspberry Pi to a Debian guest).
+
 * 2023-09-23
 
 	- Bump default version of docker-compose installed via script to v2.22.0

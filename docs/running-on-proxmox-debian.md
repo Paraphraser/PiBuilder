@@ -18,7 +18,14 @@ This tutorial walks you through the process of installing a Debian Bookworm gues
 	- [Script 04](#runScript04)
 	- [Script 05](#runScript05)
 
-- [Phase 6 - IOTstack is ready](#phaseRunIOTstack)
+- [Phase 6 - running IOTstack](#phaseRunIOTstack)
+
+	- [running the menu](#phaseRunMenu)
+	- [migrating IOTstack](#phaseMigrate)
+
+		- [using IOTstackBackup](#phaseMigrateNatural)
+		- [using migration assistant](#phaseMigrateAssisted)
+
 - [Home Assistant (Supervised)](#hassio)
 
 <a name="assumptions"></a>
@@ -68,9 +75,9 @@ This phase walks you through the process of downloading the installation media f
 	* Click the "Upload" button <mark>E</mark>
 
 	In the file selection dialog that opens:
-	
+
 	![ISO upload form](./images/proxmox-select-local-iso.jpg)
-	
+
 	* Click the "Select File" button <mark>F</mark>
 	* Use the file picker to select the `.iso` you downloaded from [https://www.debian.org](https://www.debian.org).
 
@@ -166,7 +173,7 @@ This phase walks you through the process of creating a Debian guest system. You 
 		* <a name="noRootPassword"></a>**Leave both root password fields empty**.
 
 			Key points:
-			
+
 			1. If you accept this advice and do not assign a root password then the user you create in the next step will be given the ability to run `sudo`. This is similar to the privileges given to the default `pi` user on a Raspberry Pi. These instructions assume you accept this advice.
 			2. If you ignore this advice and decide to assign a root password anyway then you should stop following these instructions.
 
@@ -249,9 +256,9 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 	```
 
 	Supply the `«guest_user_password»` when prompted.
-	
+
 	Note:
-	
+
 	* If you are not able to execute commands using `sudo`, it probably means that you set a password for the root user, even though the [instructions](#noRootPassword) advised against doing that. Your best course of action is to destroy this guest system and start again.
 
 4. Run the following commands, one at a time:
@@ -392,7 +399,15 @@ Tip:
 * If you wish to use Proxmox's facilities to take a snapshot of your guest OS before you start doing anything with IOTstack, this is the place to do it.
 
 <a name="phaseRunIOTstack"></a>
-## Phase 6 - IOTstack is ready
+## Phase 6 - running IOTstack
+
+At this point, you have two choices:
+
+* if you are just getting started with IOTstack, go to [running the menu](#phaseRunMenu).
+* if you intend to migrate an existing IOTstack installation to your Debian guest, go to [migrating IOTstack](#phaseMigrate).
+
+<a name="phaseRunMenu"></a>
+### running the menu 
 
 1. Login to the guest:
 
@@ -400,29 +415,147 @@ Tip:
 	$ ssh «guest_user»@«guest_host».local
 	```
 
-2. The system is now ready for IOTstack. You can:
+2. Change your working directory:
 
-	* EITHER restore a backup:
+	``` console
+	$ cd ~/IOTstack
+	```
+
+3. Initialise your time-zone:
+
+	``` console
+	$ echo "TZ=$(cat /etc/timezone)" >>.env
+	```
+
+	This copies the timezone for your Debian guest into the file `~/IOTstack/.env`, which makes it available to any containers which define their `TZ` variables like this:
+
+	``` yaml
+	- TZ=${TZ:-Etc/UTC}
+	```
+
+	That statement says "if `TZ` is defined in `.env` then use its value, otherwise default to `Etc/UTC`. It is an effective way of making sure all containers that support `TZ` run on the same timezone as your operating system and saves you the trouble of editing the same environment variable in each service definition.
+
+4. Run the menu and choose your containers:
+
+	``` console
+	$ ./menu.sh
+	```
+
+	The first time you run the menu, there will be a delay while the script constructs a virtual environment for Python.
+
+5. Bring up your stack:
+
+	``` console
+	$ docker-compose up -d
+	```
+
+<a name="phaseMigrate"></a>
+### migrating IOTstack
+
+Have you been using [IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup) to backup your existing IOTstack system?
+
+* if "yes" then go to [using IOTstackBackup](#phaseMigrateNatural)
+* if "no" then go to [using migration assistant](#phaseMigrateAssisted)
+
+<a name="phaseMigrateNatural"></a>
+#### using IOTstackBackup
+
+In general, you will want to take a backup immediately before you do the migration process so:
+
+1. Login to your old IOTstack system:
+
+	``` console
+	$ ssh «user»@«host».local
+	```
+	
+	where `«host»` is the name of your old IOTstack device, and `«user»` is the username on your old IOTstack device.
+
+2. Run a backup:
+
+	``` console
+	$ iotstack_backup
+	```
+
+3. List your backups directory and use the timestamps embedded in the file names to identify the backup files that were just created. For example:
+
+	```
+	2023-09-30_1138.iot-hub.backup-log.txt
+	2023-09-30_1138.iot-hub.general-backup.tar.gz
+	2023-09-30_1138.iot-hub.influx-backup.tar
+	```
+
+	The `«runtag»` is the string comprising the date, time and hostname. In the above, the hostname is "iot-hub" so the «runtag» is:
+
+	```
+	2023-09-30_1138.iot-hub
+	```
+
+	<a name="noteRunTag"></a>Make a note of your `«runtag»` because you will need it later. Do not be concerned by the fact that the hostname portion is the name of your old system. It is exactly what you want!
+
+4. Logout from the old system by pressing <kbd>control</kbd>+<kbd>d</kbd>.
+5. Login to your newly-created guest system:
+
+	``` console
+	$ ssh «guest_user»@«guest_host».local
+	```
+
+6. In order to function properly, IOTstackBackup needs the following files to be in place:
+
+	* `~/.config/iotstack_backup/config.yml` (required)
+	* `~/.config/rclone/rclone.conf (optional)
+
+	The `rclone.conf` is only needed if you have been using the RCLONE method (eg your backups are being sent to Dropbox).
+
+	You *can* provide those files to PiBuilder so that they are installed automatically. If you have **not** done that, then you need to fix that problem now, like this:
+
+	1. These steps are required:
 
 		``` console
-		$ iotstack_restore «runtag»
+		$ mkdir -p ~/.config/iotstack_backup
+		$ cd ~/.config/iotstack_backup
+		$ scp «user»@«host».local:.config/iotstack_backup/config.yml .
 		```
 
-		Note:
+		where `«host»` is the name of your old IOTstack device, and `«user»` is the username on your old IOTstack device. You may be prompted to permit the connection, and for a login password.
 
-		* Your ability to run `iotstack_restore` depends on having set up two files:
-
-			- `~/.config/iotstack_backup/config.yml`
-			- `~/.config/rclone/rclone.conf`
-
-			If you did not configure PiBuilder to do that for you, you will have to copy those two files into place now.
-
-	* OR launch the menu like this:
+	2. You only need to do these steps if you have been using the RCLONE method:
 
 		``` console
-		$ cd ~/IOTstack
-		$ ./menu.sh
+		$ mkdir -p ~/.config/rclone
+		$ cd ~/.config/rclone
+		$ scp «user»@«host».local:.config/rclone/rclone.conf .
 		```
+
+7. Now you can run the restore:
+
+	``` console
+	$ cd
+	$ iotstack_restore «runtag»
+	```
+
+	where `«runtag»` is the value you [made a note of](#noteRunTag) earlier. For example:
+
+	``` console
+	$ iotstack_restore 2023-09-30_1138.iot-hub
+	```
+
+	The `iotstack_restore` script will fetch the backup files using your chosen method (SCP, RSYNC or RCLONE) and then invoke subordinate scripts to restore your stack. Once again, do not be concerned by the fact that the hostname portion is the name of your old system. It is exactly what you want!
+
+8. Once the restore completes, you can bring up your stack:
+
+	``` console
+	$ cd ~/IOTstack
+	$ docker-compose up -d
+	```
+
+<a name="phaseMigrateAssisted"></a>
+#### using migration assistant
+
+Follow the instructions at [IOTstackBackup migration assistant](https://github.com/Paraphraser/IOTstackBackup#migration-assistant).
+
+Note:
+
+* You can also use the migration assistant even if you have IOTstackBackup installed and configured on your old machine. Follow the link to the instructions above, then just skip step 2.
 
 <a name="hassio"></a>
 ## Home Assistant (Supervised)
