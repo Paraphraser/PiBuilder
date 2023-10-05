@@ -265,7 +265,7 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 
 	``` console
 	$ sudo apt update ; sudo apt install -y git
-	$ echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$USER" >/dev/null
+	$ echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$USER" >/dev/null
 	$ sudo usermod -G adm -a $USER
 	$ exit
 	```
