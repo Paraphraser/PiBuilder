@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-10-06
+
+	- Remove patch added 2023-08-02 which removes pins from Python requirements files using `sed`. Now that [PR 723](https://github.com/SensorsIot/IOTstack/pull/723) has been applied, this is no longer needed.
+
 * 2023-10-03
 
 	- Reset `exim4` paniclog if non-zero length.

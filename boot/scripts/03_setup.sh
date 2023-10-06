@@ -177,16 +177,6 @@ touch "$HOME/IOTstack/.new_install"
 echo "Protective creation of sub-folders which should be user-owned"
 mkdir -p "$HOME/IOTstack/backups" "$HOME/IOTstack/services"
 
-# I will put in a pull request to remove pins from the requirements
-# files in the IOTstack directory. For now, this hack serves the
-# same purpose
-if is_running_OS_release bookworm ; then
-   echo "Removing pins from IOTstack Python requirements files"
-   sed -i.bak 's/==.*//' \
-      "$HOME/IOTstack/requirements-menu.txt" \
-      "$HOME/IOTstack/requirements-mkdocs.txt"
-fi
-
 echo "Cloning IOTstackAliases"
 git clone https://github.com/Paraphraser/IOTstackAliases.git ~/.local/IOTstackAliases
 
