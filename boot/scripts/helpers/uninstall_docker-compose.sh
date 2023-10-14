@@ -33,23 +33,11 @@ if [ "$(uname -s)" !=  "Linux" -o -z "$(which apt)" -o -z "$(which pip3)" ] ; th
 
 fi
 
-running_OS_release() {
-   if [ -e "/etc/os-release" ] ; then
-      . "/etc/os-release"
-      if [ -n "$VERSION_CODENAME" ] ; then
-         echo "$VERSION_CODENAME"
-         return 0
-      fi
-   fi
-   echo "unknown"
-   return 1
-}
-
-is_running_OS_release() {
-   if [ "$(running_OS_release)" = "$1" ] ; then
-      return 0
-   fi 
-   return 1
+function is_running_OS_release() {
+	unset VERSION_CODENAME
+	[ -f "/etc/os-release" ] && eval $(grep "^VERSION_CODENAME=" /etc/os-release)
+	[ "$VERSION_CODENAME" = "$1" ] && return 0
+	return 1
 }
 
 if is_running_OS_release bookworm ; then

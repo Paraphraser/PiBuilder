@@ -153,9 +153,9 @@ The steps are:
 
 	Unless you have good reasons to do otherwise, I recommend:
 
-	- Open the "Image customization options" popup menu <mark>A</mark> and choose "to always use". If you select that option then all of your settings will be remembered across launches of Raspberry Pi Imager. In other words, you will only have to configure Raspberry Pi Imager **once**.
+	- Open the "Image customization options" popup menu &#x1F1E6; and choose "to always use". If you select that option then all of your settings will be remembered across launches of Raspberry Pi Imager. In other words, you will only have to configure Raspberry Pi Imager **once**.
 
-	- Enable <mark>B</mark>, then enter a name for your host at <a name="firstBootHostName"></a><mark>C</mark>.
+	- Enable &#x1F1E7;, then enter a name for your host at <a name="firstBootHostName"></a>&#x1F1E8;.
 
 		I **strongly** recommend using the name "raspberrypi" (one word, all lower-case) in this panel, and then changing the name later when you run the first PiBuilder script. These instructions assume you accept this advice.
 
@@ -169,28 +169,28 @@ The steps are:
 
 		2. You will have to remember to come back into this panel each time you run Raspberry Pi Imager.
 
-	- Enable <mark>D</mark> and <mark>E</mark>. This turns on SSH access.
-	- Enable <mark>F</mark>, then:
+	- Enable &#x1F1E9; and &#x1F1EA;. This turns on SSH access.
+	- Enable &#x1F1EB;, then:
 
-		- Enter a username at <mark>G</mark>. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it now.
+		- Enter a username at &#x1F1EC;. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it now.
 
 			The choice you make here will become the username for *all* of your Raspberry Pis. If you want a different username for each of your Raspberry Pis then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
 
 			This documentation uses "«username»" to represent the choice you make here.
 
-		- Set a strong password at <a name="firstBootUserPassword"></a><mark>H</mark>. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
+		- Set a strong password at <a name="firstBootUserPassword"></a>&#x1F1ED;. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
 
-	- If you want the Raspberry Pi's WiFi interface to be active, enable <mark>I</mark>, then:
+	- If you want the Raspberry Pi's WiFi interface to be active, enable &#x1F1EE;, then:
 
-		- enter your WiFi network name in <mark>J</mark>.
-		- enter your WiFi password in <mark>K</mark>.
-		- use the popup menu <mark>L</mark> to select your country code.
+		- enter your WiFi network name in &#x1F1EF;.
+		- enter your WiFi password in &#x1F1F0;.
+		- use the popup menu &#x1F1F1; to select your country code.
 
 			> Your support host may pre-populate some or all of these fields.
 
-	- Enable <mark>M</mark> and then use the popup menus <mark>N</mark> and <mark>O</mark> to set appropriate values.
-	- Enable <mark>P</mark>.
-	- Click <kbd>SAVE</kbd> (<mark>Q</mark>) to save your settings.
+	- Enable &#x1F1F2; and then use the popup menus &#x1F1F3; and &#x1F1F4; to set appropriate values.
+	- Enable &#x1F1F5;.
+	- Click <kbd>SAVE</kbd> (&#x1F1F6;) to save your settings.
 
 9. Click <kbd>WRITE</kbd> and respond to any system prompts to transfer the prepared image to your media.
 

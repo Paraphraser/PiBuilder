@@ -67,24 +67,24 @@ This phase walks you through the process of downloading the installation media f
 
 	![ISO images list](./images/proxmox-upload-local-iso.jpg)
 
-	* Select the "Server View" <mark>A</mark>
-	* Select your server by name <mark>B</mark> (the server in this example is named "bauxite")
+	* Select the "Server View" &#x1F1E6;
+	* Select your server by name &#x1F1E7; (the server in this example is named "bauxite")
 	* If the hierarchy is not expanded, expand it by clicking the &#xFE65; so it turns into &#x22C1; 
-	* Select the "local" storage option <mark>C</mark>
-	* Select the "ISO Images" grouping <mark>D</mark>
-	* Click the "Upload" button <mark>E</mark>
+	* Select the "local" storage option &#x1F1E8;
+	* Select the "ISO Images" grouping &#x1F1E9;
+	* Click the "Upload" button &#x1F1EA;
 
 	In the file selection dialog that opens:
 
 	![ISO upload form](./images/proxmox-select-local-iso.jpg)
 
-	* Click the "Select File" button <mark>F</mark>
+	* Click the "Select File" button &#x1F1EB;
 	* Use the file picker to select the `.iso` you downloaded from [https://www.debian.org](https://www.debian.org).
 
 		> Ignore the `C:\fakepath` in the dialog
 
-	* Click the "Upload" button <mark>G</mark>
-	* The uploaded file will appear in the list <mark>H</mark>.
+	* Click the "Upload" button &#x1F1EC;
+	* The uploaded file will appear in the list &#x1F1ED;.
 
 <a name="phaseConstructGuest"></a>
 ## Phase 2 - construct Debian guest
@@ -97,10 +97,10 @@ This phase walks you through the process of creating a Debian guest system. You 
 
 	* Connect to your Proxmox&nbsp;VE instance on port 8006
 	* Login as root
-	* Select the "Pool View" <mark>J</mark>
-	* Click "Create VM" <mark>K</mark>
+	* Select the "Pool View" &#x1F1EF;
+	* Click "Create VM" &#x1F1F0;
 
-	> Ignore reference points <mark>L</mark>, <mark>M</mark> and <mark>N</mark>; we will come to those later. 
+	> Ignore reference points &#x1F1F1;, &#x1F1F2; and &#x1F1F3;; we will come to those later. 
 
 2. In the "Create Virtual Machine" dialog, work through the tabs in order, clicking <kbd>Continue</kbd> at the end of each:
 
@@ -139,9 +139,9 @@ This phase walks you through the process of creating a Debian guest system. You 
 
 		- Click <kbd>Finish</kbd>
 
-3. Click the newly-created guest <mark>L</mark> to select it.
-4. Click the "Console" <mark>M</mark> to select the guest's console.
-5. Click the "Start Now" button <mark>N</mark>.
+3. Click the newly-created guest &#x1F1F1; to select it.
+4. Click the "Console" &#x1F1F2; to select the guest's console.
+5. Click the "Start Now" button &#x1F1F3;.
 6. The guest will boot from the installation `.iso`:
 
 	* Choose "Graphical install" and press <kbd>return</kbd>
@@ -502,7 +502,7 @@ In general, you will want to take a backup immediately before you do the migrati
 6. In order to function properly, IOTstackBackup needs the following files to be in place:
 
 	* `~/.config/iotstack_backup/config.yml` (required)
-	* `~/.config/rclone/rclone.conf (optional)
+	* `~/.config/rclone/rclone.conf` (optional)
 
 	The `rclone.conf` is only needed if you have been using the RCLONE method (eg your backups are being sent to Dropbox).
 
