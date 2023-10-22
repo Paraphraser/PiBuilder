@@ -114,6 +114,10 @@ fi
 
 install_packages "$PACKAGES"
 
+# clean up any dross
+echo "Removing any unused packages"
+sudo apt autoremove -y
+
 # 02 disables IPv6 but exim4 is only installed as a by-product of
 # installing "at" - apply the fix here
 try_patch "/etc/exim4/update-exim4.conf.conf" "stop exim4 paniclog messages (when IPv6 disabled)"
