@@ -202,7 +202,7 @@ fi
 # set the hostname. set_hostname.sh:
 # 1. sanitises any proposed "#03626F"; and also attempts to
 # 2. set a proper domain name.
-sudo $HELPERS/set_hostname.sh "HOSTNAME"
+sudo $HELPERS/set_hostname.sh "$HOSTNAME"
 
 # acquire actual hostname now in force (may have been sanitised)
 HOSTNAME="$(hostname -s)"
