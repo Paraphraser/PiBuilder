@@ -1,5 +1,14 @@
 # PiBuilder Change Summary
 
+* 2023-10-22
+
+	- Adds `set_hostname.sh` helper script. This mimics (in part) the approach of `raspi-config` to changing the hostname but augments it with a best-efforts discovery of any local domain name which may have been learned from DHCP. Taken together, this is closer to the result obtained from running the Debian ISO installer. It results in `/etc/hosts` gaining a fully-qualified domain name and that, in turn, means the `hostname -d` and `hostname -f` commands work.
+
+		> for anyone following along at home, the problem with `hostname -d` and `-f` not working because `/etc/hosts` lacked an FQDN was a chance discovery while attempting to add ownCloud to IOTstack. It worked properly in a Debian guest on Proxmox but not on the Pi.
+
+	- Change-of-hostname functionality in the 01 script now implemented by invoking `set_hostname.sh`.
+
+
 * 2023-10-20
 
 	- Bump default version of docker-compose installed via script to v2.23.0

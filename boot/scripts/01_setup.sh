@@ -16,19 +16,14 @@ WARN_TRUST_RESET="false"
 SAVE_HOSTNAME="$HOSTNAME"
 
 # allow an optional argument to overwrite the hostname
+# HOSTNAME needs to be set here so @syntax works in this script
 HOSTNAME="${1:-"$HOSTNAME"}"
 
-# does the host name appear to be changing?
-if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
-
-   # yes! sanitise the new name (only lower-case letters, digits, hyphens)
-   # (-dc = delete any characters in the complement of the set)
-   HOSTNAME=$(echo "$HOSTNAME" | tr -dc '[:alnum:]-' | tr '[:upper:]' '[:lower:]')
-
-fi
-
-# declare path to support directory and import common functions
+# declare path to support and helper directories
 SUPPORT="$WHERE/support"
+HELPERS="$WHERE/helpers"
+
+# import common functions
 . "$SUPPORT/pibuilder/functions.sh"
 
 # copy etc
@@ -204,31 +199,16 @@ else
 
 fi
 
-# does the host name need to be updated?
-if [ "$HOSTNAME" != "$SAVE_HOSTNAME" ] ; then
+# set the hostname. set_hostname.sh:
+# 1. sanitises any proposed "#03626F"; and also attempts to
+# 2. set a proper domain name. This
+$HELPERS/set_hostname.sh "HOSTNAME"
 
-   # yes! mimic raspi-config approach
-   INIT="$(ps --no-headers -o comm 1)"
-   if [ "$INIT" = "systemd" ] && systemctl -q is-active dbus && ! ischroot; then
-      # note that "set-hostname" appears to be an older command with
-      # "hostname" becoming the norm. At the moment, "set-hostname"
-      # appears to be backwards compatible on all Debian flavours.
-      sudo hostnamectl set-hostname "$HOSTNAME"
-   else
-      echo "$HOSTNAME" > /etc/hostname
-   fi
-   sudo sed -i "s/127\.0\.1\.1.*$SAVE_HOSTNAME/127.0.1.1\t$HOSTNAME/g" /etc/hosts
+# acquire actual hostname now in force (may have been sanitised)
+HOSTNAME="$(hostname -s)"
 
-   # report
-   echo "Machine name changed from $SAVE_HOSTNAME to $HOSTNAME"
-
-   # kick ssh services
-   sudo systemctl restart sshd ssh
-
-   # remind user to remove old known hosts record
-   WARN_TRUST_RESET="true"
-
-fi
+# sense change of hostname
+[ "$HOSTNAME" != "$SAVE_HOSTNAME" ] && WARN_TRUST_RESET="true"
 
 # has anything been done to invalidate known_hosts on the support host?
 if [ "$WARN_TRUST_RESET" = "true" ] ; then
@@ -244,8 +224,7 @@ echo "$SCRIPT complete - rebooting..."
 echo "If the Raspberry Pi does not seem to reboot cleanly, it is OK to remove"
 echo "and re-apply power. A normal reboot takes about 30-40 seconds. A good"
 echo "test of whether the Pi has hung is if you can 'ping' the Pi but ssh says"
-echo "'Connection refused' when you try to connect. Hanging seems to be a"
-echo "side-effect of setting locales."
+echo "'Connection refused' when you try to connect."
 
 sudo touch /boot/ssh
 sudo /usr/sbin/reboot
