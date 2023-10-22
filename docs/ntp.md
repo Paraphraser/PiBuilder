@@ -174,27 +174,17 @@ SystemNTPServers=0.au.pool.ntp.org 1.au.pool.ntp.org 2.au.pool.ntp.org 3.au.pool
 
 	```
 	$ cd /etc/systemd/
-	$ diff -c timesyncd.conf.bak timesyncd.conf >~/timesyncd.conf.patch
+	$ diff timesyncd.conf.bak timesyncd.conf >~/timesyncd.conf.patch
 	```
-	
-	> The `-c` option sets three lines of context and helps the patching system deal with Bullseye/Bookworm differences.
 
 	Example:
 
 	```
 	$ cat ~/timesyncd.conf.patch
-	*** prx-deb-timesyncd.conf.bak	Wed Aug 30 14:23:11 2023
-	--- prx-deb-timesyncd.conf	Wed Aug 30 14:32:37 2023
-	***************
-	*** 14,19 ****
-	--- 14,20 ----
-	  
-	  [Time]
-	  #NTP=
-	+ NTP=0.au.pool.ntp.org 1.au.pool.ntp.org 2.au.pool.ntp.org 3.au.pool.ntp.org
-	  #FallbackNTP=0.debian.pool.ntp.org 1.debian.pool.ntp.org 2.debian.pool.ntp.org 3.debian.pool.ntp.org
-	  #RootDistanceMaxSec=5
-	  #PollIntervalMinSec=32
+	16c16
+	< #NTP=
+	---
+	> NTP=0.au.pool.ntp.org 1.au.pool.ntp.org 2.au.pool.ntp.org 3.au.pool.ntp.org
 	```
 
 2. Move the patch file to the folder:
