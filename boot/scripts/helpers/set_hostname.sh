@@ -3,15 +3,15 @@
 # $1 = new name of host (required)
 # $2 = domain name to use (optional)
 
-# should not run as root
-[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit 1
+# must run as root
+[ "$EUID" -ne 0 ] && echo "This script MUST be run using sudo" && exit 1
 
 # the name of this script is
 SCRIPT=$(basename "$0")
 
 # check parameters
 if [ $# -lt 1 -o $# -gt 2 ] ; then
-	echo "Usage: $SCRIPT hostname {domain}"
+	echo "Usage: sudo $SCRIPT hostname {domain}"
 	exit 1
 fi
 
@@ -52,7 +52,7 @@ if [ "$INIT" = "systemd" ] && systemctl -q is-active dbus && ! ischroot; then
 	# "hostname" becoming the norm. At the moment, "set-hostname"
 	# appears to be backwards compatible on all Debian flavours.
 	# and also automatically informs NetworkManager if it is running
-	sudo hostnamectl set-hostname "$HNAME"
+	hostnamectl set-hostname "$HNAME"
 else
 	echo "$HNAME" > /etc/hostname
 fi
@@ -61,7 +61,7 @@ fi
 if [ -n "$DNAME" ] ; then
 
 	# yes! apply that
-	sudo sed -i  "/127\.0\.1\.1/c 127.0.1.1\t$HNAME.$DNAME\t$HNAME" /etc/hosts
+	sed -i  "/127\.0\.1\.1/c 127.0.1.1\t$HNAME.$DNAME\t$HNAME" /etc/hosts
 
 	# report
 	echo "Machine name changed to $HNAME.$DNAME"
@@ -69,7 +69,7 @@ if [ -n "$DNAME" ] ; then
 else
 
 	# no! only a hostname is available
-	sudo sed -i  "/127\.0\.1\.1/c 127.0.1.1\t$HNAME" /etc/hosts
+	sed -i  "/127\.0\.1\.1/c 127.0.1.1\t$HNAME" /etc/hosts
 
 	# report
 	echo "Machine name changed to $HNAME"
@@ -78,5 +78,5 @@ fi
 
 # kick services
 echo "Restarting AVAHI and SSH daemons"
-sudo service avahi-daemon restart
-sudo systemctl restart sshd
+service avahi-daemon restart
+systemctl restart sshd
