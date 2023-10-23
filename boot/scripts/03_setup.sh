@@ -176,7 +176,7 @@ git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 # breaking changes, and an invitation to switch to old-menu where the
 # default is "yes". That can be very confusing for first-time users so
 # this next line bypasses that alert:
-touch "$HOME/IOTstack/.new_install"
+echo "0" >"$HOME/IOTstack/.new_install"
 
 echo "Protective creation of sub-folders which should be user-owned"
 mkdir -p "$HOME/IOTstack/backups" "$HOME/IOTstack/services"
