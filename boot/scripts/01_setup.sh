@@ -141,13 +141,15 @@ if is_raspberry_pi ; then
          sudo raspi-config nonint do_camera 0
          ;;
 
-      "bullseye+legacy" )
+      "bullseye+legacy" ) ;&
+      "bookworm+legacy" )
          echo "Enabling Raspberry Pi ribbon-cable camera in legacy mode"
          sudo raspi-config nonint do_legacy 0
          ;;
 
-      "bullseye+true" )
-         echo "Enabling Raspberry Pi ribbon-cable camera in bullseye mode"
+      "bullseye+true" ) ;&
+      "bookworm+true" )
+         echo "Enabling Raspberry Pi ribbon-cable camera"
          sudo raspi-config nonint do_camera 0
          ;;
 
