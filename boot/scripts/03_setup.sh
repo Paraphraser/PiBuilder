@@ -21,25 +21,40 @@ SUPPORT="$WHERE/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
+# defaults which can be overridden by adding the variable to the
+# options script, or inline on the call to this script, or exported
+# to the environment prior to calling this script
+#
+# default location of IOTstack
+IOTSTACK=${IOTSTACK:-"$HOME/IOTstack"}
+IOTSTACK=$(realpath "$IOTSTACK")
+# defaults for git cloning operations
+IOTSTACK_URL="${IOTSTACK_URL:-"https://github.com/SensorsIot/IOTstack.git"}"
+IOTSTACK_BRANCH="${IOTSTACK_BRANCH:-"master"}"
+IOTSTACKALIASES_URL="${IOTSTACKALIASES_URL:-"https://github.com/Paraphraser/IOTstackAliases.git"}"
+IOTSTACKALIASES_BRANCH="${IOTSTACKALIASES_BRANCH:-"master"}"
+IOTSTACKBACKUP_URL="${IOTSTACKBACKUP_URL:-"https://github.com/Paraphraser/IOTstackBackup.git"}"
+IOTSTACKBACKUP_BRANCH="${IOTSTACKBACKUP_BRANCH:-"master"}"
+
 # canned general advisory if IOTstack already exists
 read -r -d "\n" IOTSTACKFAIL <<-EOM
 ========================================================================
-The $HOME/IOTstack directory already exists. This script needs to
+The $IOTSTACK directory already exists. This script needs to
 clone IOTstack from GitHub but git won't clone into a directory that
 already exists. You should EITHER rename the existing folder:
 
-   mv ~/IOTstack ~/IOTstack.off
+   mv $IOTSTACK $IOTSTACK.off
 
 OR delete the existing folder:
 
-   sudo rm -rf ~/IOTstack
+   sudo rm -rf $IOTSTACK
 
 and then re-run this script.
 ========================================================================
 EOM
 
 # sense IOTstack folder already exists
-if [ -d "$HOME/IOTstack" ] ; then
+if [ -d "$IOTSTACK" ] ; then
    echo "$IOTSTACKFAIL"
    exit 1
 fi
@@ -168,31 +183,32 @@ if try_merge "$TARGET" "USB device rules" ; then
    sudo chmod 644 "$TARGET"/*
 fi
 
-echo "Cloning IOTstack"
-git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
+echo "Cloning IOTstack from $IOTSTACK_URL"
+git clone -b "$IOTSTACK_BRANCH" "$IOTSTACK_URL" "$IOTSTACK"
 
 # by definition a clean install is up-to-date but the menu chucks up
 # inappropriate and, IMV, quite misleading alert about a large update,
 # breaking changes, and an invitation to switch to old-menu where the
 # default is "yes". That can be very confusing for first-time users so
 # this next line bypasses that alert:
-echo "0" >"$HOME/IOTstack/.new_install"
+echo "0" >"$IOTSTACK/.new_install"
 
 echo "Protective creation of sub-folders which should be user-owned"
-mkdir -p "$HOME/IOTstack/backups" "$HOME/IOTstack/services"
+mkdir -p "$IOTSTACK/backups" "$IOTSTACK/services"
 
-echo "Cloning IOTstackAliases"
-git clone https://github.com/Paraphraser/IOTstackAliases.git ~/.local/IOTstackAliases
+echo "Cloning IOTstackAliases from $IOTSTACKALIASES_URL"
+git clone -b "$IOTSTACKALIASES_BRANCH" "$IOTSTACKALIASES_URL" ~/.local/IOTstackAliases
 
 echo "Installing rclone and shell yaml support"
 curl https://rclone.org/install.sh | sudo bash
 pip3 install -U $PIBUILDER_PYTHON_OPTIONS shyaml
 
-echo "Cloning and installing IOTstackBackup"
-git clone https://github.com/Paraphraser/IOTstackBackup.git ~/.local/IOTstackBackup
+echo "Cloning IOTstackBackup from $IOTSTACKBACKUP_URL"
+git clone -b "$IOTSTACKBACKUP_BRANCH" "$IOTSTACKBACKUP_URL" ~/.local/IOTstackBackup
+echo "Installing IOTstackBackup scripts"
 ~/.local/IOTstackBackup/install_scripts.sh
 
-TARGET="$HOME/IOTstack/requirements-mkdocs.txt"
+TARGET="$IOTSTACK/requirements-mkdocs.txt"
 if [ -e "$TARGET" ] ; then
    echo "Adding mkdocs support (eg mkdocs serve -a 0.0.0.0:8765)" 
    pip3 install $PIBUILDER_PYTHON_OPTIONS -r "$TARGET"

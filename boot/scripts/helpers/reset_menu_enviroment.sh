@@ -22,7 +22,8 @@ is_running_OS_release() {
    return 1
 }
 
-IOTSTACK="$HOME/IOTstack"
+IOTSTACK=${IOTSTACK:-"$HOME/IOTstack"}
+IOTSTACK=$(realpath "$IOTSTACK")
 APT_DEPENDENCIES="python3-pip python3-dev python3-virtualenv"
 PIP_UNINSTALL="virtualenv ruamel.yaml blessed"
 REQUIREMENTS="$IOTSTACK/requirements-menu.txt"

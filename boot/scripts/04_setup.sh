@@ -21,20 +21,28 @@ SUPPORT="$WHERE/support"
 # import user options and run the script prolog - if they exist
 run_pibuilder_prolog
 
+# defaults which can be overridden by adding the variable to the
+# options script, or inline on the call to this script, or exported
+# to the environment prior to calling this script
+#
+# default location of IOTstack
+IOTSTACK=${IOTSTACK:-"$HOME/IOTstack"}
+IOTSTACK=$(realpath "$IOTSTACK")
+
 # add these to /boot/cmdline.txt
 CMDLINE_OPTIONS="cgroup_memory=1 cgroup_enable=memory"
 
 # canned general advisory if IOTstack doesn't exist
 read -r -d "\n" IOTSTACKFAIL <<-EOM
 ========================================================================
-The $HOME/IOTstack directory does not exist. This is normally
+The $IOTSTACK directory does not exist. This is normally
 created by the 03 script when it clones IOTstack from GitHub. The most
 common explanation for the directory being missing is because the 03
 script did not complete normally, and the most common reason for that
 is due to one or more failures of "sudo apt install <package>". You
 need to keep re-running the 03 script until it completes normally.
 
-Another reason why the $HOME/IOTstack directory might not
+Another reason why the $IOTSTACK directory might not
 exist is because you are running this script simply to install docker
 and docker-compose but without running the preceding PiBuilder scripts.
 That's OK but you do need to clone IOTstack from GitHub first.
@@ -75,7 +83,7 @@ EOM
 # the docker convenience script so that it is safe to either re-run
 # the 03 script until it completes, or bypass the check by cloning
 # the IOTstack repo
-if [ ! -d "$HOME/IOTstack" ] ; then
+if [ ! -d "$IOTSTACK" ] ; then
    echo "$IOTSTACKFAIL"
    exit 1
 fi
@@ -121,7 +129,7 @@ for P in virtualenv ruamel.yaml blessed ; do
 done
 
 # the menu now has its own requirements list - process that
-TARGET="$HOME/IOTstack/requirements-menu.txt"
+TARGET="$IOTSTACK/requirements-menu.txt"
 if [ -e "$TARGET" ] ; then
    echo "Satisfying IOTstack menu requirements" 
    pip3 install $PIBUILDER_PYTHON_OPTIONS -r "$TARGET"
@@ -130,7 +138,7 @@ fi
 # and, just on the off-chance that this script is being run to reinstall
 # docker and docker-compose, in which case the virtual environment might
 # already exist, clobber that so it will be recreated when the menu runs
-sudo rm -rf "$HOME/IOTstack/.virtualenv-menu"
+sudo rm -rf "$IOTSTACK/.virtualenv-menu"
 
 # set cmdline options if possible
 TARGET="/boot/cmdline.txt"

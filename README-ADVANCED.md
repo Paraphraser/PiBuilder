@@ -12,6 +12,7 @@ This document explains how to customise PiBuilder to your needs.
 - [PiBuilder installation options](#generalOptions)
 
 	- [Per-host installation options](#hostSpecificOptions)
+	- [Environment variable overrides](#envVarOverrides)
 
 - [Script scaffolding](#scriptScaffolding)
 
@@ -192,7 +193,7 @@ The defaults are appropriate for most first-time builds. However, you can uncomm
 			This calculation will result in a 2GB swap file for any Raspberry Pi with 1GB or more of real RAM. This is the recommended option if your Raspberry Pi boots from SSD or HD.
 
 			Rules 1 and 2 are implemented by the `./etc/dphys-swapfile.patch` supplied with PiBuilder. If you change or override that file then whatever rules your patch imposes will be implemented by `automatic`.
-			
+
 	- `custom` is equivalent to `automatic` but it does not check if your system is running from SD. If you want to enable swap on an SD system, this or "default" are the options to use.
 
 	- `default` makes no changes to the virtual memory system. The current Raspberry Pi OS defaults enable virtual memory swapping with a swap file size of 100MB. This is perfectly workable on systems with 4GB of RAM or more.
@@ -242,6 +243,43 @@ You can also create a variant of the options file which is specific to a given h
 ```
 
 If both a host-specific and a general options file exist, the host-specific file is given precedence and the general file is ignored. 
+
+<a name="envVarOverrides"></a>
+### Environment variable overrides
+
+Some of PiBuilder's scripts support additional customisation by setting environment variables that are not listed in the default `options.sh`. You can apply overrides in one of three ways:
+
+1. Adding the environment variable to your `options.sh`; or
+2. Specifying the override inline on the call to the script. For example:
+
+	``` console
+	$ IOTSTACK="$HOME/MySpecialIOTstack" ./PiBuilder/boot/scripts/03_setup.sh
+	```
+
+3. Exporting the override before calling the script. Example:
+
+	``` console
+	$ export IOTSTACK="$HOME/MySpecialIOTstack"
+	$ ./PiBuilder/boot/scripts/03_setup.sh
+	```
+
+The variables supported in this fashion are summarised below.
+
+variable                 | script(s) | default
+-------------------------|:---------:|------------------------------------------
+`IOTSTACK`               | 03, 04    | `$HOME/IOTstack`
+`IOTSTACK_URL`           | 03        | `https://github.com/SensorsIot/IOTstack.git`
+`IOTSTACK_BRANCH`        | 03        | `master`
+`IOTSTACKALIASES_URL`    | 03        | `https://github.com/Paraphraser/IOTstackAliases.git`
+`IOTSTACKALIASES_BRANCH` | 03        | `master`
+`IOTSTACKBACKUP_URL`     | 03        | `https://github.com/Paraphraser/IOTstackBackup.git`
+`IOTSTACKBACKUP_BRANCH`  | 03        | `master`
+
+The variables with `_URL` and `_BRANCH` suffixes are intended to make it easy to clone those repositories from your own custom clones, forks and branches.
+
+Note:
+
+* If you change the `IOTSTACK` variable, you must be consistent and use it for both the 03 and 04 scripts, otherwise PiBuilder will raise an error.
 
 <a name="scriptScaffolding"></a>
 ## Script scaffolding
@@ -361,7 +399,7 @@ The `try_patch()` function has two common use patterns:
 	``` 
 
 * conditional invocation where subsequent actions depend on the success of the patch. For example:
-	
+
 	``` bash
 	if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
 		sudo dphys-swapfile setup
@@ -775,14 +813,14 @@ There is no default patch. If you supply a general or host-specific patch file, 
 	```
 	search_domains=my.domain.com
 	```
-	
+
 2. Tell a host to use itself for DNS resolution (eg running BIND9 or PiHole), with a fallback to Google:
 
 	```
 	name_servers="127.0.0.1 8.8.8.8"
 	resolv_conf_local_only=NO
 	```
-	
+
 See also [Configuring DNS for Raspbian](./docs/dns.md).
 
 <a name="etc_samba_smb_conf"></a>
