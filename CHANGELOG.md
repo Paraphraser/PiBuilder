@@ -15,7 +15,9 @@
 		`IOTSTACKBACKUP_BRANCH`  | `master`
 
 	- `IOTSTACK` allows the installation folder to be something other than `~/IOTstack` while the others permit cloning from forks or copies of the relevant repositories.
-	- Explanation added to [Advanced README](./README-ADVANCED.md#envVarOverrides) 
+	- Explanation of above added to [Advanced README](./README-ADVANCED.md#envVarOverrides) 
+	- Removed installation of `sshfs` from 03 script (deprecated upstream).
+
 * 2023-10-22
 
 	- Adds `set_hostname.sh` helper script. This mimics (in part) the approach of `raspi-config` to changing the hostname but augments it with a best-efforts discovery of any local domain name which may have been learned from DHCP. Taken together, this is closer to the result obtained from running the Debian ISO installer. It results in `/etc/hosts` gaining a fully-qualified domain name and that, in turn, means the `hostname -d` and `hostname -f` commands work.

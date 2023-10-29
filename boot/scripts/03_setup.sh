@@ -91,7 +91,6 @@ rlwrap
 ruby
 software-properties-common
 sqlite3
-sshfs
 subversion
 sysstat
 tcpdump
