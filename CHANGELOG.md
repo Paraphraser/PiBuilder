@@ -3,6 +3,7 @@
 * 2023-11-01
 
 	- Rewrite [original build method](./README-ADVANCED.md#originalBuild) material to cater for Bookworm.
+	- Update `running_OS_build()` function to allow for change to where `issue.txt` file is stored in Bookworm.
 
 * 2023-10-29
 

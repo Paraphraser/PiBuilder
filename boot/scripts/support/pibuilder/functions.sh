@@ -98,7 +98,10 @@ is_running_OS_release() {
 running_OS_build() {
 
    # determine the build stage
-   local BUILDSTAGE=$(tail -1 /boot/issue.txt | cut -d "," -f 4 | tr -d "[:space:]")
+   local ISSUE="/boot/issue.txt"
+   [ ! -f "$ISSUE" ] && ISSUE="/boot/firmware/issue.txt"
+   [ ! -f "$ISSUE" ] && echo "unknown" && return -1
+   local BUILDSTAGE=$(tail -1 "$ISSUE" | cut -d "," -f 4 | tr -d "[:space:]")
 
    # vector on answer
    case "$BUILDSTAGE" in
