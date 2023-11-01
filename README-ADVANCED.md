@@ -929,26 +929,53 @@ Notes:
 <a name="originalBuild"></a>
 ### Original build method still works
 
-The original PiBuilder build method still works:
+The original PiBuilder build method still works *on the Raspberry Pi* but there are differences depending on whether you are installing Raspberry Pi OS Bullseye (or earlier), or Raspberry Pi OS Bookworm.
 
-1. Image your media (SD/SSD).
-2. Mount the boot partition on your support host.
-3. Copying the **contents** of the PiBuilder `boot` directory to the boot partition. If your support host is macOS, you can still perform the copying operation by running:
+The steps are:
 
-	``` bash
-	$ ./setup_boot_volume.sh
-	```
+1. Image your media (SD/SSD). Although you can change the default, Raspberry Pi Imager normally ejects the media at the end of the process.
+2. Mount the boot partition on your support host. This can be as simple as physically removing and re-connecting the media and waiting for the operating system on your support host to mount the media.
+3. Identify the name of the boot partition. If you are building a system based on:
 
-4. Move the media to your Raspberry Pi and apply power.
-5. Connect to your Pi via SSH and run the scripts from the boot partition. For example:
+	* Bullseye (or earlier), the boot partition has the name "boot".
+	* Bookworm, the boot partition has the name "bootfs".
 
-	``` bash
-	$ /boot/scripts/01_setup.sh «newHostName»
-	``` 
+4. Copy the **contents** of the PiBuilder `boot` **directory** to the boot **partition**. If your support host is:
+
+	* macOS, you can perform the copying operation by running:
+
+		``` bash
+		$ ./setup_boot_volume.sh
+		```
+	
+		> On macOS, the script detects whether `/Volumes/boot` or `/Volumes/bootfs` has mounted and adapts accordingly.
+		
+	* Linux, you will need to pass the correct path to the boot partition. Example:
+
+		``` bash
+		$ ./setup_boot_volume.sh path/to/boot-or-bootfs-partition
+		```
+				
+	* Windows, the `setup_boot_volume.sh` script will not run. You need to copy the **contents** of the `boot` **directory** to the drive where the boot **partition** has mounted.
+
+5. Move the media to your Raspberry Pi and apply power.
+6. Connect to your Pi via SSH and run the scripts. If you are building a system based on:
+
+	* Bullseye (or earlier), you can run the first script like this:
+
+		``` bash
+		$ /boot/scripts/01_setup.sh «newHostName»
+		```
+		
+	* Bookworm, you can run the first script like this:
+
+		``` bash
+		$ /boot/firmware/scripts/01_setup.sh «newHostName»
+		```
 
 You can use this older method with either a clean clone of PiBuilder from GitHub or with a local repository containing your own customisations.
 
-The **only** reason why the PiBuilder documentation focuses on the newer method is because it will also work in situations where the `/boot` partition does not exist, such as Proxmox or starting with a Debian install on non-Pi hardware.
+The reason why the PiBuilder documentation now focuses on the newer method is because it will also work in situations where the boot partition does not exist (or you can't get to it easily), such as Proxmox VE, or starting with a Debian install on non-Pi hardware, or starting with a non-Raspberry Pi OS on Raspberry Pi hardware.
 
 <a name="githubSync"></a>
 ## Keeping in sync with GitHub

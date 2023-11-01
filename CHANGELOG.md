@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-11-01
+
+	- Rewrite [original build method](./README-ADVANCED.md#originalBuild) material to cater for Bookworm.
+
 * 2023-10-29
 
 	- Supports the following environment variables in either options.sh, or inline on the call to the 03 and 04 scripts, or exported to the environment before calling those scripts:
