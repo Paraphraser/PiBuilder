@@ -80,6 +80,7 @@ iotop
 iperf
 jq
 libffi-dev
+libnss3-tools
 libreadline-dev
 mosquitto-clients
 netcat-openbsd
