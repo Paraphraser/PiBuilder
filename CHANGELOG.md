@@ -2,7 +2,7 @@
 
 * 2023-11-23
 
-	- Bump default version of docker-compose installed via script to v2.23.2
+	- Bump default version of docker-compose installed via script to v2.23.2; and then again (same day) to v2.23.3.
 
 * 2023-11-17
 
