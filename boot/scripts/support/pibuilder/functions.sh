@@ -5,6 +5,8 @@
 # A TIME to reduce failure problems resulting from the all-too-frequent
 #  Failed to fetch http://raspbian.raspberrypi.org/raspbian/pool/main/z/zip/zip_3.0-11_armhf.deb
 #   Unable to connect to raspbian.raspberrypi.org:http: [IP: 93.93.128.193 80]
+# Takes two arguments - first is packages list, second is exit code on
+# failure.
 
 install_packages() {
 
@@ -41,13 +43,33 @@ install_packages() {
    # any retries?
    if [ ! -z "$RETRIES" ] ; then
 
-      # yes! bung out the list
+      # set the scene
       echo "Some base packages could not be installed. This is usually"
       echo "because of some transient problem with APT."
-      echo "Retry the errant installations listed below by hand, and"
-      echo "then re-run $SCRIPT"
+      echo ""
+
+      # are the dependencies mandatory
+      if [ $2 -eq 1 ] ; then
+
+         # yes! bung out the list and abort
+         echo "Retry the errant installations listed below by hand, and"
+         echo "then re-run $SCRIPT."
+
+      else
+
+         # no! bung out the list and continue
+         echo "The errant installations listed below are NOT essential"
+         echo "for either PiBuilder or IOTstack. This script will continue"
+         echo "without these dependencies but you should probably try"
+         echo "installing them by hand after you have finished running"
+         echo "PiBuilder."
+
+      fi
+
+      echo "------------------------------------------------------------"
       cat "$RETRIES"
-      exit 1
+      echo "------------------------------------------------------------"
+      exit $2
 
    fi
 

@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2023-12-11
+
+	- `hopenpgp-tools` package removed from dependency list in 03 script. See [About `hopenpgp-tools`](./docs/hopenpgp-tools.md) for more information.
+	- support second argument to `install_packages()` function so as to make primary dependencies (those actually needed for IOTstack) mandatory (as now) with the crypto dependencies optional.
+
 * 2023-11-23
 
 	- Bump default version of docker-compose installed via script to v2.23.2; and then again (same day) to v2.23.3.

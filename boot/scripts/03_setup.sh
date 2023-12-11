@@ -102,7 +102,8 @@ uuid-runtime
 wget
 BASE_PACKAGES
 
-install_packages "$PACKAGES"
+# these packages are mandatory (the "1" argument)
+install_packages "$PACKAGES" 1
 
 cat <<-CRYPTO_PACKAGES >"$PACKAGES"
 at
@@ -110,7 +111,6 @@ cryptsetup
 dirmngr
 gnupg-agent
 gnupg2
-hopenpgp-tools
 openssl
 pcscd
 python3-gnupg
@@ -127,7 +127,8 @@ if ! is_running_OS_release buster ; then
    echo "python3-ykman" >>"$PACKAGES"
 fi
 
-install_packages "$PACKAGES"
+# these packages are mandatory (the "0" argument)
+install_packages "$PACKAGES" 0
 
 # clean up any dross
 echo "Removing any unused packages"
