@@ -14,6 +14,8 @@ This document explains how to customise PiBuilder to your needs.
 	- [Per-host installation options](#hostSpecificOptions)
 	- [Environment variable overrides](#envVarOverrides)
 
+		- [about Git options](#aboutGitOptions)
+
 - [Script scaffolding](#scriptScaffolding)
 
 - [The PiBuilder Patching System](#patchingSystem)
@@ -267,6 +269,7 @@ The variables supported in this fashion are summarised below.
 
 variable                 | script(s) | default
 -------------------------|:---------:|------------------------------------------
+`GIT_CLONE_OPTIONS`      | 03        | `--filter=tree:0`
 `IOTSTACK`               | 03, 04    | `$HOME/IOTstack`
 `IOTSTACK_URL`           | 03        | `https://github.com/SensorsIot/IOTstack.git`
 `IOTSTACK_BRANCH`        | 03        | `master`
@@ -281,6 +284,54 @@ Note:
 
 * If you change the `IOTSTACK` variable, you must be consistent and use it for both the 03 and 04 scripts, otherwise PiBuilder will raise an error.
 
+<a name="aboutGitOptions"></a>
+#### about Git options
+
+The default value of `GIT_CLONE_OPTIONS` is consistent with the IOTstack `install.sh` script, save that it is also applied to cloning the IOTstackAliases and IOTstackBackup repositories.
+
+These are your options for invoking the 03 script. They are ranked in increasing order of the load placed on GitHub:
+
+* *Shallow* clone (least expensive):
+
+	``` console
+	$ GIT_CLONE_OPTIONS="--depth=1" ./PiBuilder/boot/scripts/03_setup.sh
+	```
+	
+	This is the "cheapest" download but it constrains your options (eg your ability to switch between the IOTstack *old* and *new* menu systems) quite severely. Not really recommended.
+
+* *Treeless* clone (the PiBuilder default):
+
+	``` console
+	$ ./PiBuilder/boot/scripts/03_setup.sh
+	```
+	
+	This passes the `--filter=tree:0` option to `git clone`. It only downloads from GitHub what is essential to running IOTstack on your machine. The downloading of additional components is deferred until it is actually necessary which, in many installations, could easily be "never".
+	
+* *Blobless* clone:
+
+	``` console
+	$ GIT_CLONE_OPTIONS="--filter=blob:none" ./PiBuilder/boot/scripts/03_setup.sh
+	```
+	
+	This download all reachable commits and trees, but only downloads blobs when necessary.
+
+* *Full* clone (most expensive):
+
+	``` console
+	$ GIT_CLONE_OPTIONS= ./PiBuilder/boot/scripts/03_setup.sh
+	```
+
+	This is the more traditional clone which downloads a complete copy of each repository from GitHub. 
+
+Note:
+
+* You can use `GIT_CLONE_OPTIONS=` to pass any supported options to the `git clone` command. Fairly obviously, you are responsible for passing *valid* options!
+
+See also:
+	
+- [IOTstack PR740](https://github.com/SensorsIot/IOTstack/pull/740)
+- [Get up to speed with partial clones](https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/)
+	
 <a name="scriptScaffolding"></a>
 ## Script scaffolding
 

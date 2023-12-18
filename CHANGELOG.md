@@ -1,5 +1,15 @@
 # PiBuilder Change Summary
 
+* 2023-12-18
+
+	- Git clone commands in 03 script now default to:
+
+		``` console
+		$ git clone --filter=tree:0
+		```	
+
+		Documentation at [about Git options](./README-ADVANCED.md#aboutGitOptions).
+
 * 2023-12-11
 
 	- `hopenpgp-tools` package removed from dependency list in 03 script. See [About `hopenpgp-tools`](./docs/hopenpgp-tools.md) for more information.
