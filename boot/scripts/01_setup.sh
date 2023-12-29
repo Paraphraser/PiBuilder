@@ -84,7 +84,7 @@ fi
 
 # ensure basics available on non-Raspbian systems
 echo "Satisfying PiBuilder dependencies"
-sudo apt install -y git rsync
+sudo apt install -y git rsync avahi-daemon
 
 # remove any junk so we don't get reminders
 sudo apt autoremove -y

@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2023-12-29
+
+	- Add avahi daemon to list of PiBuilder dependencies in 01 script. This is needed for PiBuilder installs on Ubuntu.
+
 * 2023-12-18
 
 	- Git clone commands in 03 script now default to:
