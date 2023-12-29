@@ -3,6 +3,9 @@
 * 2023-12-29
 
 	- Add avahi daemon to list of PiBuilder dependencies in 01 script. This is needed for PiBuilder installs on Ubuntu.
+	- Add functions to detect running Linux distro.
+	- When omitted, `SKIP_FULL_UPGRADE` now defaults to false on Debian, true on non-Debian (eg Ubuntu). This is a workaround for a problem where Ubuntu seems to hang on full upgrades.
+	- `DEBIAN_BOOKWORM_UPGRADE` (added 2023-07-03) removed. At that time the Raspberry Pi releases page only had Bullseye images so the only way to get Bookworm was to start with Bullseye and upgrade. That is no longer the case so this control is redundant.
 
 * 2023-12-18
 

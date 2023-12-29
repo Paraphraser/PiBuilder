@@ -76,6 +76,42 @@ install_packages() {
 }
 
 
+# a function to return the OS distribution
+# Example:
+#   running_OS_distro
+# returns a string containing the OS distro (eg debian) if and only if
+# 1. /etc/os-release exists
+# 2. /etc/os-release defines the ID variable
+# 3. ID is non-null
+# Otherwise returns "unknown" and sets exit code 1
+
+running_OS_distro() {
+   if [ -e "/etc/os-release" ] ; then
+      . "/etc/os-release"
+      if [ -n "$ID" ] ; then
+         echo "$ID"
+         return 0
+      fi
+   fi
+   echo "unknown"
+   return 1
+}
+
+
+# a function to check whether OS distro conditions apply.
+# Example:
+#   is_running_OS_distro debian
+# returns true if and only if the result of running_OS_distro matches
+# the expected argument in $1, otherwise returns false
+
+is_running_OS_distro() {
+   if [ "$(running_OS_distro)" = "$1" ] ; then
+      return 0
+   fi 
+   return 1
+}
+
+
 # a function to return the OS version name
 # Example:
 #   running_OS_release

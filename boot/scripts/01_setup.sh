@@ -59,21 +59,19 @@ if is_running_OS_release buster ; then
    fi
 fi
 
-# support upgrading from bullseye to bookworm
-if is_running_OS_release bullseye ; then
-   if [ "$DEBIAN_BOOKWORM_UPGRADE" = "true" ] ; then
-      echo "Editing apt sources to point to Debian 12 (bookworm)"
-      sudo sed -i.bak 's/bullseye/bookworm/g' /etc/apt/sources.list
-      echo "Forcing Full Upgrade"
-      SKIP_FULL_UPGRADE=false
-   fi
-fi
-
 echo "Running sudo apt update"
 sudo apt update
 
-# default behaviour is a full upgrade (ie SKIP_FULL_UPGRADE is either
-# unset or anything other than "true")
+# is this a debian distribution?
+if is_running_OS_distro debian ; then
+   # yes! the default is a full upgrade
+   SKIP_FULL_UPGRADE="${SKIP_FULL_UPGRADE:-"false"}"
+else
+   # no! the default is a routine upgrade
+   SKIP_FULL_UPGRADE="${SKIP_FULL_UPGRADE:-"true"}"
+fi
+
+# run the appropriate update
 if [ "$SKIP_FULL_UPGRADE" = "true" ] ; then
    echo "Running sudo apt upgrade -y"
    sudo apt upgrade -y
