@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-01-13
+
+	- Bump default version of docker-compose installed via script to v2.24.0.
+
 * 2023-12-29
 
 	- Add avahi daemon to list of PiBuilder dependencies in 01 script. This is needed for PiBuilder installs on Ubuntu.
