@@ -221,13 +221,12 @@ Notes:
 
 	``` bash
 	$ ssh-keygen -R raspberrypi.local
-	$ ssh -4 «username»@raspberrypi.local
+	$ ssh «username»@raspberrypi.local
 	```
 
-	Notes:
+	Note:
 
 	* The `ssh-keygen` command is protective and removes any obsolete information from your "known hosts" file. Ignore any errors.
-	* The `-4` parameter on the `ssh` command instructs SSH to stick to IPv4.
 
 	Normally, SSH will issue a challenge like this:
 
@@ -329,7 +328,9 @@ $ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 	$ ssh -4 «username»@«hostname».local
 	```
 
-	If you see the [TOFU pattern](#tofudef) again, respond with "yes".
+	Notes:
+	
+	* If you see the [TOFU pattern](#tofudef) again, respond with "yes". 	* The `-4` parameter on the `ssh` command instructs SSH to stick to IPv4. The 02 script disables IPv6 as part of its function so forcing IPv4 avoids locking-up the terminal session. 
 
 2. *On your Raspberry Pi:*
 
@@ -339,7 +340,7 @@ $ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 	$ ~/PiBuilder/boot/scripts/02_setup.sh
 	```
 
-	The 02 script runs to completion and reboots your Raspberry Pi. The 02 script also disables IPv6 so, from this point onwards, you can omit the `-4` parameter from SSH commands.
+	The 02 script runs to completion and reboots your Raspberry Pi.
 
 <a name="runScript03"></a>
 #### Script 03

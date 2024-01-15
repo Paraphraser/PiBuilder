@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-01-15
+
+	- Remove `-4` flag from SSH command prior to 01 script. Using this stalls Ubuntu on Proxmox-VE which, for some reason, changes its IPv4 address during the `apt upgrade`. The `-4` flag is really only needed for the 02 script to avoid the inverse problem when IPv6 is stopped.
+
 * 2024-01-13
 
 	- Bump default version of docker-compose installed via script to v2.24.0.
