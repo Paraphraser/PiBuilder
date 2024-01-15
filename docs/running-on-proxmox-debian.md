@@ -242,7 +242,7 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 2. Login to the guest system:
 
 	``` console
-	$ ssh -4 «guest_user»@«guest_host».local
+	$ ssh «guest_user»@«guest_host».local
 	```
 
 	You should expect to see the "trust on first use" (aka TOFU) challenge ("The authenticity of host … can't be established"). Respond with "yes" and press <kbd>return</kbd>.
@@ -285,7 +285,7 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 1. Login to the guest system:
 
 	``` console
-	$ ssh -4 «guest_user»@«guest_host».local
+	$ ssh «guest_user»@«guest_host».local
 	```
 
 	Supply the `«guest_user_password»` when prompted.
@@ -321,7 +321,7 @@ Tip:
 1. Login to the guest:
 
 	``` console
-	$ ssh -4 «guest_user»@«guest_host».local
+	$ ssh «guest_user»@«guest_host».local
 	```
 
 2. Run the first script:
