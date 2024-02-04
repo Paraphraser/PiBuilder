@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-02-04
+
+	- Bump default version of docker-compose installed via script to v2.24.5. This was released 31/Jan to fix a Windows problem so I decided to skip it as not relevant to PiBuilder builds. However, v2.24.5 is now the default with `apt upgrade` so PiBuilder may as well follow suit.
+
 * 2024-01-30
 
 	- Bump default version of docker-compose installed via script to v2.24.4 (v2.24.3 skipped because it was only relevant to Docker Desktop for Windows).
