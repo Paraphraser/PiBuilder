@@ -216,7 +216,7 @@ The steps are:
 
 	![Raspberry Pi Imager Customisation dialog Services tab](./images/imager-custom-services.jpg)
 
-	- Enable SSH at <!--Q-->&#x1F1F7; and select password authentication at <!--P-->&#x1F1F5;.
+	- Enable SSH at <!--O-->&#x1F1F4; and select password authentication at <!--P-->&#x1F1F5;.
 	- Click <!--Q-->&#x1F1F6; to switch to the "OPTIONS" tab.
 
 	![Raspberry Pi Imager Customisation dialog Options tab](./images/imager-custom-options.jpg)
