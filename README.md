@@ -173,13 +173,13 @@ The steps are:
 	* Select the media connected in step 1. *Be careful with this step!*
 
 6. Click "NEXT".
-7. Click "EDIT SETTINGS". This opens the "OS Customisation" panel at the "GENERAL" tab <!--A-->&#x1F1E6;:
+7. Click "EDIT SETTINGS". This opens the "OS Customisation" panel at the "GENERAL" tab <!--A-->&#x1F130;:
 
 	![Raspberry Pi Imager Customisation dialog General tab](./images/imager-custom-general.jpg)
 
 	Unless you have good reasons to do otherwise, I recommend:
 
-	- Enable <!--B-->&#x1F1E7;, then enter a name for your host at <a name="firstBootHostName"></a><!--C-->&#x1F1E8;.
+	- Enable <!--B-->&#x1F131;, then enter a name for your host at <a name="firstBootHostName"></a><!--C-->&#x1F132;.
 
 		I **strongly** recommend using the name "raspberrypi" (one word, all lower-case) in this panel, and then changing the name later when you run the first PiBuilder script. These instructions assume you accept this advice.
 
@@ -193,36 +193,36 @@ The steps are:
 
 		2. You will have to remember to come back into this panel each time you run Raspberry Pi Imager.
 
-	- Enable user credentials at <!--D-->&#x1F1E9;, then:
+	- Enable user credentials at <!--D-->&#x1F133;, then:
 
-		- Enter a username at <!--E-->&#x1F1EA;. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it now.
+		- Enter a username at <!--E-->&#x1F134;. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it now.
 
 			The choice you make here will become the username for *all* of your Raspberry Pis. If you want a different username for each of your Raspberry Pis then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
 
 			This documentation uses "«username»" to represent the choice you make here.
 
-		- Set a strong password at <a name="firstBootUserPassword"></a><!--F-->&#x1F1EB;. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
+		- Set a strong password at <a name="firstBootUserPassword"></a><!--F-->&#x1F135;. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
 
-	- If you want the Raspberry Pi's WiFi interface to be active, enable <!--G-->&#x1F1EC;, then:
+	- If you want the Raspberry Pi's WiFi interface to be active, enable <!--G-->&#x1F136;, then:
 
-		- enter your WiFi network name in <!--H-->&#x1F1ED;.
-		- enter your WiFi password in <!--I-->&#x1F1EE;.
-		- use the popup menu <!--J-->&#x1F1EF; to select your country code.
+		- enter your WiFi network name in <!--H-->&#x1F137;.
+		- enter your WiFi password in <!--I-->&#x1F138;.
+		- use the popup menu <!--J-->&#x1F139; to select your country code.
 
 			> Your support host may pre-populate some or all of these fields.
 
-	- Enable locale settings at <!--K-->&#x1F1F0; and then use the popup menus <!--L-->&#x1F1F1; and <!--M-->&#x1F1F2; to set appropriate values for your time zone and keyboard layout, respectively.
-	- Click <!--N-->&#x1F1F3; to switch to the "SERVICES" tab.
+	- Enable locale settings at <!--K-->&#x1F13A; and then use the popup menus <!--L-->&#x1F13B; and <!--M-->&#x1F13C; to set appropriate values for your time zone and keyboard layout, respectively.
+	- Click <!--N-->&#x1F13D; to switch to the "SERVICES" tab.
 
 	![Raspberry Pi Imager Customisation dialog Services tab](./images/imager-custom-services.jpg)
 
-	- Enable SSH at <!--O-->&#x1F1F4; and select password authentication at <!--P-->&#x1F1F5;.
-	- Click <!--Q-->&#x1F1F6; to switch to the "OPTIONS" tab.
+	- Enable SSH at <!--O-->&#x1F13E; and select password authentication at <!--P-->&#x1F13F;.
+	- Click <!--Q-->&#x1F140; to switch to the "OPTIONS" tab.
 
 	![Raspberry Pi Imager Customisation dialog Options tab](./images/imager-custom-options.jpg)
 	
-	- Enable "Eject media when finished" at <!--R-->&#x1F1F7;
-	- Click <kbd>SAVE</kbd> (<!--S-->&#x1F1F8;) to save your settings.
+	- Enable "Eject media when finished" at <!--R-->&#x1F141;.
+	- Click <kbd>SAVE</kbd> (<!--S-->&#x1F142;) to save your settings.
 
 9. Click <kbd>YES</kbd> and respond to any system prompts to transfer the prepared image to your media.
 
