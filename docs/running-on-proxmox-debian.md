@@ -58,7 +58,7 @@ This phase walks you through the process of downloading the installation media f
 
 1. Use your web browser to open [https://www.debian.org](https://www.debian.org).
 2. Click "Download". Your browser should begin downloading the latest Debian installer onto your support host (Linux, macOS, Windows). The file will have a name like `debian-12.1.0-amd64-netinst.iso`. This is generally referred to as *an `.iso`,* indicating that the file is in ISO9660 (Optical Disc) format. 
-7. Use your web browser to:
+3. Use your web browser to:
 
 	* Connect to your Proxmox&nbsp;VE instance on port 8006
 	* Login as root
@@ -67,24 +67,24 @@ This phase walks you through the process of downloading the installation media f
 
 	![ISO images list](./images/proxmox-upload-local-iso.jpg)
 
-	* Select the "Server View" &#x1F1E6;
-	* Select your server by name &#x1F1E7; (the server in this example is named "bauxite")
+	* Select the "Server View" <!--A-->&#x1F130;
+	* Select your server by name <!--B-->&#x1F131; (the server in this example is named "bauxite")
 	* If the hierarchy is not expanded, expand it by clicking the &#xFE65; so it turns into &#x22C1; 
-	* Select the "local" storage option &#x1F1E8;
-	* Select the "ISO Images" grouping &#x1F1E9;
-	* Click the "Upload" button &#x1F1EA;
+	* Select the "local" storage option <!--C-->&#x1F132;
+	* Select the "ISO Images" grouping <!--D-->&#x1F133;
+	* Click the "Upload" button <!--E-->&#x1F134;
 
 	In the file selection dialog that opens:
 
 	![ISO upload form](./images/proxmox-select-local-iso.jpg)
 
-	* Click the "Select File" button &#x1F1EB;
+	* Click the "Select File" button <!--F-->&#x1F135;
 	* Use the file picker to select the `.iso` you downloaded from [https://www.debian.org](https://www.debian.org).
 
 		> Ignore the `C:\fakepath` in the dialog
 
-	* Click the "Upload" button &#x1F1EC;
-	* The uploaded file will appear in the list &#x1F1ED;.
+	* Click the "Upload" button <!--G-->&#x1F136;
+	* The uploaded file will appear in the list <!--H-->&#x1F137;.
 
 <a name="phaseConstructGuest"></a>
 ## Phase 2 - construct Debian guest
@@ -97,10 +97,10 @@ This phase walks you through the process of creating a Debian guest system. You 
 
 	* Connect to your Proxmox&nbsp;VE instance on port 8006
 	* Login as root
-	* Select the "Pool View" &#x1F1EF;
-	* Click "Create VM" &#x1F1F0;
+	* Select the "Pool View" <!--J-->&#x1F139;
+	* Click "Create VM" <!--K-->&#x1F13A;
 
-	> Ignore reference points &#x1F1F1;, &#x1F1F2; and &#x1F1F3;; we will come to those later. 
+	> Ignore reference points <!--L-->&#x1F13B;, <!--M-->&#x1F13C; and <!--N-->&#x1F13D;; we will come to those later. 
 
 2. In the "Create Virtual Machine" dialog, work through the tabs in order, clicking <kbd>Continue</kbd> at the end of each:
 
@@ -139,9 +139,9 @@ This phase walks you through the process of creating a Debian guest system. You 
 
 		- Click <kbd>Finish</kbd>
 
-3. Click the newly-created guest &#x1F1F1; to select it.
-4. Click the "Console" &#x1F1F2; to select the guest's console.
-5. Click the "Start Now" button &#x1F1F3;.
+3. Click the newly-created guest <!--L-->&#x1F13B; to select it.
+4. Click the "Console" <!--M-->&#x1F13C; to select the guest's console.
+5. Click the "Start Now" button <!--N-->&#x1F13D;.
 6. The guest will boot from the installation `.iso`:
 
 	* Choose "Graphical install" and press <kbd>return</kbd>

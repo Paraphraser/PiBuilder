@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2024-03-24
+
+	- Bump default version of docker-compose installed via script to v2.26.0 (`apt upgrade` is up to v2.25.0).
+	- Better Unicode range for boxed letters in Running on Proxmox-debian.
+
 * 2024-03-17
 
 	- Bump default version of docker-compose installed via script to v2.25.0.
