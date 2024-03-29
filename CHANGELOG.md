@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-03-30
+
+	- Bump default version of docker-compose installed via script to v2.26.1.
+
 * 2024-03-24
 
 	- Bump default version of docker-compose installed via script to v2.26.0 (`apt upgrade` is up to v2.25.0).
