@@ -1,5 +1,23 @@
 # PiBuilder Change Summary
 
+* 2024-04-09
+
+	- Improve method for disabling IPv6. Originally, disabling IPv6 was accomplished by setting appropriate options in `/etc/sysctl.d/local.conf`.
+
+		That worked on the Pi in Buster and Bullseye but not in Bookworm.
+		
+		The mechanism also never worked on any Debian install (irrespective of release) if Network Manager was present. The solution there was to configure grub to turn off IPv6 at boot time. That solution is deprecated by this change.
+		
+		The Raspberry Pi doesn't use grub so the scheme didn't work for Bookworm.
+		
+		It *appears* that there is some underlying conflict with Network Manager. My analysis suggests `sysctl` options are being applied early in the boot process, but then Network Manager undoes those changes.
+		
+		Googling has led to [this post](https://bbs.archlinux.org/viewtopic.php?id=282819). The solution works by adding a hook script which causes Network Manager to re-apply the `sysctl` settings after every Network Manager change.
+
+		This scheme has the advantage that it works on both Bullseye and Bookworm, in a platform-independent manner, and irrespective of whether Network Manager is active.
+		
+		It isn't clear whether the duel between NetworkManager and `sysctl` is a feature (ie Network Manager is *intended* to override `sysctl`) or a bug (ie the two *should* co-exist). The available documentation is remarkably silent on this question, and the web as a whole is remarkably silent on the existence of this problem.
+	
 * 2024-03-30
 
 	- Bump default version of docker-compose installed via script to v2.26.1.
