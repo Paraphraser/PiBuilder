@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# refer https://bbs.archlinux.org/viewtopic.php?id=282819
+# (path to sysctl amended)
+# this file should be owned root:root with mode 755
+
+/usr/sbin/sysctl --system
+
+exit 0
+
