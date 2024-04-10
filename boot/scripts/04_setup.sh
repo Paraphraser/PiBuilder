@@ -141,7 +141,7 @@ fi
 sudo rm -rf "$IOTSTACK/.virtualenv-menu"
 
 # set cmdline options if possible
-TARGET="/boot/cmdline.txt"
+TARGET=$(path_to_pi_boot_file "cmdline.txt")
 if [ -e "$TARGET" ] ; then
    unset APPEND
    for OPTION in $CMDLINE_OPTIONS ; do

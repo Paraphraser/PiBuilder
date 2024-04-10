@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-04-10
+
+	- Baseline copying and editing of `cmdline.txt` and `config.txt` not working properly on Bookworm because of relocation of those files from `/boot` to `/boot/firmware` (a mount point). Adds `path_to_pi_boot_file()` function which searches `firmware` first then falls back to `boot`. Scripts 01 and 04 updated accordingly.
+
 * 2024-04-09
 
 	- Improve method for disabling IPv6. Originally, disabling IPv6 was accomplished by setting appropriate options in `/etc/sysctl.d/local.conf`.

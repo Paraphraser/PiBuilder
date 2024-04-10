@@ -32,9 +32,10 @@ sudo cp -a /etc /etc-baseline
 
 # copy important files in /boot
 for TARGET in cmdline.txt config.txt ; do
-   if [ -e "/boot/$TARGET" ] ; then
-      echo "Taking baseline copy of $TARGET"
-      sudo cp "/boot/$TARGET" "/boot/$TARGET.baseline"
+   CANDIDATE=$(path_to_pi_boot_file "$TARGET")
+   if [ -e "$CANDIDATE" ] ; then
+      echo "Taking baseline copy of $CANDIDATE"
+      sudo cp "$CANDIDATE" "$CANDIDATE.baseline"
    fi
 done
 
@@ -119,7 +120,7 @@ fi
 if is_raspberry_pi ; then
 
    # see if 64-bit kernel should be enabled
-   TARGET="/boot/config.txt"
+   TARGET=$(path_to_pi_boot_file "config.txt")
    APPEND="arm_64bit=1"
    # is the kernel already 64-bit?
    if [ ! "$(uname -m)" = "aarch64" ] ; then

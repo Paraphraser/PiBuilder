@@ -233,6 +233,26 @@ is_raspberry_pi() {
    return 1
 }
 
+# a function to find a file which can either be in /boot/firmware or
+# /boot. Only tested for config.txt and cmdline.txt.
+#
+# Parameter $1 : filename
+# If /boot/firmware/$1 exists that path is returned.
+# else if /boot/$1 exists that path is returned
+# else a null string is returned. Note that a null string will fail
+# any subsequent path check
+path_to_pi_boot_file() {
+   local CANDIDATE="/boot/firmware/$1"
+   if [ ! -f "$CANDIDATE" ] ; then
+      CANDIDATE="/boot/$1"
+   fi
+   if [ -f "$CANDIDATE" ] ; then
+      echo "$CANDIDATE"
+   else
+      echo ""
+   fi
+}
+
 # a function to find a supporting file or folder proposed in the $1
 # parameter.
 #
