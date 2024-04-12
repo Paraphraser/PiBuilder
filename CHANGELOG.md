@@ -5,14 +5,20 @@
 	- An unexpected side-effect of [2024-04-09](#20240409) is journal warnings from NetworkManager as it repeatedly tries to enable IPv6 on the physical interfaces (eg `eth0` and `wlan0`). The underlying cause is NetworkManager defaulting to `ipv6.method=auto` for physical interfaces.
 
 		The 02 script now sets `ipv6.method=disabled` on the physical interfaces. This prevents the retries and silences the warnings. The strategy will only catch the physical interfaces that exist when the script is run. It will be up to the user to notice and react to any journal warnings coming from physical interfaces that are defined later (eg USB-to-Ethernet dongles). For example, if a second wired interface were to be added, the user would need to:
-		
+
 		``` console
 		$ sudo nmcli conn mod "Wired connection 2" ipv6.method "disabled"
 		$ sudo systemctl restart NetworkManager
 		```
-		
+
 		The `lo` and virtual interfaces created by Docker all default to IPv6 being disabled. This is because they take their lead from the options set by `sysctl` (which are applied via the NetworkManager hook script per [2024-04-09](#20240409)).
-		
+
+	- Make `isc-dhcp-fix.sh` conditional on:
+
+		1. NetworkManager not active.
+		2. `/etc/rc.local` world-executable with non-zero length (Debian and Ubuntu typically create `rc.local` as empty and without execute permission).
+		3. `isc-dhcp-fix.sh` (or a host-specific version) must exist.
+
 * 2024-04-10
 
 	- Baseline copying and editing of `cmdline.txt` and `config.txt` not working properly on Bookworm because of relocation of those files from `/boot` to `/boot/firmware` (a mount point). Adds `path_to_pi_boot_file()` function which searches `firmware` first then falls back to `boot`. Scripts 01 and 04 updated accordingly.
@@ -22,19 +28,19 @@
 	- Improve method for disabling IPv6. Originally, disabling IPv6 was accomplished by setting appropriate options in `/etc/sysctl.d/local.conf`.
 
 		That worked on the Pi in Buster and Bullseye but not in Bookworm.
-		
+
 		The mechanism also never worked on any Debian install (irrespective of release) if Network Manager was present. The solution there was to configure grub to turn off IPv6 at boot time. That solution is deprecated by this change.
-		
+
 		The Raspberry Pi doesn't use grub so the scheme didn't work for Bookworm.
-		
+
 		It *appears* that there is some underlying conflict with Network Manager. My analysis suggests `sysctl` options are being applied early in the boot process, but then Network Manager undoes those changes.
-		
+
 		Googling has led to [this post](https://bbs.archlinux.org/viewtopic.php?id=282819). The solution works by adding a hook script which causes Network Manager to re-apply the `sysctl` settings after every Network Manager change.
 
 		This scheme has the advantage that it works on both Bullseye and Bookworm, in a platform-independent manner, and irrespective of whether Network Manager is active.
-		
+
 		It isn't clear whether the duel between NetworkManager and `sysctl` is a feature (ie Network Manager is *intended* to override `sysctl`) or a bug (ie the two *should* co-exist). The available documentation is remarkably silent on this question, and the web as a whole is remarkably silent on the existence of this problem.
-	
+
 * 2024-03-30
 
 	- Bump default version of docker-compose installed via script to v2.26.1.
@@ -91,7 +97,7 @@
 
 		``` console
 		$ git clone --filter=tree:0
-		```	
+		```
 
 		Documentation at [about Git options](./README-ADVANCED.md#aboutGitOptions).
 
@@ -196,7 +202,7 @@
 
 	- Tested PiBuilder on Ubuntu Jammy guest under Proxmox.
 	- Included mention of Debian Bookworm guest under Proxmox, tested previously.
-	
+
 * 2023-08-07
 
 	- Skip locales generation following a patch failure. Ubuntu already has many more locales enable by default than either Raspberry Pi OS or Debian so, if the desired locale is not among them, it's better to have users prepare custom patches that are actually relevant to their specific situations, rather than plough on and regenerate redundant locales (a lot of wasted build time for no gain).
@@ -237,7 +243,7 @@
 			```
 
 			the focus is on cloning PiBuilder onto the Raspberry Pi and running the scripts like this:
-		
+
 			```
 			$ ~/PiBuilder/boot/scripts/01_setup.sh «new host name»
 			$ ~/PiBuilder/boot/scripts/02_setup.sh
@@ -245,9 +251,9 @@
 			```
 
 			The older mechanism still works but the newer mechanism is more straightforward when trying to use PiBuilder in situations where the `/boot` partition does not exist (eg Proxmox, Parallels, non-Pi hardware).
-			
+
 			The new approach can also be used with customised builds. Instead of cloning PiBuilder onto your Pi from GitHub, you:
-			
+
 			1. Clone PiBuilder onto your support host from GitHub.
 			2. Customise PiBuilder on your support host.
 			3. Clone the customised instance onto your Pi from your support host.
@@ -262,7 +268,7 @@
 * 2023-07-12
 
 	- Bump default version of docker-compose installed via script to v2.20.0
-			
+
 * 2023-07-03
 
 	- First pass at supporting Debian Bookworm. A test build can start with:
@@ -272,13 +278,13 @@
 		3. Download "Raspberry Pi OS with desktop" May 3rd 2023.
 
 		The expected filename is `2023-05-03-raspios-bullseye-arm64.img.xz`
-		
+
 	- To build based on Bookworm:
 
 		```
 		$ DEBIAN_BOOKWORM_UPGRADE=true /boot/scripts/01_setup.sh {«hostname»}
 		```
-		
+
 * 2023-07-01
 
 	- Bump default version of docker-compose installed via script to v2.19.1
