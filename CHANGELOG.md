@@ -27,6 +27,8 @@
 
 		but that mechanism has been superseded. Nevertheless, the ability to patch grub can be useful.
 
+	- Add `python3-braceexpand` to package list in 03 script. This is being recommended when rsync is installed.
+
 * 2024-04-10
 
 	- Baseline copying and editing of `cmdline.txt` and `config.txt` not working properly on Bookworm because of relocation of those files from `/boot` to `/boot/firmware` (a mount point). Adds `path_to_pi_boot_file()` function which searches `firmware` first then falls back to `boot`. Scripts 01 and 04 updated accordingly.

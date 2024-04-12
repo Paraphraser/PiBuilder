@@ -109,6 +109,7 @@ nmap
 python3-pip
 python3-dev
 python3-virtualenv
+python3-braceexpand
 rlwrap
 ruby
 software-properties-common
