@@ -87,17 +87,28 @@ fi
 # patch resolvconf.conf for local DNS and domain name
 try_patch "/etc/resolvconf.conf" "local name servers"
 
-# sysctl customisations (default disables IPv6)
-# Step 1: check for sysctl.conf and apply it if found. That edits
-#         /etc/sysctl.conf directly. This is the legacy approach.
-# Step 2: check for sysctl.d. If it is found, copy any files found
-#         inside it (no overwrite). This is the modern approach.
-# Step 3: check for NetworkManager/dispatcher.d. If it is found,
-#         copy any files found inside it (no overwrite). This
-#         deals with Network Manager overriding sysctl
+
+# disable IPv6
+#
+# if NetworkManager is running then iterate the available interfaces
+# and change any cases where ipv6.method is "auto" to "disabled".
+# Then install the hook script
+if [ "$(systemctl is-active NetworkManager)" = "active" ] ; then
+   nmcli -g name connection | while read C ; do
+      M="$(nmcli -g ipv6.method connection show "$C")"
+      if [ "$M" = "auto" ] ; then
+         echo "Disabling IPv6 on $C (was $M)"
+         sudo nmcli connection modify "$C" ipv6.method "disabled"
+      fi
+   done
+   try_merge "/etc/NetworkManager/dispatcher.d" "adding sysctl hook script"
+fi
+
+# ideally, there are no patches for sysctl.conf (old style)
 try_patch "/etc/sysctl.conf" "patching sysctl.conf"
+# ideally, sysctl patches are handled from sysctl.d (new style)
 try_merge "/etc/sysctl.d" "customising sysctl.d"
-try_merge "/etc/NetworkManager/dispatcher.d" "NetworkManager"
+
 
 # patch journald.conf to reduce endless docker-runtime mount messages
 try_patch "/etc/systemd/journald.conf" "less verbose journalctl"

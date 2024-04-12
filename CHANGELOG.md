@@ -1,10 +1,23 @@
 # PiBuilder Change Summary
 
+* 2024-04-12
+
+	- An unexpected side-effect of [2024-04-09](#20240409) is journal warnings from NetworkManager as it repeatedly tries to enable IPv6 on the physical interfaces (eg `eth0` and `wlan0`). The underlying cause is NetworkManager defaulting to `ipv6.method=auto` for physical interfaces.
+
+		The 02 script now sets `ipv6.method=disabled` on the physical interfaces. This prevents the retries and silences the warnings. The strategy will only catch the physical interfaces that exist when the script is run. It will be up to the user to notice and react to any journal warnings coming from physical interfaces that are defined later (eg USB-to-Ethernet dongles). For example, if a second wired interface were to be added, the user would need to:
+		
+		``` console
+		$ sudo nmcli conn mod "Wired connection 2" ipv6.method "disabled"
+		$ sudo systemctl restart NetworkManager
+		```
+		
+		The `lo` and virtual interfaces created by Docker all default to IPv6 being disabled. This is because they take their lead from the options set by `sysctl` (which are applied via the NetworkManager hook script per [2024-04-09](#20240409)).
+		
 * 2024-04-10
 
 	- Baseline copying and editing of `cmdline.txt` and `config.txt` not working properly on Bookworm because of relocation of those files from `/boot` to `/boot/firmware` (a mount point). Adds `path_to_pi_boot_file()` function which searches `firmware` first then falls back to `boot`. Scripts 01 and 04 updated accordingly.
 
-* 2024-04-09
+* <a name="20240409"></a>2024-04-09
 
 	- Improve method for disabling IPv6. Originally, disabling IPv6 was accomplished by setting appropriate options in `/etc/sysctl.d/local.conf`.
 
