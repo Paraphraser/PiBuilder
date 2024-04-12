@@ -124,6 +124,17 @@ try_patch "/etc/sysctl.conf" "patching sysctl.conf"
 try_merge "/etc/sysctl.d" "customising sysctl.d"
 
 
+# grub customisations for hosts booting that way. Raspberry Pis don't
+# use grub so this is aimed at native/ProxMox Debian/Ubuntu.
+if try_merge "/etc/default/grub.d" "customising grub.d" ; then
+   if [ -x "/usr/sbin/update-grub" ] ; then
+      echo "Updating GRUB"
+      sudo update-grub
+   else
+      echo "Warning: PiBuilder patched /etc/default/grub.d but /usr/sbin/update-grub not present"
+   fi
+fi
+
 # patch journald.conf to reduce endless docker-runtime mount messages
 try_patch "/etc/systemd/journald.conf" "less verbose journalctl"
 

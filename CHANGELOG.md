@@ -19,6 +19,14 @@
 		2. `/etc/rc.local` world-executable with non-zero length (Debian and Ubuntu typically create `rc.local` as empty and without execute permission).
 		3. `isc-dhcp-fix.sh` (or a host-specific version) must exist.
 
+	- Reinstate support for merging `/etc/default/grub.d`. Originally, this was used to add the file `no-ipv6.cfg` with the line:
+
+		```
+		GRUB_CMDLINE_LINUX="ipv6.disable=1"
+		```
+
+		but that mechanism has been superseded. Nevertheless, the ability to patch grub can be useful.
+
 * 2024-04-10
 
 	- Baseline copying and editing of `cmdline.txt` and `config.txt` not working properly on Bookworm because of relocation of those files from `/boot` to `/boot/firmware` (a mount point). Adds `path_to_pi_boot_file()` function which searches `firmware` first then falls back to `boot`. Scripts 01 and 04 updated accordingly.

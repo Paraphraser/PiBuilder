@@ -809,8 +809,6 @@ Raspberry Pi OS does not use GRUB so you should ignore this section if you are u
 
 However, [GRUB](https://en.wikipedia.org/wiki/GNU_GRUB) (Grand Unified Bootloader) is common in other environments such as Debian native or Debian-in-Proxmox. In such cases, the contents of the PiBuilder configuration directory are merged with its equivalent on the system under construction, and then `update-grub` is invoked.
 
-The default content of `/etc/default/grub.d` supplied with PiBuilder disables IPv6 at boot time. It has the (intended) side-effect of preventing Network Manager from trying to manage IPv6 on any interface.
-
 <a name="etc_locales"></a>
 ### Locales
 
