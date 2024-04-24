@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-04-24
+
+	- Explains how to create Proxmox-VE Debian guest *without* enabling a Desktop. A console-only guest does not activate mDNS so this needs to be installed and enabled before the guest will respond to its name in the `.local` domain.
+
 * 2024-04-12
 
 	- An unexpected side-effect of [2024-04-09](#20240409) is journal warnings from NetworkManager as it repeatedly tries to enable IPv6 on the physical interfaces (eg `eth0` and `wlan0`). The underlying cause is NetworkManager defaulting to `ipv6.method=auto` for physical interfaces.

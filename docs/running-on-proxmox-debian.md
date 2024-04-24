@@ -8,7 +8,11 @@ This tutorial walks you through the process of installing a Debian Bookworm gues
 - [Definitions](#definitions)
 - [Phase 1 - get installation media](#phaseGetISO)
 - [Phase 2 - construct Debian guest](#phaseConstructGuest)
-- [Phase 3 - guest user configuration](#phaseGuestConfig)
+- [Phase 3 - guest configuration](#phaseGuestConfig)
+
+	- [guest pre-configuration](#phaseGuestPreconfig)
+	- [guest user configuration](#phaseGuestUserConfig)
+
 - [Phase 4 - clone PiBuilder](#phaseClonePiBuilder)
 - [Phase 5 - run PiBuilder scripts](#phaseRunPiBuilder)
 
@@ -91,7 +95,7 @@ This phase walks you through the process of downloading the installation media f
 
 This phase walks you through the process of creating a Debian guest system. You can construct any number of Debian Guest systems from the installation media downloaded in the [previous phase](#phaseGetISO).
 
-![Create virtual machine](./images/proxmox-create-vm.jpg)
+<a name="createVirtualMachine"></a>![Create virtual machine](./images/proxmox-create-vm.jpg)
 
 1. Use your web browser to:
 
@@ -207,9 +211,10 @@ This phase walks you through the process of creating a Debian guest system. You 
 	- enable "SSH server".
 	- choose desktop environments as you prefer.
 
-	Note:
+	Notes:
 
 	* Enabling SSH is **important.** Please do not skip this step.
+	* <a name="consoleonly"></a>"You can disable all desktop environments if you prefer to run from the console (the installation will be significantly faster).
 
 12. The installer will install your selected software.
 13. "Install the GRUB boot loader":
@@ -221,13 +226,40 @@ This phase walks you through the process of creating a Debian guest system. You 
 15. Your system will reboot. There is no need to respond to any of the boot-time prompts. Eventually, you will see a screen containing the full username you set [earlier](#setFullUserName).
 
 <a name="phaseGuestConfig"></a>
-## Phase 3 - guest user configuration
+## Phase 3 - guest configuration
 
-A limitation of the Proxmox&nbsp;VE console window for a guest is that copy and paste doesn't work. Although it is possible to configure guests to support copy and paste in the console, it's simpler to use SSH.
+<a name="phaseGuestPreconfig"></a>
+### guest pre-configuration
 
-Note:
+This step is only needed if you [elected to run from the console](#consoleonly). If you enabled one or more of the Desktop options, you can jump straight to [guest user configuration](#phaseGuestUserConfig).
 
-* You can't use SSH to login to the `«guest_host»` as root. You must connect using the `«guest_user»` username.
+If you only enabled the console, you will need to do some preparatory steps. A limitation of the Proxmox&nbsp;VE console window for a guest is that copy and paste doesn't work so you will need to enter commands by hand:
+
+1. In the [Proxmox-VE GUI](#createVirtualMachine), select your guest <!--L-->&#x1F13B; and click the console <!--M-->&#x1F13C;.
+2. Login using the console window <!--N-->&#x1F13D;. Remember to use the `«guest_user»` [credentials](#setShortUserName) you set earlier. There is no `root` account!
+3. Get a privileged shell:
+
+	```
+	$ sudo -s
+	```
+	
+	You will be asked to re-enter your login password. The prompt will change to `#` to indicate that you are running as `root`.
+	
+4. Run the following commands: 
+
+	```
+	# apt update
+	# apt install -y avahi-daemon
+	# service avahi-daemon restart
+	# systemctl restart sshd
+	```
+
+	This installs and starts the `avahi-daemon` which provides multicast Domain Name Services (mDNS). After this, the guest system will respond to the name `«guest_host».local`.
+	
+5.	Finish off by pressing <kbd>control</kbd>+<kbd>d</kbd> twice to exit the privileged shell and the console session.
+
+<a name="phaseGuestUserConfig"></a>
+### guest user configuration
 
 Open a Terminal window on your support host (eg your Mac/PC). From the Terminal window:
 
@@ -248,6 +280,10 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 	You should expect to see the "trust on first use" (aka TOFU) challenge ("The authenticity of host … can't be established"). Respond with "yes" and press <kbd>return</kbd>.
 
 	Supply the `«guest_user_password»` when prompted.
+
+	Note:
+	
+	* You can't use SSH to login to the `«guest_host»` as root. You must connect using the `«guest_user»` username.
 
 3. Confirm that you can execute commands using `sudo`:
 
@@ -296,7 +332,7 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 	$ sudo echo "hello"
 	```
 
-	> If you are prompted for a password to run the `sudo` command, go back to the [previous phase](#phaseGuestConfig) and check your work.
+	> If you are prompted for a password to run the `sudo` command, go back to the [previous phase](#phaseGuestUserConfig) and check your work.
 
 3. Clone PiBuilder:
 
