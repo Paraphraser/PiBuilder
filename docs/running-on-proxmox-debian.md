@@ -245,6 +245,14 @@ If you only enabled the console, you will need to do some preparatory steps. A l
 	
 	You will be asked to re-enter your login password. The prompt will change to `#` to indicate that you are running as `root`.
 	
+3. This is an optional step. If the font size in the Proxmov-VE console is too small to read comfortably, you can exercise *some* control over that by running:
+
+	```
+	# dpkg-reconfigure console-setup
+	```
+	
+	Good choices are `UTF-8` (default), `Latin 1 & 5` (default), `TerminusBold`, then whatever character size you like.
+	
 4. Run the following commands: 
 
 	```
@@ -256,7 +264,7 @@ If you only enabled the console, you will need to do some preparatory steps. A l
 
 	This installs and starts the `avahi-daemon` which provides multicast Domain Name Services (mDNS). After this, the guest system will respond to the name `«guest_host».local`.
 	
-5.	Finish off by pressing <kbd>control</kbd>+<kbd>d</kbd> twice to exit the privileged shell and the console session.
+6.	Finish off by pressing <kbd>control</kbd>+<kbd>d</kbd> twice to exit the privileged shell and the console session.
 
 <a name="phaseGuestUserConfig"></a>
 ### guest user configuration

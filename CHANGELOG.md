@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2024-04-25
+
+	- Bump default version of docker-compose installed via script to v2.27.0.
+	- Add optional step to adjust console font size for Debian guests.
+
 * 2024-04-24
 
 	- Explains how to create Proxmox-VE Debian guest *without* enabling a Desktop. A console-only guest does not activate mDNS so this needs to be installed and enabled before the guest will respond to its name in the `.local` domain.
