@@ -49,6 +49,7 @@ This document explains how to customise PiBuilder to your needs.
 	- [Locales](#etc_locales)
 	- [Network interfaces](#etc_network)
 	- [Network interface monitoring](#etc_rc_local)
+	- [Network Manager customisation](#etc_networkmanager)
 	- [DNS resolver](#etc_resolvconf_conf)
 	- [Samba (SMB)](#etc_samba_smb_conf)
 	- [Secure Shell (SSH)](#etc_ssh)
@@ -733,6 +734,11 @@ static ip_address=192.168.132.55/24
 static routers=192.168.132.1
 ```
 
+> Note that this only works in systems where Network Manager is not running (ie Bullseye and earlier). See [Network Manager customisation](#etc_networkmanager) for an example of setting a static IP address.
+
+### Network Manager customisation
+
+
 Another possible use is explicitly forbidding interfaces that might otherwise match the wild-card "allow" above from participating in DHCP. One situation where you might need to do this is if you defined VLAN interfaces in `/etc/networks` and assigned static IP addresses there. Then you would want to exclude them from DHCP:
 
 ```
@@ -860,6 +866,76 @@ If the preconditions are met:
 
 If you don't want any of this to happen, you can either remove `/usr/bin/isc-dhcp-fix.sh` (or replace it with a do-nothing script) or remove the line added by the patch in step 2. 
 
+<a name="etc_networkmanager"></a>
+### Network Manager customisation
+
+Two hook points are provided for customising network manager:
+
+* `/etc/NetworkManager/dispatcher.d` - if this folder exists then its contents are merged with the corresponding folder in the system under construction. Example:
+
+	```
+	$ cat PiBuilder/boot/scripts/support/etc/NetworkManager/dispatcher.d/00-sysctl
+	```
+	
+	```
+	#!/bin/sh
+
+	# refer https://bbs.archlinux.org/viewtopic.php?id=282819
+	# (path to sysctl amended)
+	# this file should be owned root:root with mode 755
+
+	/usr/sbin/sysctl --system
+
+	exit 0
+	```
+	
+	If present, the effect of this file is to enforce options set in `/etc/sysctl.conf` and `/etc/sysctl.d` after each NetworkManager configuration change. Numerous web recipes mention these files so it is useful for the two ecosystems to coexist.
+
+* `/etc/NetworkManager/customisations.sh` - if this file exists, it is executed. Here is an example of how to set a static IP address. First, start with a *shebang*:
+
+	```
+	#!/usr/bin/env bash
+	```
+
+	Next:
+	
+	* if you know the connection name, define it:
+	
+		```
+		CONN="Wired connection 1"
+		```
+
+	* alternatively, if you only know the interface name, ask Network Manager to lookup the corresponding connection name:
+
+		```
+		PHY=eth0
+		CONN=$(nmcli -g GENERAL.CONNECTION dev show "$PHY" 2>/dev/null)
+		```
+		
+	Then, set the static IP address on the connection:
+	
+	```
+	STATIC="203.0.132.100/24"
+	GATEWAY="203.0.132.1"
+	if [ -n "$CONN" ] ; then
+	   sudo nmcli con mod "$CONN" \
+	      ipv4.addresses "$STATIC" \
+	      ipv4.gateway "$GATEWAY" \
+	      ipv4.method "manual"
+	   echo "Note: $PHY->$CONN set to static IP address $STATIC"
+	else
+	   echo "Warning: Unable to set static IP address $STATIC for $PHY"
+	fi
+	```
+	
+	Remember to give the script execute permission:
+	
+	```
+	$ chmod +x customisations.sh
+	```
+	
+	PiBuilder will apply the change when the 02 script runs, and the static IP address will take effect on the reboot at the end of the 02 script.
+	
 <a name="etc_resolvconf_conf"></a>
 ### DNS resolver
 

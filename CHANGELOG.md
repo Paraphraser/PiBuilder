@@ -1,5 +1,15 @@
 # PiBuilder Change Summary
 
+* 2024-05-28
+
+	- Bump default version of docker-compose installed via script to v2.27.1.
+	- Add `is_NetworkManager_running()` function (defined as `systemctl` stating "active" and `nmcli` being in the search path and `nmcli` stating "running".
+	- 02 script:
+
+		- adopts `is_NetworkManager_running()` function.
+		- adopts better practice of setting interface to `ignore` (rather than `disable`) when inactivating IPv6.
+		- provides support for running a `/etc/NetworkManager/customisations.sh` which, if present, should contain `nmcli` scripts (eg for setting static IP addresses).
+
 * 2024-04-25
 
 	- Bump default version of docker-compose installed via script to v2.27.0.

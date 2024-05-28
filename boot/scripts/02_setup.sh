@@ -50,7 +50,7 @@ try_patch "/etc/dhcpcd.conf" "allowinterfaces eth*,wlan*"
 
 # install mechanism to auto-reset physical interfaces
 # this is only needed in non-NetworkManager systems
-if [ $(systemctl is-active NetworkManager) = "inactive" ] ; then
+if ! is_NetworkManager_running ; then
 
    # it is only useful if rc.local is executable with non-zero length
    # (implying that it has the expected content and is patchable)
@@ -105,17 +105,32 @@ try_patch "/etc/resolvconf.conf" "local name servers"
 # disable IPv6
 #
 # if NetworkManager is running then iterate the available interfaces
-# and change any cases where ipv6.method is "auto" to "disabled".
-# Then install the hook script
-if [ "$(systemctl is-active NetworkManager)" = "active" ] ; then
+# and change any cases where ipv6.method is "auto" to "ignore".
+# Then install the hook script which enforces sysctl.
+if is_NetworkManager_running ; then
+
+   # disable IPv6
    nmcli -g name connection | while read C ; do
       M="$(nmcli -g ipv6.method connection show "$C")"
       if [ "$M" = "auto" ] ; then
          echo "Disabling IPv6 on $C (was $M)"
-         sudo nmcli connection modify "$C" ipv6.method "disabled"
+         sudo nmcli connection modify "$C" ipv6.method "ignore"
       fi
    done
+
+   # add hook script if it exists
    try_merge "/etc/NetworkManager/dispatcher.d" "adding sysctl hook script"
+
+   # apply local customisations (eg static IP address for interface)
+   TARGET="/etc/NetworkManager/customisations.sh"
+   if SOURCE="$(supporting_file "$TARGET")" ; then
+      if [ -f "$SOURCE" -a -x "$SOURCE" ] ; then
+         "$SOURCE"
+      else
+         echo "Warning: $SOURCE skipped (needs execute permission)"
+      fi
+   fi
+
 fi
 
 # ideally, there are no patches for sysctl.conf (old style)

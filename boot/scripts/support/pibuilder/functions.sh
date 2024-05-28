@@ -233,6 +233,20 @@ is_raspberry_pi() {
    return 1
 }
 
+# a function to determine whether NetworkManager is running.
+# Example:
+#   is_NetworkManager_running
+# Returns true is and only if:
+# 1. systemctl thinks the NetworkManager service is active
+# 2. the nmcli command is available in the search path
+# 3. the nmcli command thinks NetworkManager is running
+is_NetworkManager_running () {
+   if [ "$(systemctl is-active NetworkManager)" = "active" -a -n "$(which nmcli)" ] ; then
+      [ "$(nmcli -t -f RUNNING general)" = "running" ] && return 0
+   fi
+   return 1
+}
+
 # a function to find a file which can either be in /boot/firmware or
 # /boot. Only tested for config.txt and cmdline.txt.
 #
