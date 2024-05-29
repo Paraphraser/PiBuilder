@@ -818,11 +818,41 @@ However, [GRUB](https://en.wikipedia.org/wiki/GNU_GRUB) (Grand Unified Bootloade
 <a name="etc_locales"></a>
 ### Locales
 
+* Configuration file: `/etc/locale.conf`
+
+* Example:
+
+	```
+	[enable]
+	en_AU ISO-8859-1
+	en_AU.UTF-8 UTF-8
+	en_US.UTF-8 UTF-8
+	```
+
+`locale.conf` has a simple syntax and the script that parses it has no sanity checking so you would be unwise to push it too far. Rules:
+
+1. Everything should be left-aligned.
+2. Lines starting with a hash are treated as comments.
+3. Blank lines are ignored.
+4. Two "directives" are supported (`[enable]` and `[disable]`). Everything else is considered to be a locale name.
+5. The script assumes "[enable]" mode on entry so a simple list of locales will be treated as if `[enable]` was present.
+6. No existing locale name in `/etc/locale.gen` contains a slash (`/`). The script relies on that when generating `sed` commands and will misbehave if this rule is broken.
+7. Given a locale to be activated, a `sed` command is generated to replace an inactive form with an active form but if and only if the locale is not already active.
+8. Given a locale to be deactivated, a `sed` command is generated to replace all active forms of the locale with inactive forms.
+9. Nothing happens if a locale does not actually exist in `/etc/locale.gen`. In other words, this mechanism can't be used to add new locales.
+
+Notes:
+
+* Do not deactivate "en_GB.UTF-8" if you are running on a Raspberry Pi. If you really want to remove that locale then you should use `raspi-config` **after** PiBuilder has finished. This is not an issue on native Debian installs.
+* If `LOCALE_LANG` is defined and contains a value which is active after `/etc/locale.gen` has been modified, then that will be made the active locale.
+
+#### Deprecated mechanism
+
 * Patch file: `/etc/locale.gen.patch`
 
-Any patch file should always retain "en_GB.UTF-8" because that's assumed for the Raspberry Pi. If you really want to remove that locale then you can do so after the build using `raspi-config`.
+If a patch file is present, PiBuilder will attempt to apply it but will issue a deprecation warning.
 
-Providing `LOCALE_LANG` is defined and contains a value which is active after `/etc/locale.gen` has been patched, then that will be made the active locale.
+Patch files are *reasonably* safe providing you are using a single platform (eg Raspberry Pi) **and** a single OS build (eg Bookworm) but the `locale.conf` mechanism should prove more reliable in the long term.
 
 <a name="etc_network"></a>
 ### Network interfaces
@@ -891,7 +921,7 @@ Two hook points are provided for customising network manager:
 	
 	If present, the effect of this file is to enforce options set in `/etc/sysctl.conf` and `/etc/sysctl.d` after each NetworkManager configuration change. Numerous web recipes mention these files so it is useful for the two ecosystems to coexist.
 
-* `/etc/NetworkManager/customisations.sh` - if this file exists, it is executed. Here is an example of how to set a static IP address. First, start with a *shebang*:
+* `/etc/NetworkManager/custom_settings.sh` - if this file exists, it is executed. Here is an example of how to set a static IP address. First, start with a *shebang*:
 
 	```
 	#!/usr/bin/env bash
@@ -905,7 +935,7 @@ Two hook points are provided for customising network manager:
 		CONN="Wired connection 1"
 		```
 
-	* alternatively, if you only know the interface name, ask Network Manager to lookup the corresponding connection name:
+	* alternatively, if you only know the interface name, you can ask Network Manager to lookup the corresponding connection name:
 
 		```
 		PHY=eth0
@@ -931,10 +961,10 @@ Two hook points are provided for customising network manager:
 	Remember to give the script execute permission:
 	
 	```
-	$ chmod +x customisations.sh
+	$ chmod +x custom_settings.sh
 	```
 	
-	PiBuilder will apply the change when the 02 script runs, and the static IP address will take effect on the reboot at the end of the 02 script.
+	PiBuilder will apply the changes when the 02 script runs, and the changes will take effect on the reboot at the end of the 02 script.
 	
 <a name="etc_resolvconf_conf"></a>
 ### DNS resolver

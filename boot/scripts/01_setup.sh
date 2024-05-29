@@ -198,6 +198,9 @@ else
    # run the script epilog if it exists
    run_pibuilder_epilog
 
+   echo "Setting boot behaviour to console (no GUI)"
+   sudo systemctl --quiet set-default multi-user.target
+
 fi
 
 # set the hostname. set_hostname.sh:

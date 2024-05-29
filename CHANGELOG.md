@@ -1,14 +1,17 @@
 # PiBuilder Change Summary
 
-* 2024-05-28
+* 2024-05-29
 
 	- Bump default version of docker-compose installed via script to v2.27.1.
 	- Add `is_NetworkManager_running()` function (defined as `systemctl` stating "active" and `nmcli` being in the search path and `nmcli` stating "running".
+	- Add `edit_locales.sh` helper script to try to workaround the continual problems caused by locales being a bit of a moving target.
+	- 01 script sets boot behaviour to console for pure Debian, (mirroring Raspberry Pi).
 	- 02 script:
 
 		- adopts `is_NetworkManager_running()` function.
 		- adopts better practice of setting interface to `ignore` (rather than `disable`) when inactivating IPv6.
-		- provides support for running a `/etc/NetworkManager/customisations.sh` which, if present, should contain `nmcli` scripts (eg for setting static IP addresses).
+		- provides support for running a `/etc/NetworkManager/custom_settings.sh` which, if present, should contain `nmcli` scripts (eg for setting static IP addresses).
+		- adopts the `edit_locales.sh` helper script for editing locales. The old patch mechanism is now deprecated.
 
 * 2024-04-25
 

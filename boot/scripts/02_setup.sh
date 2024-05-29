@@ -14,8 +14,11 @@ if [ "$#" -gt 0 ]; then
     exit 1
 fi
 
-# declare path to support directory and import common functions
+# declare path to support and helper directories
 SUPPORT="$WHERE/support"
+HELPERS="$WHERE/helpers"
+
+# import common functions
 . "$SUPPORT/pibuilder/functions.sh"
 
 # import user options and run the script prolog - if they exist
@@ -27,12 +30,32 @@ if [ -d "/etc/ssh.old" ] ; then
    sudo rm -rf /etc/ssh.old
 fi
 
-# try to establish locales. Any patch should always retain
-# "en_GB.UTF-8" so we don't pull the rug out from beneath anything
-# (like Python) that already knows the default language
-# (it can be removed later if need be, eg using raspi-config.
-if try_patch "/etc/locale.gen" "setting locales" ; then
-   sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
+# locales are an ongoing problem. The goalposts keep moving between
+# OS releases (eg Buster-Bullseye-Bookworm). The problem is compounded
+# by the Raspberry Pi (effectively) depending on "en_GB.UTF-8" being
+# active while Debian installs (eg on Proxmox) seems to activate your
+# "local" locale (eg mine has en_AU.UTF-8 UTF-8).
+#
+# New process. If /etc/locale.conf exists it is used as an input to
+# a helper script which generates editing instructions for sed to apply
+# to /etc/locale.gen, otherwise fallback to the patch mechanism but
+# with a deprecation warning.
+#
+# Whatever you do, DO NOT remove "en_GB.UTF-8" from the list of active
+# locales if you are running on a Raspberry Pi. It does not like it!
+
+if SOURCE="$(supporting_file "/etc/locale.conf")" ; then
+   sudo $HELPERS/edit_locales.sh "$SOURCE"
+   if [ $? -eq 0 ] ; then
+      echo "Regenerating locales based on $SOURCE"
+      sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
+   fi
+else
+   if try_patch "/etc/locale.gen" "patching locales" ; then
+      echo "WARNING: patching locales is deprecated. Use the locale.conf mechanism"
+      echo "         (see PiBuilder documentation for details)"
+      sudo /usr/sbin/dpkg-reconfigure -f noninteractive locales
+   fi
 fi
 
 # try to set the default language
@@ -104,9 +127,13 @@ try_patch "/etc/resolvconf.conf" "local name servers"
 
 # disable IPv6
 #
-# if NetworkManager is running then iterate the available interfaces
-# and change any cases where ipv6.method is "auto" to "ignore".
-# Then install the hook script which enforces sysctl.
+# if NetworkManager is running then:
+# 1. iterate the available interfaces and change any cases where
+#    ipv6.method is "auto" to "ignore".
+# 2. install the hook script which enforces sysctl settings in a
+#    NetworkManager environment.
+# 3. run a local customisations script (eg to set static IP addresses) 
+#
 if is_NetworkManager_running ; then
 
    # disable IPv6
@@ -121,9 +148,8 @@ if is_NetworkManager_running ; then
    # add hook script if it exists
    try_merge "/etc/NetworkManager/dispatcher.d" "adding sysctl hook script"
 
-   # apply local customisations (eg static IP address for interface)
-   TARGET="/etc/NetworkManager/customisations.sh"
-   if SOURCE="$(supporting_file "$TARGET")" ; then
+   # apply local customisations
+   if SOURCE="$(supporting_file "/etc/NetworkManager/custom_settings.sh")" ; then
       if [ -f "$SOURCE" -a -x "$SOURCE" ] ; then
          "$SOURCE"
       else
