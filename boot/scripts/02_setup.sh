@@ -68,13 +68,13 @@ if [ -n "$LOCALE_LANG" ] ; then
    fi
 fi
 
-# tell dhcpcd and docker not to fight
-try_patch "/etc/dhcpcd.conf" "allowinterfaces eth*,wlan*"
 
-# install mechanism to auto-reset physical interfaces
-# this is only needed in non-NetworkManager systems
 if ! is_NetworkManager_running ; then
 
+   # tell dhcpcd and docker not to fight
+   try_patch "/etc/dhcpcd.conf" "allowinterfaces eth*,wlan*"
+
+   # install mechanism to auto-reset physical interfaces
    # it is only useful if rc.local is executable with non-zero length
    # (implying that it has the expected content and is patchable)
    HOOK="/etc/rc.local"
