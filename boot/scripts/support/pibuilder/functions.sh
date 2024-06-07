@@ -402,8 +402,6 @@ try_patch() {
          # return success if errors should be ignored
          [ "$3" = "true" ] && return 0
 
-         fi
-
       fi
 
    else
