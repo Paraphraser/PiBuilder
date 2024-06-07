@@ -368,6 +368,17 @@ try_patch() {
 
    local PATCH
 
+   # does the target of the patch exist?
+   if [ ! -f "$1" ] ; then
+
+      # no! report
+      echo "[PATCH] can't be attempted - $1 does not exist"
+
+      # shortstop return
+      [ "$3" = "true" ] && return 0 || return 1
+
+   fi
+
    # does a patch file exist for the target in $1 ?
    if PATCH="$(supporting_file "$1.patch")" ; then
 
@@ -388,11 +399,8 @@ try_patch() {
          # no! report failure
          echo "[PATCH] FAILED to apply $PATCH to $1 - $2"
 
-         # ignore errors?
-         if [ "$3" = "true" ] ; then
-
-            # yes! return success
-            return 0
+         # return success if errors should be ignored
+         [ "$3" = "true" ] && return 0
 
          fi
 
