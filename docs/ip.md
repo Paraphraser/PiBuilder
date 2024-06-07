@@ -33,6 +33,8 @@ If you are unsure about the situation on your Raspberry Pi, you can compare what
 <a name="staticIP"></a>
 ## Static IP Address configuration
 
+### when Network Manager is not running
+
 Assume you want to configure your Raspberry Pi like this:
 
 * The IP address of the Ethernet interface should be 192.168.132.55
@@ -130,6 +132,58 @@ Assume you want to configure your Raspberry Pi like this:
 	```
 
 	The next time you build a Raspberry Pi using PiBuilder, your static IP address configuration will be set automatically.
+
+### when Network Manager is running
+
+To set a static IP address on an interface:
+
+1. Get a list of connections:
+
+	``` console
+	$ nmcli con show
+	NAME                UUID                                  TYPE      DEVICE  
+	Wired connection 1  442b8a37-dd73-3593-91c8-2b6dcba56fb3  ethernet  eth0    
+	lo                  eb58f55e-c5a5-4736-bb66-b85aada99e62  loopback  lo      
+	Macquarie Mesh      352809d3-85e7-4d7f-b8cd-87a55de6b589  wifi      wlan0 
+	```  
+	
+2. Define a variable to hold name of the connection for which you wish to set a static IP address:
+
+	``` console
+	$ CONNECTION="Wired connection 1"
+	```
+
+3. Use variables to define the critical parameters of the static IP address:
+
+	``` console
+	$ ADDRESS=192.168.132.96
+	$ PREFIX=24
+	$ GATEWAY=192.168.132.1
+	```
+
+4. Configure the connection:
+
+	``` console
+	$ sudo nmcli con mod "$CONNECTION" \
+	       ipv4.addresses "$ADDRESS/$PREFIX" \
+	       ipv4.gateway "$GATEWAY" \
+	       ipv4.method "manual"
+	$ nmcli -g ipv4.method conn show "$CONNECTION"
+	$ sudo nmcli conn up "$CONNECTION"
+	```
+	
+Fairly obviously, you don't actually need to use variables. You can just substitute the values into the commands. This structure just makes it clear what needs to go where.
+
+If you want to revert a connection to obtaining its IP address from DHCP then:
+
+``` console
+$ sudo nmcli con mod "$CONNECTION" \
+       ipv4.addresses "" \
+       ipv4.gateway "" \
+       ipv4.method "auto"
+$ nmcli -g ipv4.method conn show "$CONNECTION"
+$ sudo nmcli conn up "$CONNECTION"
+```
 
 <a name="isOwnDNS"></a>
 ## Raspberry Pi runs its own DNS

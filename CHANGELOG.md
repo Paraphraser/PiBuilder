@@ -1,5 +1,12 @@
 # PiBuilder Change Summary
 
+* 2024-06-07
+
+	- try_patch() function changed so that it will not attempt to patch non-existent targets. Documentation updated accordingly.
+	- try_patch() function messages made more succinct.
+	- patch of `/etc/dhcpcd.conf` not attempted in the presence of Network Manager.
+	- add documentation to explain how to set static IP addresses in the presence of Network Manager.
+
 * 2024-05-29
 
 	- Bump default version of docker-compose installed via script to v2.27.1.

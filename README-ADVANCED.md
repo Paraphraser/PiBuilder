@@ -427,7 +427,9 @@ For example:
 try_patch "/etc/resolv.conf" "this is an example"
 ```
 
-The patch algorithm appends `.patch` to the path supplied in the first argument and then invokes `supporting_file()`:
+The patch algorithm first checks whether the target (the file to be patched in the running system) actually exists. If it does not then, returns "success" if the third argument is `true`, otherwise returns "fail".
+
+If the target exists, the patch algorithm appends `.patch` to the path supplied in the first argument and then invokes `supporting_file()`:
 
 ``` bash
 supporting_file "/etc/resolv.conf.patch"
@@ -717,6 +719,7 @@ This is a placeholder containing comments on how to set up cron jobs. PiBuilder 
 ### DHCP client daemon
 
 * Patch file: `/etc/dhcpcd.conf.patch`
+* Note: not attempted if Network Manager is running.
 
 The patch file supplied with PiBuilder adds the line:
 
@@ -735,17 +738,6 @@ static routers=192.168.132.1
 ```
 
 > Note that this only works in systems where Network Manager is not running (ie Bullseye and earlier). See [Network Manager customisation](#etc_networkmanager) for an example of setting a static IP address.
-
-### Network Manager customisation
-
-
-Another possible use is explicitly forbidding interfaces that might otherwise match the wild-card "allow" above from participating in DHCP. One situation where you might need to do this is if you defined VLAN interfaces in `/etc/networks` and assigned static IP addresses there. Then you would want to exclude them from DHCP:
-
-```
-denyinterfaces eth0,eth0.1,eth0.2
-``` 
-
-See also [Configuring Static IP addresses on Raspbian](./docs/ip.md).
 
 <a name="etc_docker_daemon"></a>
 ### Docker daemon
