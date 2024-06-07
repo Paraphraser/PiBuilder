@@ -407,7 +407,7 @@ try_patch() {
    else
 
       # no patch found
-      echo "[PATCH] no patch $PATCH found for $1 - $2"
+      echo "[PATCH] no patch found for $1"
 
    fi
 
