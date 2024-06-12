@@ -206,15 +206,27 @@ This phase walks you through the process of creating a Debian guest system. You 
 	* If you need to set up a proxy, enter the details; otherwise leave the field blank.
 
 10. Respond to the "popularity contest" question as you think appropriate.
-11. At "Software selection":
+11. In the "Software selection" panel:
 
-	- enable "SSH server".
-	- choose desktop environments as you prefer.
+	- <a name="consoleonly"></a>"Debian desktop environment": You have two choices:
 
-	Notes:
+		1. You can leave this enabled and choose one or more of the windowing environments:
 
-	* Enabling SSH is **important.** Please do not skip this step.
-	* <a name="consoleonly"></a>"You can disable all desktop environments if you prefer to run from the console (the installation will be significantly faster).
+			* The installation takes longer and occupies more space on the virtual disk (~3GB);
+			* The resulting guest boots into a windowing environment but you have the ability to instruct the system to boot to the console;
+			* Network Manager is installed and configured; and
+			* The Avahi daemon (multicast DNS) is installed and configured, or
+
+		2. You can disable the desktop environment entirely:
+
+			* The installation is *significantly* faster and uses less space;
+			* The resulting guest boots to the console (there is no ability to switch to a Desktop environment)
+			* Network Manager is not installed; and
+			* The Avahi daemon (multicast DNS) is not installed.
+
+		If your goal is to construct a server-class system for running IOTstack then I recommend disabling the desktop environment. However, if you need a user-class system which also happens to run IOTstack as a service then leaving the desktop environment enabled may be more appropriate. Your system, your rules!
+
+	- enable "SSH server". This is **important.** Please do not skip this step.
 
 12. The installer will install your selected software.
 13. "Install the GRUB boot loader":
@@ -231,43 +243,36 @@ This phase walks you through the process of creating a Debian guest system. You 
 <a name="phaseGuestPreconfig"></a>
 ### guest pre-configuration
 
-This step is only needed if you [elected to run from the console](#consoleonly). If you enabled one or more of the Desktop options, you can jump straight to [guest user configuration](#phaseGuestUserConfig).
+This pre-configuration step is only needed if you [elected to run from the console](#consoleonly). If you enabled one or more of the Desktop options, you can jump straight to [guest user configuration](#phaseGuestUserConfig).
 
-If you only enabled the console, you will need to do some preparatory steps. A limitation of the Proxmox&nbsp;VE console window for a guest is that copy and paste doesn't work so you will need to enter commands by hand:
+A limitation of the Proxmox&nbsp;VE console window for a guest is that copy and paste doesn't work so you will need to enter commands by hand:
 
 1. In the [Proxmox-VE GUI](#createVirtualMachine), select your guest <!--L-->&#x1F13B; and click the console <!--M-->&#x1F13C;.
 2. Login using the console window <!--N-->&#x1F13D;. Remember to use the `«guest_user»` [credentials](#setShortUserName) you set earlier. There is no `root` account!
 3. Get a privileged shell:
 
-	```
+	``` console
 	$ sudo -s
 	```
-	
-	You will be asked to re-enter your login password. The prompt will change to `#` to indicate that you are running as `root`.
-	
-3. This is an optional step. If the font size in the Proxmov-VE console is too small to read comfortably, you can exercise *some* control over that by running:
 
-	```
-	# dpkg-reconfigure console-setup
-	```
-	
-	Good choices are `UTF-8` (default), `Latin 1 & 5` (default), `TerminusBold`, then whatever character size you like.
-	
+	You will be asked to re-enter your login password. The prompt will change to `#` to indicate that you are running as `root`.
+
 4. Run the following commands: 
 
-	```
+	``` console
 	# apt update
-	# apt install -y avahi-daemon
-	# service avahi-daemon restart
+	# apt install -y network-manager avahi-daemon
 	# systemctl restart sshd
 	```
 
-	This installs and starts the `avahi-daemon` which provides multicast Domain Name Services (mDNS). After this, the guest system will respond to the name `«guest_host».local`.
-	
-6.	Finish off by pressing <kbd>control</kbd>+<kbd>d</kbd> twice to exit the privileged shell and the console session.
+	The `avahi-daemon` provides multicast Domain Name Services (mDNS). After this, the guest system will respond to the name `«guest_host».local`.
+
+5.	Finish off by pressing <kbd>control</kbd>+<kbd>d</kbd> twice to exit the privileged shell and the console session.
 
 <a name="phaseGuestUserConfig"></a>
 ### guest user configuration
+
+Although these commands *could* be executed from the guest console or a Terminal session opened in the Desktop windowing environment, you would need to type each command by hand. A limitation of the NoVNC interface prevents you from using clipboard services to paste commands into the guest. That's error-prone and, for that reason, the remainder of these instructions assume you will be working via SSH.
 
 Open a Terminal window on your support host (eg your Mac/PC). From the Terminal window:
 
@@ -290,7 +295,7 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 	Supply the `«guest_user_password»` when prompted.
 
 	Note:
-	
+
 	* You can't use SSH to login to the `«guest_host»` as root. You must connect using the `«guest_user»` username.
 
 3. Confirm that you can execute commands using `sudo`:
@@ -305,23 +310,81 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 
 	* If you are not able to execute commands using `sudo`, it probably means that you set a password for the root user, even though the [instructions](#noRootPassword) advised against doing that. Your best course of action is to destroy this guest system and start again.
 
-4. Run the following commands, one at a time:
+4. This step is only needed if you [elected to run from the console](#consoleonly). Skip to the [next step](#phaseGuestConsole) if you enabled any of the Desktop options. Otherwise, run the following commands:
 
 	``` console
-	$ sudo apt update ; sudo apt install -y git
+	$ ip link show
+	$ nmcli conn show
+	```
+
+	The output from the first command will be something like this:
+
+	```
+	1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+	    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+	2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+	    link/ether bc:24:11:c7:58:1e brd ff:ff:ff:ff:ff:ff
+	    altname enp0s18
+	```
+
+	The output from the second command will be something like this:
+
+	```
+	NAME  UUID                                  TYPE      DEVICE 
+	lo    1a328f3f-8f60-4249-9355-c9181202b97b  loopback  lo     
+	```
+
+	Taken together, the output from `ip link` shows that Proxmox-VE has defined a (virtual) PHY (OSI Layer 1 physical interface) named `ens18`, while the output from `nmcli` shows that Network Manager is not in control of that interface. It is better to let Network Manager control your interfaces so this problem should be fixed.
+
+	Typically, a Proxmox-VE guest only has a single networking interface and `ens18` appears to be the default name, so the command you are most likely to need to run is:
+
+	``` console
+	$ sudo sed -i.bak -e '/ens18/ s/^/#/' /etc/network/interfaces
+	```
+
+	However, if the output from `ip link show` identifies:
+
+	* A **different** interface name then you should edit the command accordingly. For example, if the interface was named `ens20` then the command would be:
+
+		``` console
+		$ sudo sed -i.bak -e '/ens20/ s/^/#/' /etc/network/interfaces 
+		```
+
+	* **multiple** interfaces (other than `lo`) then you repeat the `-e «script»` syntax. For example, if two interfaces `ens18` and `ens19` were displayed, then the command would be: 
+
+		``` console
+		$ sudo sed -i.bak -e '/ens18/ s/^/#/' -e '/ens19/ s/^/#/' /etc/network/interfaces 
+		```
+
+	Once `sed` has edited `/etc/network/interfaces`, you need to make Network Manager aware of the change, like this:
+
+	``` console
+	$ sudo systemctl restart NetworkManager.service
+	```
+
+5. <a name="phaseGuestConsole"></a>This is an optional step. If the font size in the Proxmov-VE console is too small to read comfortably, you can exercise *some* control over that by running:
+
+	``` console
+	$ sudo dpkg-reconfigure console-setup
+	```
+
+	Good choices are `UTF-8` (default), `Latin 1 & 5` (default), `TerminusBold`, then whatever character size you like.
+
+6. Run the following commands, one at a time:
+
+	``` console
 	$ echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$USER" >/dev/null
 	$ sudo usermod -G adm -a $USER
-	$ exit
+	$ sudo reboot
 	```
 
 	Explanation:
 
-	1. The first line installs `git`.
-	2. The second line gives the current user the ability to execute `sudo` commands without needing a password.
-	3. The third line adds the current user to the `adm` group (administration).
-	4. The `exit` command is the same as typing <kbd>control</kbd>+<kbd>d</kbd>. Logging-out from the `«guest_user»` account is required before the privilege changes can take effect.
+	1. The first line gives the current user the ability to execute `sudo` commands without needing a password.
+	2. The second line adds the current user to the `adm` group (administration).
+	3. The reboot is needed for some of the earlier commands to take effect.
  
- 	After the next login, `«guest_user»` will have exactly the same privileges as the default `pi` user on a Raspberry Pi and, in particular, the ability to run `sudo` commands without a password prompt.
+ 	After the reboot, `«guest_user»` will have exactly the same privileges as the default `pi` user on a Raspberry Pi and, in particular, the ability to run `sudo` commands without a password prompt.
 
 <a name="phaseClonePiBuilder"></a>
 ## Phase 4 - clone PiBuilder
@@ -345,6 +408,7 @@ Open a Terminal window on your support host (eg your Mac/PC). From the Terminal 
 3. Clone PiBuilder:
 
 	``` console
+	$ sudo apt update ; sudo apt install -y git
 	$ git clone https://github.com/Paraphraser/PiBuilder.git ~/PiBuilder
 	```
 
@@ -375,6 +439,22 @@ Tip:
 	```
 
 	There is no need to pass the `«guest_host»` argument to this script. You already entered the name for this host at ["Please enter the host name for this system"](#setHostName).
+
+	Note:
+
+	* If you elected to install the [Debian desktop](#consoleonly) and one or more windowing environments then a side-effect of the 01 script is to boot the Proxmox-VE guest to the console. If you want to re-enable the Desktop login, run the following command:
+
+		``` console
+		$ sudo systemctl set-default graphical.target
+		```
+
+		If you subsequently decide to boot to the console, run:
+
+		``` console
+		$ sudo systemctl set-default multi-user.target
+		```
+
+		Both commands take effect on the next reboot.
 
 <a name="runScript02"></a>
 ### Script 02
@@ -511,7 +591,7 @@ In general, you will want to take a backup immediately before you do the migrati
 	``` console
 	$ ssh «user»@«host».local
 	```
-	
+
 	where `«host»` is the name of your old IOTstack device, and `«user»` is the username on your old IOTstack device.
 
 2. Run a backup:

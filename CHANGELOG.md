@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2024-06-12
+
+	- Explain how to re-enable Network Manager in a no-Desktop environment.
+	- Add instructions for undoing automatic boot-to-console set by 01 script.
+
 * 2024-06-07
 
 	- try_patch() function changed so that it will not attempt to patch non-existent targets. Documentation updated accordingly.
