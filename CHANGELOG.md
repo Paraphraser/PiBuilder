@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-06-21
+
+	- Bump default version of docker-compose installed via script to v2.28.0. In the past few days, v2.27.2 and v2.27.3 have been released in rapid succession. PiBuilder is skipping straight to v2.28.0.
+
 * 2024-06-12
 
 	- Explain how to re-enable Network Manager in a no-Desktop environment.
