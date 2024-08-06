@@ -39,7 +39,7 @@ sudo apt -y remove $TARGET $TARGET_PLUGIN
 
 # step 2 - remove any python versions
 echo "Attempting to remove any versions installed by 'pip3'"
-PIP_BREAK_SYSTEM_PACKAGES=1 sudo pip3 uninstall -y $TARGET
+sudo PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y $TARGET
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y $TARGET
 
 # candidate directories where modern plugin versions might be installed

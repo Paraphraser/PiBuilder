@@ -18,7 +18,7 @@ sudo apt reinstall -y $APT_DEPENDENCIES
 
 echo -e "\n\nUninstalling pip dependencies..."
 for P in $PIP_UNINSTALL ; do
-   PIP_BREAK_SYSTEM_PACKAGES=1 sudo pip3 uninstall -y "$P"
+   sudo PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
    PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
 done
 

@@ -124,7 +124,7 @@ sudo /usr/sbin/usermod -G bluetooth -a $USER
 # the menu now has some specific structural requirements for its dependencies
 echo "Removing any Python dependencies which may conflict with the IOTstack menu"
 for P in virtualenv ruamel.yaml blessed ; do
-   PIP_BREAK_SYSTEM_PACKAGES=1 sudo pip3 uninstall -y "$P"
+   sudo PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
    PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
 done
 
