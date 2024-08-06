@@ -44,7 +44,7 @@ GENFILE=${2:-/etc/locale.gen}
 # verify both files exist
 for F in "$CONFILE" "$GENFILE" ; do
    if [ ! -f "$F" ] ; then
-      echo "Error: $F does not exist"
+      echo "Note: expected environment does not exist for $SCRIPT - $F"
       exit 2
    fi
 done

@@ -59,8 +59,9 @@ else
 fi
 
 # try to set the default language
-if [ -n "$LOCALE_LANG" ] ; then
-   if [ $(grep -c "^${LOCALE_LANG}" /etc/locale.gen) -gt 0 ] ; then
+TARGET="/etc/locale.gen"
+if [ -n "$LOCALE_LANG" -a -f "$TARGET" ] ; then
+   if [ $(grep -c "^${LOCALE_LANG}" "$TARGET") -gt 0 ] ; then
       echo "Setting default language to $LOCALE_LANG"
       sudo /usr/sbin/update-locale "LANG=$LOCALE_LANG"
    else

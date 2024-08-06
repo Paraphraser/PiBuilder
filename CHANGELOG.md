@@ -12,6 +12,8 @@
 
 	- Adds `apt-util` to basic packages in 01 script (missing on Ubuntu server).
 
+	- Check for existence of `/etc/locale.gen` before attempting merge, plus improved warning text from `edit_locales.sh` helper script.
+
 * 2024-07-25
 
 	- Bump default version of docker-compose installed via script to v2.29.1. This is also the version you get with a routine `apt upgrade`.
