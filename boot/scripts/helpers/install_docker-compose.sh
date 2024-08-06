@@ -49,30 +49,6 @@
 # support user renaming of script
 SCRIPT=$(basename "$0")
 
-running_OS_release() {
-   if [ -e "/etc/os-release" ] ; then
-      . "/etc/os-release"
-      if [ -n "$VERSION_CODENAME" ] ; then
-         echo "$VERSION_CODENAME"
-         return 0
-      fi
-   fi
-   echo "unknown"
-   return 1
-}
-
-is_running_OS_release() {
-   if [ "$(running_OS_release)" = "$1" ] ; then
-      return 0
-   fi 
-   return 1
-}
-
-if is_running_OS_release bookworm ; then
-   echo "Note: pip3 installs will bypass externally-managed environment check"
-   PIBUILDER_PYTHON_OPTIONS="--break-system-packages"
-fi
-
 # the default version of docker-compose at the moment is
 DOCKER_COMPOSE_VERSION_DEFAULT="v2.29.1"
 
@@ -233,7 +209,7 @@ if [ -n "$WHERE" ] ; then
       # yes!
       echo "Python-based version of docker-compose found. Assuming it was installed"
       echo "using pip3. Trying to remove it using the same method"
-      pip3 uninstall -y $PIBUILDER_PYTHON_OPTIONS docker-compose
+      PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y docker-compose
 
       # re-try the search for docker-compose
       WHERE=$(which docker-compose)
@@ -325,7 +301,7 @@ if [ -z "$WHERE" ] ; then
       rm -f "$TARGET"
 
       echo "Attempt to download docker-compose failed. Falling back to pip method."
-      pip3 install -U $PIBUILDER_PYTHON_OPTIONS docker-compose
+      PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install -U docker-compose
 
    fi
 

@@ -498,11 +498,7 @@ run_pibuilder_prolog() {
       . "$IMPORT"
    fi
 
-   # hack to overcome Python externally-managed-environment
-   if is_running_OS_release bookworm ; then
-      echo "Note: pip3 installs will bypass externally-managed environment check"
-      PIBUILDER_PYTHON_OPTIONS="--break-system-packages"
-   fi
+   echo "Note: pip3 installs will bypass externally-managed environment check"
 
    # run a prolog if it exists
    if IMPORT="$(supporting_file "/pibuilder/prologs/$SCRIPT")" ; then

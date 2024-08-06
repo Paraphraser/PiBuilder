@@ -1,5 +1,15 @@
 # PiBuilder Change Summary
 
+* 2024-08-06
+
+	- Alter how Python "break system packages" functionality is implemented. Previously, all scripts tested for the presence of Bookworm and, from that, *inferred* that `--break-system-packages` should be passed to `pip3`. This was an interim strategy which was going to break on Debian "trixie" and was guaranteed to fail on Ubuntu which uses different names. With this change, all calls to `pip3` are implemented like this:
+
+		```
+		$ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y docker-compose
+		```
+		
+		This should be platform, distribution and release agnostic. If Python on the platform cares about "break system packages" then it will respect the environment variable; otherwise the variable will be ignored.
+
 * 2024-07-25
 
 	- Bump default version of docker-compose installed via script to v2.29.1. This is also the version you get with a routine `apt upgrade`.

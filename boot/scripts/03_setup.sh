@@ -224,7 +224,7 @@ $GIT_CLONE_CMD -b "$IOTSTACKALIASES_BRANCH" "$IOTSTACKALIASES_URL" ~/.local/IOTs
 
 echo "Installing rclone and shell yaml support"
 curl https://rclone.org/install.sh | sudo bash
-pip3 install -U $PIBUILDER_PYTHON_OPTIONS shyaml
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install -U shyaml
 
 echo "Cloning IOTstackBackup from $IOTSTACKBACKUP_URL"
 $GIT_CLONE_CMD -b "$IOTSTACKBACKUP_BRANCH" "$IOTSTACKBACKUP_URL" ~/.local/IOTstackBackup
@@ -234,7 +234,7 @@ echo "Installing IOTstackBackup scripts"
 TARGET="$IOTSTACK/requirements-mkdocs.txt"
 if [ -e "$TARGET" ] ; then
    echo "Adding mkdocs support (eg mkdocs serve -a 0.0.0.0:8765)" 
-   pip3 install $PIBUILDER_PYTHON_OPTIONS -r "$TARGET"
+   PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install -r "$TARGET"
 fi
 
 # run the script epilog if it exists
