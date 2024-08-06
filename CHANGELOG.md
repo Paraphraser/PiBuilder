@@ -10,6 +10,8 @@
 		
 		This should be platform, distribution and release agnostic. If Python on the platform cares about "break system packages" then it will respect the environment variable; otherwise the variable will be ignored.
 
+	- Adds `apt-util` to basic packages in 01 script (missing on Ubuntu server).
+
 * 2024-07-25
 
 	- Bump default version of docker-compose installed via script to v2.29.1. This is also the version you get with a routine `apt upgrade`.
