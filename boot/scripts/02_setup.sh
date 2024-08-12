@@ -193,6 +193,12 @@ try_merge "/etc/network" "customising network interfaces"
 [ -z "$VM_SWAP" ] && [ "$DISABLE_VM_SWAP" = "true" ] && VM_SWAP=disable
 is_raspberry_pi && VM_SWAP="${VM_SWAP:-automatic}" || VM_SWAP="default"
 
+# patching dphys-swapfile is deprecated
+if PATCH="$(supporting_file "/etc/dphys-swapfile.patch")" ; then
+   echo "[DEPRECATION] $PATCH is deprecated. Forcing VM_SWAP=default"
+   echo "              Please see PiBuilder documentation on try_edit()"
+   VM_SWAP="default"
+fi
 
 # now, how should VM be handled?
 case "$VM_SWAP" in
@@ -231,7 +237,7 @@ case "$VM_SWAP" in
          [ -n "$(/usr/sbin/swapon -s)" ] &&  sudo dphys-swapfile swapoff
 
          # try to patch the swap file setup
-         if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
+         if try_edit "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
 
             # patch success! deploy
             sudo dphys-swapfile setup
@@ -247,7 +253,7 @@ case "$VM_SWAP" in
    "custom" )
 
       # try to patch the swap file setup
-      if try_patch "/etc/dphys-swapfile" "setting swap to max(2*physRAM,2048) GB" ; then
+      if try_edit "/etc/dphys-swapfile" "setting custom swap" ; then
 
          # patch success! turn off swap if it is enabled
          [ -n "$(/usr/sbin/swapon -s)" ] &&  sudo dphys-swapfile swapoff

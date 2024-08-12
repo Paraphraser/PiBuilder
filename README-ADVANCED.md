@@ -24,6 +24,7 @@ This document explains how to customise PiBuilder to your needs.
 
 		- [Search function](#supportingFileFunction)
 		- [Patch function](#tryPatchFunction)
+		- [File edit function](#tryEditFunction)
 		- [Folder merge function](#tryMergeFunction)
 
 	- [Preparing your own patches](#patchPreparation)
@@ -468,6 +469,50 @@ The `try_patch()` function has two common use patterns:
 	fi
 	```
 
+<a name="tryEditFunction"></a>
+#### File edit function
+
+The `try_edit()` function takes two arguments:
+
+1. A path beginning with a `/` which has the same definition as for [`supporting_file()`](#supportingFileFunction).
+2. A comment string summarising the purpose of the edit.
+
+For example:
+
+``` bash
+try_edit "/etc/dphys-swapfile" "revert swapfile to defaults"
+```
+
+The algorithm first checks whether the target (the file to be patched in the running system) actually exists. If it does not then the function returns "fail".
+
+If the target exists, the algorithm appends `.sed` to the path supplied in the first argument and then invokes `supporting_file()`:
+
+``` bash
+supporting_file "/etc/dphys-swapfile.sed"
+``` 
+
+Calling `supporting_file()` implies both *host-specific* and *general* candidates will be considered, with the *host-specific* form given precedence.
+
+If `supporting_file()` returns a candidate, the algorithm will assume it is a file containing valid `sed` editing instructions and will attempt to apply it to the target file. The function sets its result code to mean "success" if the editing instructions could be applied and the edited file compares-different from the original.
+
+Otherwise the function result code is set to mean "fail".
+
+The `try_edit()` function has two common use patterns:
+
+* unconditional invocation where there are no actions that depend on the success of the patch. For example:
+
+	``` bash
+	try_edit "/etc/dphys-swapfile" "revert swapfile to defaults"
+	``` 
+
+* conditional invocation where subsequent actions depend on the success of the patch. For example:
+
+	``` bash
+	if try_edit "/etc/dphys-swapfile" "revert swapfile to defaults" ; then
+		sudo dphys-swapfile setup
+	fi
+	```
+
 <a name="tryMergeFunction"></a>
 #### Folder merge function
 
@@ -764,13 +809,14 @@ See also:
 ### System swap-file
 
 * Controlling variable: `VM_SWAP`
-* Patch file: `/etc/dphys-swapfile.patch`
+* Edits file: `/etc/dphys-swapfile.sed`
 
-The patch file supplied with PiBuilder sets the conditions such that the default for swap space is twice the amount of physical RAM, capped at a limit of 2GB. This will be 2GB for any Raspberry Pi with 1GB or more of real RAM. You can, however, change this arrangement to suit your needs, either by altering the supplied patch file or providing a host-specific override.
+The edits file supplied with PiBuilder sets the conditions such that the default for swap space is twice the amount of physical RAM, capped at a limit of 2GB. This will be 2GB for any Raspberry Pi with 1GB or more of real RAM. You can, however, change this arrangement to suit your needs, either by altering the supplied edits file (refer to the [try_edit()](#tryEditFunction) function) or by providing a host-specific override.
 
 If `VM_SWAP` is set to:
 
 - `disable`, no swapping occurs. This may be appropriate if your Raspberry Pi boots from SD and you want to avoid wear and tear on the card.
+
 - `automatic`:
 
 	- If the Pi is running from an SD card, this is the same as `disable`.
@@ -797,6 +843,10 @@ $ sudo reboot
 You can always check if swapping is enabled using the `swapon -s` command. Silence means swapping is disabled.
 
 It is important to appreciate that VM swapping is not **bad**. Please don't disable swapping without giving it some thought. If you can afford to add an SSD, you'll get a better result with swapping enabled than if you stick with the SD and disable swapping.
+
+#### `/etc/dphys-swapfile` deprecated
+
+Previously, `/etc/dphys-swapfile` was edited via a patch file. The Raspberry Pi Foundation changed the contents of the default file such that *patching* (using the Unix `patch` command) became less reliable that *editing* (using the Unix `sed` command). If PiBuilder senses a patch file, it will display a deprecation notice and force `VM_SWAP=default` which means "no change from OS defaults".
 
 <a name="etc_defaults_grub"></a>
 ### GRUB

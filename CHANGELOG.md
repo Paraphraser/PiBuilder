@@ -1,5 +1,11 @@
 # PiBuilder Change Summary
 
+* 2024-08-12
+
+	- A change to the default version of `/etc/dphys-swapfile` supplied with recent versions of Raspberry Pi OS Bookworm created a conflict the relevant patching instructions. A new `try_edit()` function has been implemented via which a file of editing commands can be passed to `sed`. That is now being used to edit `/etc/dphys-swapfile` such that swap space is calculated as twice physical RAM, capped to 2GB. This is actually the default for `dphys-swapfile`. The edit merely undoes the Raspberry Pi Foundations changes.
+
+	- If PiBuilder senses the presence of an `/etc/dphys-swapfile.patch`, it displays a deprecation warning and forces `VM_SWAP=default` which amounts to just leaving things alone. This only affects Raspberry Pis running Raspberry Pi OS.
+
 * 2024-08-06
 
 	- Alter how Python "break system packages" functionality is implemented. Previously, all scripts tested for the presence of Bookworm and, from that, *inferred* that `--break-system-packages` should be passed to `pip3`. This was an interim strategy which was going to break on Debian "trixie" and was guaranteed to fail on Ubuntu which uses different names. With this change, all calls to `pip3` are implemented like this:
