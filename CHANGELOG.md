@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2024-08-23
+
+	- Bump default version of docker-compose installed via script to v2.29.2.
+	- Add instructions to [VNC](./docs/vnc.md) for adding Chromium browser.
+
 * 2024-08-12
 
 	- A change to the default version of `/etc/dphys-swapfile` supplied with recent versions of Raspberry Pi OS Bookworm created a conflict the relevant patching instructions. A new `try_edit()` function has been implemented via which a file of editing commands can be passed to `sed`. That is now being used to edit `/etc/dphys-swapfile` such that swap space is calculated as twice physical RAM, capped to 2GB. This is actually the default for `dphys-swapfile`. The edit merely undoes the Raspberry Pi Foundations changes.

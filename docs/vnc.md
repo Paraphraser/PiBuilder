@@ -24,6 +24,8 @@
 		- [manual](#manualTightVNC)
 		- [automatic](#autoTightVNC)
 
+	- [A better browser](#betterBrowser)
+
 <a name="theStory"></a>
 ## why PiBuilder disables RealVNC and Desktop
 
@@ -357,3 +359,22 @@ If you want the VNC service to be "always on", there are two methods:
 		```
 
 2. Follow the instructions for setting up [TightVNC as a System Service](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-ubuntu-20-04#step-4-running-vnc-as-a-system-service).
+
+<a name="betterBrowser"></a>
+### A better browser
+
+The browser that comes with TightVNC is a bit old. If you want something slightly more up-to-date, run:
+
+```
+$ sudo apt install -y chromium-browser
+```
+
+[Connect to TightVNC](#connectToTightVNC) and click on the "Web Browser" icon in the Dock. That should launch Chromium.
+
+If the older browser launches, start the Terminal, and run:
+
+```
+$ /usr/bin/chromium-browser`
+```
+
+Follow its prompts. Thereafter, clicking the "Web Browser" icon in the Dock should launch Chromium.
