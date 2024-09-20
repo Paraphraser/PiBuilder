@@ -4,6 +4,14 @@
 
 	- Bump default version of docker-compose installed via script to v2.29.6.
 
+	- And then again (same day) to v2.29.7.
+
+		Meanwhile, v2.29.6 has made it into the `apt` repositories so it doesn't include [PR12141](https://github.com/docker/compose/pull/12141) added in v2.29.7:
+		
+		```
+		revert commits link to mount API over bind changes
+		``` 
+
 * 2024-09-18
 
 	- Bump default version of docker-compose installed via script to v2.29.5 (2.29.3 and 2.29.4 seemed less stable).
