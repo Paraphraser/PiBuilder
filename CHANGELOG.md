@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-09-20
+
+	- Bump default version of docker-compose installed via script to v2.29.6.
+
 * 2024-09-18
 
 	- Bump default version of docker-compose installed via script to v2.29.5 (2.29.3 and 2.29.4 seemed less stable).
