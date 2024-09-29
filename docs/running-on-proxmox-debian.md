@@ -37,7 +37,7 @@ This tutorial walks you through the process of installing a Debian Bookworm gues
 
 1. Your hardware platform meets the Proxmox [minimum system requirements](https://www.proxmox.com/en/proxmox-virtual-environment/requirements).
 2. You have already [downloaded](https://www.proxmox.com/en/downloads) and installed Proxmox&nbsp;VE on your platform.
-3. You are able to use a web browser to connect to the Proxmox&nbsp;VE GUI on port 8086.
+3. You are able to use a web browser to connect to the Proxmox&nbsp;VE GUI on port 8006.
 4. You are able to login to the Proxmox&nbsp;VE GUI as root.
 
 <a name="definitions"></a>

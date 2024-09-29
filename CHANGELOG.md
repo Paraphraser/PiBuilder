@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-09-30
+
+	- Use correct port 8006 (not 8086) for connecting to Proxmox-VE GUI. Thanks to `@trebornerg` on Discord for spotting and reporting this. 
+
 * 2024-09-20
 
 	- Bump default version of docker-compose installed via script to v2.29.6.
