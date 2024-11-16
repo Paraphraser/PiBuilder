@@ -99,6 +99,9 @@ dnsutils
 git
 iotop
 iperf
+iputils-ping
+iputils-arping
+iputils-tracepath
 jq
 libffi-dev
 libnss3-tools
