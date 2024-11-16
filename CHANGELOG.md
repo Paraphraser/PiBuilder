@@ -4,6 +4,8 @@
 
 	- Add `iputils` commands to 03 script (mainly `arping` and `tracepath`).
 
+	- Bump default version of docker-compose installed via script to v2.30.3.
+
 * 2024-11-06
 
 	- Bump default version of docker-compose installed via script to v2.30.2.
