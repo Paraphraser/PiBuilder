@@ -30,6 +30,8 @@ This tutorial walks you through the process of installing a Debian Bookworm gues
 		- [using IOTstackBackup](#phaseMigrateNatural)
 		- [using migration assistant](#phaseMigrateAssisted)
 
+- [automating your backups](#backuptip)
+
 - [Home Assistant (Supervised)](#hassio)
 
 <a name="assumptions"></a>
@@ -600,7 +602,7 @@ In general, you will want to take a backup immediately before you do the migrati
 	$ iotstack_backup
 	```
 
-3. List your backups directory and use the timestamps embedded in the file names to identify the backup files that were just created. For example:
+3. <a name="noteRunTag"></a>List your backups directory and use the timestamps embedded in the file names to identify the backup files that were just created. For example:
 
 	```
 	2023-09-30_1138.iot-hub.backup-log.txt
@@ -614,7 +616,7 @@ In general, you will want to take a backup immediately before you do the migrati
 	2023-09-30_1138.iot-hub
 	```
 
-	<a name="noteRunTag"></a>Make a note of your `«runtag»` because you will need it later. Do not be concerned by the fact that the hostname portion is the name of your old system. It is exactly what you want!
+	Make a note of your `«runtag»` because you will need it later. Do not be concerned by the fact that the hostname portion is the name of your old system. It is exactly what you want!
 
 4. Logout from the old system by pressing <kbd>control</kbd>+<kbd>d</kbd>.
 5. Login to your newly-created guest system:
@@ -675,11 +677,25 @@ In general, you will want to take a backup immediately before you do the migrati
 <a name="phaseMigrateAssisted"></a>
 #### using migration assistant
 
-Follow the instructions at [IOTstackBackup migration assistant](https://github.com/Paraphraser/IOTstackBackup#migration-assistant).
+Follow the instructions at [IOTstackBackup migration assistant](https://github.com/Paraphraser/IOTstackBackup?tab=readme-ov-file#migration-assistant).
 
 Note:
 
 * You can also use the migration assistant even if you have IOTstackBackup installed and configured on your old machine. Follow the link to the instructions above, then just skip step 2.
+
+<a name="backuptip"></a>
+#### automating your backups
+
+PiBuilder installs [IOTstackBackup](#https://github.com/Paraphraser/IOTstackBackup) and all required dependencies but can't configure it for you. To configure IOTstackBackup you either need to:
+
+* start from scratch and follow the instructions to set up [the configuration file](https://github.com/Paraphraser/IOTstackBackup?tab=readme-ov-file#the-configuration-file); or
+* copy an existing configuration file from another host.
+
+Tip:
+
+* PiBuilder's [advanced README](https://github.com/Paraphraser/PiBuilder/blob/master/README-ADVANCED.md#overview) contains an example of how to provide your IOTstackBackup configuration files to PiBuilder so IOTstackBackup is ready to run once PiBuilder finishes.
+
+Once IOTstackBackup is configured, you should consider automating your backups using `cron`. You will find instructions [here](https://github.com/Paraphraser/IOTstackBackup?tab=readme-ov-file#using-cron-to-run-iotstack_backup).
 
 <a name="hassio"></a>
 ## Home Assistant (Supervised)
