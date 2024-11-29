@@ -262,7 +262,7 @@ A limitation of the Proxmox&nbsp;VE console window for a guest is that copy and 
 	``` console
 	# apt update
 	# apt install -y network-manager avahi-daemon
-	# systemctl restart sshd
+	# systemctl restart ssh
 	```
 
 	The `avahi-daemon` provides multicast Domain Name Services (mDNS). After this, the guest system will respond to the name `«guest_host».local`.

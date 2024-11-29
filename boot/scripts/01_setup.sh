@@ -98,7 +98,7 @@ if SOURCE="$(supporting_file "/etc/ssh/etc-ssh-backup.tar.gz")" ; then
    sudo chown root:root /etc/ssh
    sudo chmod 755 /etc/ssh
    sudo tar --same-owner -xzf "$SOURCE" -C /etc/ssh
-   sudo systemctl restart sshd ssh
+   sudo systemctl restart ssh
    WARN_TRUST_RESET="true"
 
 else

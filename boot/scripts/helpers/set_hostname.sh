@@ -79,4 +79,4 @@ fi
 # kick services
 echo "Restarting AVAHI and SSH daemons"
 service avahi-daemon restart
-systemctl restart sshd
+systemctl restart ssh
