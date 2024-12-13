@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2024-12-14
+
+	- Bump default version of docker-compose installed via script to v2.32.0. `apt` currently installs v2.31.0.
+
 * 2024-11-16
 
 	- Add `iputils` commands to 03 script (mainly `arping` and `tracepath`).
