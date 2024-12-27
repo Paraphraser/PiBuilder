@@ -63,7 +63,7 @@ Wherever you see any «guillemot» delimited placeholders in these instructions,
 This phase walks you through the process of downloading the installation media for Debian. You only need to complete the steps in this phase once. You will be able to construct any number of Debian Guest systems from the same installation media.
 
 1. Use your web browser to open [https://www.debian.org](https://www.debian.org).
-2. Click "Download". Your browser should begin downloading the latest Debian installer onto your support host (Linux, macOS, Windows). The file will have a name like `debian-12.1.0-amd64-netinst.iso`. This is generally referred to as *an `.iso`,* indicating that the file is in ISO9660 (Optical Disc) format. 
+2. Click "Download". Your browser should begin downloading the latest Debian installer onto your support host (Linux, macOS, Windows). The file will have a name like `debian-12.8.0-amd64-netinst.iso`. This is generally referred to as *an `.iso`,* indicating that the file is in ISO9660 (Optical Disc) format. 
 3. Use your web browser to:
 
 	* Connect to your Proxmox&nbsp;VE instance on port 8006
@@ -116,7 +116,7 @@ This phase walks you through the process of creating a Debian guest system. You 
 
 	* "OS" tab:
 
-		- "ISO image" popup menu: select `debian-12.1.0-amd64-netinst.iso`
+		- "ISO image" popup menu: select `debian-12.8.0-amd64-netinst.iso`
 
 		This is the image you downloaded in the [previous phase](#phaseGetISO).
 
@@ -237,7 +237,7 @@ This phase walks you through the process of creating a Debian guest system. You 
 	- At "Device for boot loader installation", select `/dev/sda`.
 
 14. At "Installation complete", ignore the reminder to remove the installation media. Proxmox&nbsp;VE handles this automatically.
-15. Your system will reboot. There is no need to respond to any of the boot-time prompts. Eventually, you will see a screen containing the full username you set [earlier](#setFullUserName).
+15. Your system will reboot. There is no need to respond to any of the boot-time prompts. Eventually, you will see a login prompt. The type of prompt will depend on whether you [chose a desktop or console](#consoleonly) environment. Either way, you will be able to login using the credentials you set [earlier](#setFullUserName).
 
 <a name="phaseGuestConfig"></a>
 ## Phase 3 - guest configuration
