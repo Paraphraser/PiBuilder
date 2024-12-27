@@ -3,6 +3,7 @@
 * 2024-12-27
 
 	- Minor edits to Proxmox documentation to update examples to a more-recent Debian image, and to clarify that the login screen depends on Desktop vs Console choices.
+	- Expand on HA installation.
 
 * 2024-12-19
 

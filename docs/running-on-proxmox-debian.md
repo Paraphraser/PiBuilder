@@ -700,4 +700,36 @@ Once IOTstackBackup is configured, you should consider automating your backups u
 <a name="hassio"></a>
 ## Home Assistant (Supervised)
 
-If you wish to install Home Assistant on the same Proxmox&nbsp;VE instance, follow the instructions [here](https://community.home-assistant.io/t/installing-home-assistant-os-using-proxmox-8/201835#section-3-installing-home-assistant-os-4).
+If you wish to install Home Assistant on the same Proxmox&nbsp;VE instance, follow the instructions [here](https://community.home-assistant.io/t/installing-home-assistant-os-using-proxmox-8/201835#section-3-installing-home-assistant-os-4). At that link you will find a `bash -c` command which you should copy to the clipboard.
+
+> I am not going to provide the command here because it may change. You should always go to the source!
+
+You can run the command using any method that makes sense in your situation:
+
+1. If you have a keyboard+screen attached to your Proxmox-VE server, you can login and do it from there.
+
+2. You can use the Proxmox-VE web GUI:
+
+	```
+	Server view » Datacenter » host » shell
+	```
+
+3. You can connect to your Proxmox-VE server using SSH.
+
+Regardless of connection method, if you login as the "root" user then you can paste the `bash -c …` command directly from the clipboard.
+
+However, if you login as a non-root user, you should run the command like this:
+
+1. Obtain a shell as root:
+
+	```
+	$ sudo -s
+	```
+
+	The system prompt will change to `#` to indicate that you are now root.
+
+2. Paste the `bash -c …` from the clipboard.
+
+3. Exit the root shell by pressing <kbd>control</kbd>+<kbd>d</kbd>
+
+Whichever approach you choose, simply accept the defaults. The result is a running guest instance of Home Assistant.
