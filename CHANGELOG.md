@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2025-01-03
+
+	- Clarify decisions to be made when installing a Debian guest under Proxmox-VE. When a desktop environment is desired, both "Debian Desktop Environment" and at least one windowing system need to be chosen. When a console environment is desired, "Debian Desktop Environment" and all windowing systems must be disabled. This follows on from a question on Discord.
+
 * 2024-12-27
 
 	- Minor edits to Proxmox documentation to update examples to a more-recent Debian image, and to clarify that the login screen depends on Desktop vs Console choices.

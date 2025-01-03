@@ -210,19 +210,21 @@ This phase walks you through the process of creating a Debian guest system. You 
 10. Respond to the "popularity contest" question as you think appropriate.
 11. In the "Software selection" panel:
 
+	![Guest package options](./images/proxmox-package-options.jpg)
+
 	- <a name="consoleonly"></a>"Debian desktop environment": You have two choices:
 
-		1. You can leave this enabled and choose one or more of the windowing environments:
+		1. **Either** leave this enabled and choose one or more of the windowing environments (eg GNOME):
 
 			* The installation takes longer and occupies more space on the virtual disk (~3GB);
 			* The resulting guest boots into a windowing environment but you have the ability to instruct the system to boot to the console;
 			* Network Manager is installed and configured; and
-			* The Avahi daemon (multicast DNS) is installed and configured, or
+			* The Avahi daemon (multicast DNS) is installed and configured.
 
-		2. You can disable the desktop environment entirely:
-
+		2. **Or** disable the desktop environment entirely. To be specific, that means disabling both the "Debian Desktop Environment" option and disabling **all** windowing-environment options:
+			
 			* The installation is *significantly* faster and uses less space;
-			* The resulting guest boots to the console (there is no ability to switch to a Desktop environment)
+			* The resulting guest boots to the console (there is no ability to switch to a Desktop environment);
 			* Network Manager is not installed; and
 			* The Avahi daemon (multicast DNS) is not installed.
 
