@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2025-01-12
+
+	- Bump default version of docker-compose installed via script to v2.32.2.
+
 * 2025-01-03
 
 	- Clarify decisions to be made when installing a Debian guest under Proxmox-VE. When a desktop environment is desired, both "Debian Desktop Environment" and at least one windowing system need to be chosen. When a console environment is desired, "Debian Desktop Environment" and all windowing systems must be disabled. This follows on from a question on Discord.
