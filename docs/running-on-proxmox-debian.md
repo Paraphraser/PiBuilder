@@ -229,6 +229,8 @@ This phase walks you through the process of creating a Debian guest system. You 
 			* The Avahi daemon (multicast DNS) is not installed.
 
 		If your goal is to construct a server-class system for running IOTstack then I recommend disabling the desktop environment. However, if you need a user-class system which also happens to run IOTstack as a service then leaving the desktop environment enabled may be more appropriate. Your system, your rules!
+		
+		If you are worried that you might not fully understand the distinction between *server-class* and *user-class*, or if you simply can't make up your mind, then I **strongly** recommend you opt for the server-class system. It is almost always the correct decision.
 
 	- enable "SSH server". This is **important.** Please do not skip this step.
 

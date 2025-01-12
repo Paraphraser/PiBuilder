@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2025-01-13
+
+	- Give more weight to constructing CLI-only guests.
+
 * 2025-01-12
 
 	- Bump default version of docker-compose installed via script to v2.32.2.
