@@ -97,6 +97,7 @@ curl
 bridge-utils
 dnsutils
 git
+inotify-tools
 iotop
 iperf
 iputils-ping

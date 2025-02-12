@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2025-02-13
+
+	- add `inotify-tools` to 03 script dependencies list
+
 * 2025-01-16
 
 	- Bump default version of docker-compose installed via script to v2.32.4.
