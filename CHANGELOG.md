@@ -1,9 +1,13 @@
 # PiBuilder Change Summary
 
+* 2025-03-03
+
+	- Bump default version of docker-compose installed via script to v2.33.1. This is also the current version for `apt upgrade`.
+
 * 2025-02-13
 
 	- Bump default version of docker-compose installed via script to v2.33.0
-- add `inotify-tools` to 03 script dependencies list
+	- add `inotify-tools` to 03 script dependencies list.
 
 * 2025-01-16
 
