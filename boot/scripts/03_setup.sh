@@ -93,6 +93,7 @@ echo "Installing additional packages"
 PACKAGES="$(mktemp -p /dev/shm/)"
 cat <<-BASE_PACKAGES >"$PACKAGES"
 acl
+avahi-utils
 curl
 bridge-utils
 dnsutils
