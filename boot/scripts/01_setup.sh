@@ -200,6 +200,7 @@ else
 
    echo "Setting boot behaviour to console (no GUI)"
    sudo systemctl --quiet set-default multi-user.target
+   echo "To revert to GUI use: sudo systemctl set-default graphical.target"
 
 fi
 
