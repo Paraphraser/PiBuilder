@@ -1,5 +1,11 @@
 # PiBuilder Change Summary
 
+* 2025-03-25
+
+	- Add useful packages `avahi-utils`, `gnutls-bin`, `p11-kit` and `p11-kit-modules` to 03 script.
+    
+	- Add inline tip to revert back to GUI on non-Raspbian to 01 script.
+
 * 2025-03-17
 
 	- Bump default version of docker-compose installed via script to v2.34.0.
@@ -68,7 +74,7 @@
 	- And then again (same day) to v2.29.7.
 
 		Meanwhile, v2.29.6 has made it into the `apt` repositories so it doesn't include [PR12141](https://github.com/docker/compose/pull/12141) added in v2.29.7:
-		
+
 		```
 		revert commits link to mount API over bind changes
 		``` 
@@ -95,7 +101,7 @@
 		```
 		$ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y docker-compose
 		```
-		
+
 		This should be platform, distribution and release agnostic. If Python on the platform cares about "break system packages" then it will respect the environment variable; otherwise the variable will be ignored.
 
 	- Adds `apt-util` to basic packages in 01 script (missing on Ubuntu server).

@@ -136,9 +136,12 @@ cat <<-CRYPTO_PACKAGES >"$PACKAGES"
 at
 cryptsetup
 dirmngr
+gnutls-bin
 gnupg-agent
 gnupg2
 openssl
+p11-kit
+p11-kit-modules
 pcscd
 python3-gnupg
 rng-tools
