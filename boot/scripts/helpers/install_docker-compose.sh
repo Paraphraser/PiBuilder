@@ -50,7 +50,7 @@
 SCRIPT=$(basename "$0")
 
 # the default version of docker-compose at the moment is
-DOCKER_COMPOSE_VERSION_DEFAULT="v2.34.0"
+DOCKER_COMPOSE_VERSION_DEFAULT="v2.35.0"
 
 read -r -d '' COMPOSENOTES <<-EOM
 \n

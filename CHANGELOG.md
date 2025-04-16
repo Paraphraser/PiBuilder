@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2025-04-16
+
+	- Bump default version of docker-compose installed via script to v2.35.0.
+
 * 2025-03-25
 
 	- Add useful packages `avahi-utils`, `gnutls-bin`, `p11-kit` and `p11-kit-modules` to 03 script.
