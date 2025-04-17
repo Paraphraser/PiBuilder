@@ -158,22 +158,42 @@ $ sudo apt upgrade
 
 The problem with letting `apt` do the work is there seem to be significant delays between new versions of docker-compose being released on GitHub and making their way into the `apt` repositories.
 
-At the time of writing (2022-09-15):
+At the time of writing (2025-04-17):
 
-* the `apt` version is v2.10.2. It was released on 2022-08-27.
-* the [releases page](https://github.com/docker/compose/releases) has advanced to v2.11.1.
+* the `apt` version is v2.34.0. It was released on 2025-03-14.
+* the [releases page](https://github.com/docker/compose/releases) has advanced to v2.35.0.
 
 If you need a more-recent version of docker-compose, proceed like this:
 
-```bash
-$ cd ~/PiBuilder/boot/scripts/helpers
-$ ./uninstall_docker-compose.sh
-$ sudo ./install_docker-compose.sh v2.11.1
-```
+1. Move to the scripts directory:
+
+	```bash
+	$ cd ~/PiBuilder/boot/scripts/helpers
+	```
+
+2. Uninstall all versions of docker-compose:
+
+	```bash
+	$ ./uninstall_docker-compose.sh
+	```
+
+3. Do one of the following:
+
+	* **EITHER** install the desired version by passing an explicit version number:
+
+		```bash
+		$ sudo ./install_docker-compose.sh v2.35.0
+		```
+
+	* **OR** install the latest version by omitting the version number:
+
+		```bash
+		$ sudo ./install_docker-compose.sh
+		```
 
 Notes:
 
-1. Replace "v2.11.1" with whatever version you need. The leading "v" is required.
+1. Replace "v2.35.0" with whatever version you need. The leading "v" is required.
 2. This uninstall/upgrade sequence can also be used to downgrade to any v2.x.x.
 3. Once you have used the `install_docker-compose.sh` script to upgrade docker-compose, the [`apt` method](#composeByApt) will no longer work. If you want to revert to the `apt` method, you will need [option 3](#recomposeByApt). 
 

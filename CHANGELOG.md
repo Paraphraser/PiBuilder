@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2025-04-17
+
+	`install_docker-compose.sh` updated to default to, and accept an argument of `latest` in addition to specific version numbers like `v2.35.0`. Parses the JSON structures available from GitHub to determine the URL to download. Going forward, this will avoid the need to update this script every time a new version of docker-compose is released on GitHub.
+
 * 2025-04-16
 
 	- Bump default version of docker-compose installed via script to v2.35.0.
