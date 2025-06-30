@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2025-06-30
+
+	- add new [tutorial](./add-privileged-user.md) on adding a privileged user and disabling the root account.
+	- update SQLite3 build script year and version variables to 2025 and 3500200, respectively. Minor internal re-organisation.
+
 * 2025-04-17
 
 	`install_docker-compose.sh` updated to default to, and accept an argument of `latest` in addition to specific version numbers like `v2.35.0`. Parses the JSON structures available from GitHub to determine the URL to download. Going forward, this will avoid the need to update this script every time a new version of docker-compose is released on GitHub.

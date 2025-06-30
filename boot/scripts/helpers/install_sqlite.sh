@@ -15,11 +15,15 @@ fi
 set -e
 
 # set defaults but permit overrides by caller
-SQLITEYEAR="${SQLITEYEAR:-2023}"
-SQLITEVERSION="${SQLITEVERSION:-sqlite-autoconf-3420000}"
+SQLITEYEAR="${SQLITEYEAR:-2025}"
+SQLITEVERSION="${SQLITEVERSION:-3500200}"
+
+# path components
+SQLITE_LFN="sqlite-autoconf-$SQLITEVERSION"
+SQLITE_EXT="tar.gz"
 
 # construct download URL
-SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITEVERSION.tar.gz"
+SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITE_LFN.$SQLITE_EXT"
 echo "Using $SQLITEURL"
 echo "check https://www.sqlite.org/download.html for updates"
 
@@ -44,7 +48,7 @@ wget -O "$LFN" "$SQLITEURL"
 tar -xzf "$LFN"
 
 # move into the versioned directory
-cd "$SQLITEVERSION"
+cd "$SQLITE_LFN"
 
 # make the bastard!
 echo "Configuring $SQLITEVERSION"

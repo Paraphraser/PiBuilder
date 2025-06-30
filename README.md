@@ -494,6 +494,7 @@ Once you are logged-in to your Raspberry Pi:
 
 * Tutorials:
 
+	- [Adding a privileged user and disabling root](./add-privileged-user.md)
 	- [Domain Name System servers](./docs/dns.md)
 	- [Localisation options](./docs/locales.md)
 	- [Login profiles)](./docs/login.md)
