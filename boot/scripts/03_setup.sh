@@ -117,7 +117,6 @@ python3-virtualenv
 python3-braceexpand
 rlwrap
 ruby
-software-properties-common
 sqlite3
 subversion
 sysstat

@@ -1,5 +1,17 @@
 # PiBuilder Change Summary
 
+* 2025-07-05
+
+	- remove `software-properties-common` from 03 script. The presence of this package [blocks](https://tracker.debian.org/pkg/software-properties) PiBuilder completion on Trixie.
+
+		This package adds the `apt-add-repository` command, which is a convenience for editing `apt` repository lists. 
+
+		PiBuilder doesn't actually use that command itself and it isn't mentioned in the IOTstack [install.sh](https://github.com/SensorsIot/IOTstack/blob/master/install.sh) script.
+		
+		The package was added to PiBuilder on [2022-09-16](https://github.com/Paraphraser/PiBuilder/commit/56673c221345470a6dfde8bf773cb1f9b316133d) with the remark that it anticipated Python 3.10. To the extent that IOTstack's menu uses Python, this does not seem to be an issue on Trixie.
+		
+		Better out than in.
+
 * 2025-06-30
 
 	- add new [tutorial](./add-privileged-user.md) on adding a privileged user and disabling the root account.
