@@ -120,6 +120,7 @@ fi
 echo "Setting groups required for docker and bluetooth"
 sudo /usr/sbin/usermod -G docker -a $USER
 sudo /usr/sbin/usermod -G bluetooth -a $USER
+sudo /usr/sbin/usermod -G dialout -a $USER
 
 # the menu now has some specific structural requirements for its dependencies
 echo "Removing any Python dependencies which may conflict with the IOTstack menu"

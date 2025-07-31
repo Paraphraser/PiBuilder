@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2025-07-31
+
+	- ensure user is a member of the `dialout` group. This is the default on Raspberry Pi OS but not on Debian. It is (apparently) required for [deConz](https://sensorsiot.github.io/IOTstack/Containers/Deconz/#dialout-group).
+
 * 2025-07-05
 
 	- remove `software-properties-common` from 03 script. The presence of this package [blocks](https://tracker.debian.org/pkg/software-properties) PiBuilder completion on Trixie.
