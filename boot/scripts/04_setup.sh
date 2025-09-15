@@ -117,16 +117,34 @@ else
    exit 1
 fi
 
-echo "Setting groups required for docker and bluetooth"
-sudo /usr/sbin/usermod -G docker -a $USER
-sudo /usr/sbin/usermod -G bluetooth -a $USER
-sudo /usr/sbin/usermod -G dialout -a $USER
+
+function should_add_user_to_group()
+{
+	# sense group does not exist
+	grep -q "^$1:" /etc/group || return 1
+	# sense group exists and user is already a member
+	groups | grep -q "\b$1\b" && return 1
+	# group exists, user should be added
+	return 0
+}
+
+DESIRED_GROUPS="docker bluetooth dialout"
+echo "Setting required groups ($DESIRED_GROUPS)"
+for GROUP in $DESIRED_GROUPS ; do
+	if should_add_user_to_group $GROUP ; then
+		sudo /usr/sbin/usermod -G $GROUP -a $USER
+	fi
+done
 
 # the menu now has some specific structural requirements for its dependencies
 echo "Removing any Python dependencies which may conflict with the IOTstack menu"
-for P in virtualenv ruamel.yaml blessed ; do
-   sudo PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
-   PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
+CONFLICTS="ruamel.yaml blessed"
+is_running_OS_release trixie || CONFLICTS="$CONFLICTS virtualenv"
+for P in $CONFLICTS ; do
+	if [ -n "$(pip3 list | grep "$P")" ] ; then
+		sudo PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
+		PIP_BREAK_SYSTEM_PACKAGES=1 pip3 uninstall -y "$P"
+	fi
 done
 
 # the menu now has its own requirements list - process that

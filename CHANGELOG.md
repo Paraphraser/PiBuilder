@@ -1,5 +1,13 @@
 # PiBuilder Change Summary
 
+* 2025-09-15
+
+	- 04 script improvements for Trixie:
+
+		- check whether group exists before adding user to group.
+		- don't forcibly uninstall virtualenv from Trixie.
+		- check whether other historically problematic Python dependencies are actually installed before forcibly removing them. 
+
 * 2025-07-31
 
 	- ensure user is a member of the `dialout` group. This is the default on Raspberry Pi OS but not on Debian. It is (apparently) required for [deConz](https://sensorsiot.github.io/IOTstack/Containers/Deconz/#dialout-group).
