@@ -548,16 +548,10 @@ At this point, you have two choices:
 	$ ssh «guest_user»@«guest_host».local
 	```
 
-2. Change your working directory:
+2. Initialise your time-zone:
 
 	``` console
-	$ cd ~/IOTstack
-	```
-
-3. Initialise your time-zone:
-
-	``` console
-	$ echo "TZ=$(cat /etc/timezone)" >>.env
+	$ ./PiBuilder/boot/scripts/helpers/set_timezone_for_IOTstack.sh
 	```
 
 	This copies the timezone for your Debian guest into the file `~/IOTstack/.env`, which makes it available to any containers which define their `TZ` variables like this:
@@ -567,6 +561,24 @@ At this point, you have two choices:
 	```
 
 	That statement says "if `TZ` is defined in `.env` then use its value, otherwise default to `Etc/UTC`. It is an effective way of making sure all containers that support `TZ` run on the same timezone as your operating system and saves you the trouble of editing the same environment variable in each service definition.
+	
+	Note:
+	
+	* On Debian installations before Trixie, you *could* initialise `TZ` like this:
+
+		``` console
+		$ echo "TZ=$(cat /etc/timezone)" >>~/IOTstack/.env
+		```
+		
+		That command will not work on Trixie (or later) because `/etc/timezone` has been removed. That [change](https://git.gsi.de/chef/cookbooks/sys/-/issues/54) brings Debian into line with other Unices. The `set_timezone_for_IOTstack.sh` helper relies on `/etc/localtime` and should work on the majority of Unix systems (ie macOS and Linux) and should be independent of distro and release versions.
+		
+		> `set_timezone_for_IOTstack.sh` does not use either the `timedatectl` or `readlink` commands suggested at the above link, because those will not work on macOS. 
+
+3. Change your working directory:
+
+	``` console
+	$ cd ~/IOTstack
+	```
 
 4. Run the menu and choose your containers:
 

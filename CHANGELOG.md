@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2025-09-16
+
+	- adds `set_timezone_for_IOTstack.sh` helper script
+	- updates `running-on-proxmox-debian.md` to use helper script
+
 * 2025-09-15
 
 	- 04 script improvements for Trixie:
