@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-01-24
+
+	- update SQLite3 build script year and version variables to 2026 and 3510200, respectively.
+
 * 2025-09-16
 
 	- adds `set_timezone_for_IOTstack.sh` helper script

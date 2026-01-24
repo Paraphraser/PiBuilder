@@ -15,8 +15,8 @@ fi
 set -e
 
 # set defaults but permit overrides by caller
-SQLITEYEAR="${SQLITEYEAR:-2025}"
-SQLITEVERSION="${SQLITEVERSION:-3500200}"
+SQLITEYEAR="${SQLITEYEAR:-2026}"
+SQLITEVERSION="${SQLITEVERSION:-3510200}"
 
 # path components
 SQLITE_LFN="sqlite-autoconf-$SQLITEVERSION"
@@ -24,8 +24,8 @@ SQLITE_EXT="tar.gz"
 
 # construct download URL
 SQLITEURL="https://www.sqlite.org/$SQLITEYEAR/$SQLITE_LFN.$SQLITE_EXT"
-echo "Using $SQLITEURL"
-echo "check https://www.sqlite.org/download.html for updates"
+echo "Using $SQLITEURL - for updates, check:"
+echo "    https://www.sqlite.org/download.html"
 
 # create a directory to download into
 DOWNLOAD=$(mktemp -d /tmp/sqlite.download.XXXXX)
