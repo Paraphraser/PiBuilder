@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-02-02
+
+	- Add rsync and whiptail as dependencies in 03 script (rsync already in 01 script so this is mainly for documentation purposes).
+
 * 2026-01-24
 
 	- update SQLite3 build script year and version variables to 2026 and 3510200, respectively.

@@ -117,6 +117,7 @@ python3-dev
 python3-virtualenv
 python3-braceexpand
 rlwrap
+rsync
 ruby
 sqlite3
 subversion
@@ -127,6 +128,7 @@ traceroute
 tree
 uuid-runtime
 wget
+whiptail
 BASE_PACKAGES
 
 # these packages are mandatory (the "1" argument)
