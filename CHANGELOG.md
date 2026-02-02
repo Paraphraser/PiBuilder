@@ -3,6 +3,8 @@
 * 2026-02-02
 
 	- Add rsync and whiptail as dependencies in 03 script (rsync already in 01 script so this is mainly for documentation purposes).
+	- Itemize `rsync` call in `try_merge()`.
+	- Simplify subsequent user experience by extending conditional NetworkManager processing in 02 script to rename interfaces so they have the same device and connection names.
 
 * 2026-01-24
 

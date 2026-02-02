@@ -459,7 +459,7 @@ try_merge() {
 
          # merge without overwriting. The trailing "/" on MERGEDIR is
          # required. The filtering gets rid of macOS artifacts.
-         sudo rsync -rv --ignore-existing --exclude=".DS_Store" --exclude="._*" "$MERGEDIR"/ "$1"
+         sudo rsync -rvi --ignore-existing --exclude=".DS_Store" --exclude="._*" "$MERGEDIR"/ "$1"
 
          # return rsync's result code
          return $?
