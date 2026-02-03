@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-02-03
+
+	- fix incorrect usage comments for `try_edit()` function.
+
 * 2026-02-02
 
 	- Add rsync and whiptail as dependencies in 03 script (rsync already in 01 script so this is mainly for documentation purposes).
