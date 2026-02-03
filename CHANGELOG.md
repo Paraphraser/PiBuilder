@@ -3,6 +3,7 @@
 * 2026-02-03
 
 	- fix incorrect usage comments for `try_edit()` function.
+	- Trixie Virtual Memory adaptations.
 
 * 2026-02-02
 

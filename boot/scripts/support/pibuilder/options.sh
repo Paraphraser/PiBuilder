@@ -11,7 +11,10 @@
 #   true, adds "arm_64bit=1" to /boot/config.txt
 #PREFER_64BIT_KERNEL=false
 
-# - preference for handling virtual memory swapping. Three options:
+# VM_SWAP only applies to (1) a device which self-identifies as a
+# Raspberry Pi and (2) has the dphys-swapfile utility at the expected
+# path. This should be true for any Raspberry Pi hardware running
+# Raspberry Pi OS Bookworm or earlier. These options are supported:
 #      VM_SWAP=disable
 #         turns off swapping. You should consider this on any Pi
 #         that boots from SD.

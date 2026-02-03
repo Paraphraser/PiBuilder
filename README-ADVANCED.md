@@ -45,7 +45,7 @@ This document explains how to customise PiBuilder to your needs.
 
 	- [DHCP client daemon](#etc_dhcpcd_conf)
 	- [Docker daemon](#etc_docker_daemon)
-	- [System swap-file](#etc_dphys_swapfile)
+	- [System swap-file](#etc_dphys_swapfile) *deprecated*
 	- [GRUB](#etc_defaults_grub)
 	- [Locales](#etc_locales)
 	- [Network interfaces](#etc_network)
@@ -64,6 +64,8 @@ This document explains how to customise PiBuilder to your needs.
 	- [Original build method still works](#originalBuild)
 
 - [Keeping in sync with GitHub](#githubSync)
+
+- [Some notes on Virtual Memory](#vmNotes)
 
 <a name="overview"></a>
 ## Overview
@@ -121,54 +123,57 @@ Use a text editor to open:
 The file supplied with PiBuilder looks like this:
 
 ``` bash
- # this file is "sourced" in all build scripts. In the release version,
- # all variables are commented-out and shown with their default values.
+# this file is "sourced" in all build scripts. In the release version,
+# all variables are commented-out and shown with their default values.
 
- # - skip full upgrade in the 01 script.
- #SKIP_FULL_UPGRADE=false
+# - skip full upgrade in the 01 script.
+#SKIP_FULL_UPGRADE=false
 
- # - skip firmware in the 01 script.
- #SKIP_EEPROM_UPGRADE=false
+# - skip firmware in the 01 script.
+#SKIP_EEPROM_UPGRADE=false
 
- # - preference for kernel. Only applies to 32-bit installations. If
- #   true, adds "arm_64bit=1" to /boot/config.txt
- #PREFER_64BIT_KERNEL=false
+# - preference for kernel. Only applies to 32-bit installations. If
+#   true, adds "arm_64bit=1" to /boot/config.txt
+#PREFER_64BIT_KERNEL=false
 
- # - preference for handling virtual memory swapping. Three options:
- #      VM_SWAP=disable
- #         turns off swapping. You should consider this on any Pi
- #         that boots from SD.
- #      VM_SWAP=automatic
- #         same as "disable" if the Pi is running from SD. Otherwise,
- #         changes /etc/dphys-swapfile configuration so that swap size
- #         is twice real RAM, with a maximum limit of 2GB. In practice,
- #         this will usually result in 2GB of swap space. You should
- #         consider this if your Pi boots from SSD.
- #      VM_SWAP=custom
- #         applies whatever patching instructions are found in:
- #            ./support/etc/dphys-swapfile.patch
- #         Same as "automatic" but does not check if running from SD.
- #      VM_SWAP=default
- #         the Raspberry Pi OS defaults apply. In practice, this means
- #         swap is enabled and the swap space is 100MB.
- #   if VM_SWAP is not defined but the old DISABLE_VM_SWAP=true then
- #   that combination is interpreted as VM_SWAP=disable
- #VM_SWAP=automatic
+# VM_SWAP only applies to (1) a device which self-identifies as a
+# Raspberry Pi and (2) has the dphys-swapfile utility at the expected
+# path. This should be true for any Raspberry Pi hardware running
+# Raspberry Pi OS Bookworm or earlier. These options are supported:
+#      VM_SWAP=disable
+#         turns off swapping. You should consider this on any Pi
+#         that boots from SD.
+#      VM_SWAP=automatic
+#         same as "disable" if the Pi is running from SD. Otherwise,
+#         changes /etc/dphys-swapfile configuration so that swap size
+#         is twice real RAM, with a maximum limit of 2GB. In practice,
+#         this will usually result in 2GB of swap space. You should
+#         consider this if your Pi boots from SSD.
+#      VM_SWAP=custom
+#         applies whatever patching instructions are found in:
+#            ./support/etc/dphys-swapfile.patch
+#         Same as "automatic" but does not check if running from SD.
+#      VM_SWAP=default
+#         the Raspberry Pi OS defaults apply. In practice, this means
+#         swap is enabled and the swap space is 100MB.
+#   if VM_SWAP is not defined but the old DISABLE_VM_SWAP=true then
+#   that combination is interpreted as VM_SWAP=disable
+#VM_SWAP=automatic
 
- # - default language
- #   Whatever you change this to must be in your list of active locales
- #   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
- #LOCALE_LANG="en_GB.UTF-8"
+# - default language
+#   Whatever you change this to must be in your list of active locales
+#   (set via ~/PiBuilder/boot/scripts/support/etc/locale.gen.patch)
+#LOCALE_LANG="en_GB.UTF-8"
 
- # - Raspberry Pi ribbon-cable camera control
- #   Options are: disabled, "false", "true" and "legacy"
- #ENABLE_PI_CAMERA=false
+# - Raspberry Pi ribbon-cable camera control
+#   Options are: disabled, "false", "true" and "legacy"
+#ENABLE_PI_CAMERA=false
 
- # - Handling options for .bashrc and .profile
- #   Options are: "append" (default), "replace" and "skip"
- #   See PiBuilder "login" tutorial
- #DOT_BASHRC_ACTION=append
- #DOT_PROFILE_ACTION=append
+# - Handling options for .bashrc and .profile
+#   Options are: "append" (default), "replace" and "skip"
+#   See PiBuilder "login" tutorial
+#DOT_BASHRC_ACTION=append
+#DOT_PROFILE_ACTION=append
 ```
 
 The defaults are appropriate for most first-time builds. However, you can uncomment any variable and set its right hand side as follows:
@@ -183,7 +188,7 @@ The defaults are appropriate for most first-time builds. However, you can uncomm
 	If and only if the response includes "UPDATE AVAILABLE" is a firmware update applied. The EEPROM is updated during the reboot at the end of the 01 script. The process adds extra time to the normal reboot cycle so please be patient. 
 
 * <a name="prefer64BitKernel"></a>`PREFER_64BIT_KERNEL` to `true`. This only applies to 32-bit versions of Raspbian. The overall effect is a 64-bit kernel with a 32-bit user mode.
-* <a name="handleVMswap"></a>`VM_SWAP` to:
+* <a name="handleVMswap"></a>`VM_SWAP` is **deprecated**. It will work on a device which self-identifies as a Raspberry Pi and has the `dphys-swapfile` utility installed. This should be true for any Raspberry Pi running Raspberry Pi OS Bookworm or earlier, in which case the following values are supported:
 
 	- `disable` to disable virtual memory (VM) swapping. This is appropriate if your Raspberry Pi boots from SD **and** has limited RAM.
 	- `automatic`:
@@ -806,7 +811,9 @@ See also:
 2. [Daemon configuration](https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file).
 
 <a name="etc_dphys_swapfile"></a>
-### System swap-file
+### System swap-file deprecated
+
+This mechanism will only work on a device which self-identifies as a Raspberry Pi and has the `dphys-swapfile` utility installed. This should be true for any Raspberry Pi running Raspberry Pi OS Bookworm or earlier. See also [Some notes on Virtual Memory](#vmNotes).
 
 * Controlling variable: `VM_SWAP`
 * Edits file: `/etc/dphys-swapfile.sed`
@@ -1331,3 +1338,90 @@ $ git commit -m "merged with GitHub updates"
 ```
 
 Now you are in sync with GitHub.
+
+<a name="vmNotes"></a>
+## Some notes on Virtual Memory
+
+This topic is beset with moving goal-posts. It breaks down into the following categories:
+
+### Raspberry Pis running Bookworm or earlier
+
+The mechanisms for controlling VM that PiBuilder has had since the get-go are still supported. See:
+
+* The [`VM_SWAP`](#handleVMswap) option; and
+* The [System swap-file](#etc_dphys_swapfile) discussion.
+
+Although both are marked *deprecated*, that's really a heads-up for Raspberry Pi OS Trixie and later. The main issue is that the venerable `dphys-swapfile` utility was replaced by `rpi-swap` in Trixie. 
+
+### Raspberry Pis running Trixie or later
+
+There is not exactly a huge amount of useful information about `rpi-swap`. However, it boils down to this. If you want to customise:
+
+```
+$ cd /etc/rpi
+$ sudo mkdir swap.conf.d
+$ sudo cp swap.conf swap.conf.d/custom.conf
+```
+
+The `swap.conf` documents the defaults. The copying operation establishes a placeholder which will give you the section headers. You can edit `custom.conf` to create your desired configuration.
+
+For example, at least on the Trixie systems that I've built, the default VM structure is `zram+file` (compressed RAM overflowing to a file). Let's say I'm running the Pi from an SSD and want to revert to a more traditional arrangement where VM is based on a swapfile. I would edit `custom.conf` to look like this:
+
+```
+[Main]
+Mechanism=swapfile
+
+[File]
+FixedSizeMiB=4096
+```
+
+In words:
+
+* The mechanism is a traditional `swapfile` (overriding the default of `auto` which, according to the documentation at the time of writing, is a synonym for `zram+file`); and
+* The size of the swapfile is 4GiB.
+
+To implement the change, you **must** reboot.
+
+To check the VM story on your system:
+
+* the situation on a 4GB Raspberry Pi 4B running Raspberry Pi OS Trixie at system defaults:
+
+	``` console
+	$ systemctl list-units --type swap | head -2
+	  UNIT           LOAD   ACTIVE SUB    DESCRIPTION
+	  dev-zram0.swap loaded active active rpi-swap managed swap device (zram+file)
+	
+	$ free -m
+	               total        used        free      shared  buff/cache   available
+	Mem:            3795         585         662          13        2647        3209
+	Swap:           2047           0        2047
+	```
+
+* the situation on the same device with a 4GB traditional swapfile:
+
+	``` console
+	$ systemctl list-units --type swap | head -2
+	  UNIT          LOAD   ACTIVE SUB    DESCRIPTION
+	  var-swap.swap loaded active active rpi-swap managed swap device (swapfile)
+	
+	$ free -m
+	               total        used        free      shared  buff/cache   available
+	Mem:            3795         645         600          13        2631        3150
+	Swap:           4095           0        4095
+	```
+
+See also:
+
+``` console
+$ man rpi-swap
+$ man swap.conf
+```
+
+### Debian guest on Proxmox-VE
+
+Refer to [this gist](https://gist.github.com/Paraphraser/270f02feadf9a74d1825fb546b4a964e#file-proxmox-debian-bookworm-disk-resize-md). The focus is on expanding the primary partition but it also explains how to expand the swap partition. The [one more thing](https://gist.github.com/Paraphraser/270f02feadf9a74d1825fb546b4a964e#one-more-thing) heading at the end of that gist points out its application to changing swap size.
+
+### Non-Raspberry Pi
+
+I'm afraid you have to follow your nose.
+
