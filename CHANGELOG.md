@@ -4,6 +4,7 @@
 
 	- fix incorrect usage comments for `try_edit()` function.
 	- Trixie Virtual Memory adaptations.
+	- Exclude loopback from IPv6 disable (silences warning).
 
 * 2026-02-02
 

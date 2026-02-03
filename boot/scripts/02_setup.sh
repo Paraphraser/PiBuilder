@@ -153,7 +153,7 @@ if is_NetworkManager_running ; then
    # disable IPv6
    nmcli -g name connection | while read C ; do
       M="$(nmcli -g ipv6.method connection show "$C")"
-      if [ "$M" = "auto" ] ; then
+      if [ "$M" = "auto" -a "$C" != "lo" ] ; then
          echo "Disabling IPv6 on $C (was $M)"
          sudo nmcli connection modify "$C" ipv6.method "ignore"
       fi
