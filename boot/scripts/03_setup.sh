@@ -14,8 +14,11 @@ if [ "$#" -gt 0 ]; then
     exit 1
 fi
 
-# declare path to support directory and import common functions
+# declare path to support and helper directories
 SUPPORT="$WHERE/support"
+HELPERS="$WHERE/helpers"
+
+# import common functions
 . "$SUPPORT/pibuilder/functions.sh"
 
 # import user options and run the script prolog - if they exist
@@ -219,12 +222,15 @@ fi
 echo "Cloning IOTstack from $IOTSTACK_URL"
 $GIT_CLONE_CMD -b "$IOTSTACK_BRANCH" "$IOTSTACK_URL" "$IOTSTACK"
 
+# set the timezone (initialises .env)
+PROJECT="$IOTSTACK" $HELPERS/set_timezone_for_project.sh
+
 # by definition a clean install is up-to-date but the menu chucks up
 # inappropriate and, IMV, quite misleading alert about a large update,
 # breaking changes, and an invitation to switch to old-menu where the
 # default is "yes". That can be very confusing for first-time users so
 # this next line bypasses that alert:
-echo "0" >"$IOTSTACK/.new_install"
+( cd "$IOTSTACK" ; ./install.sh version >.new_install )
 
 echo "Protective creation of sub-folders which should be user-owned"
 mkdir -p "$IOTSTACK/backups" "$IOTSTACK/services"

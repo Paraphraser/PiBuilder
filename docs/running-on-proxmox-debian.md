@@ -551,7 +551,7 @@ At this point, you have two choices:
 2. Initialise your time-zone:
 
 	``` console
-	$ ./PiBuilder/boot/scripts/helpers/set_timezone_for_IOTstack.sh
+	$ ./PiBuilder/boot/scripts/helpers/set_timezone_for_project.sh
 	```
 
 	This copies the timezone for your Debian guest into the file `~/IOTstack/.env`, which makes it available to any containers which define their `TZ` variables like this:
@@ -570,9 +570,9 @@ At this point, you have two choices:
 		$ echo "TZ=$(cat /etc/timezone)" >>~/IOTstack/.env
 		```
 		
-		That command will not work on Trixie (or later) because `/etc/timezone` has been removed. That [change](https://git.gsi.de/chef/cookbooks/sys/-/issues/54) brings Debian into line with other Unices. The `set_timezone_for_IOTstack.sh` helper relies on `/etc/localtime` and should work on the majority of Unix systems (ie macOS and Linux) and should be independent of distro and release versions.
+		That command will not work on Trixie (or later) because `/etc/timezone` has been removed. That [change](https://git.gsi.de/chef/cookbooks/sys/-/issues/54) brings Debian into line with other Unices. The `set_timezone_for_project.sh` helper relies on `/etc/localtime` and should work on the majority of Unix systems (ie macOS and Linux) and should be independent of distro and release versions.
 		
-		> `set_timezone_for_IOTstack.sh` does not use either the `timedatectl` or `readlink` commands suggested at the above link, because those will not work on macOS. 
+		> `set_timezone_for_project.sh` does not use either the `timedatectl` or `readlink` commands suggested at the above link, because those will not work on macOS. 
 
 3. Change your working directory:
 

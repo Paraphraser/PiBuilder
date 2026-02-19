@@ -1,5 +1,12 @@
 # PiBuilder Change Summary
 
+* 2026-02-19
+
+	- renames `set_timezone_for_IOTstack.sh` to `set_timezone_for_project.sh`
+	- adds call to the above to 03 script after IOTstack is cloned.
+	- consequential change to documentation.
+	- improved method of simulating `./install.sh` completed.
+
 * 2026-02-03
 
 	- fix incorrect usage comments for `try_edit()` function.
