@@ -502,6 +502,7 @@ Once you are logged-in to your Raspberry Pi:
 	- [SAMBA](./docs/samba.md)
 	- [Static IP addresses](./docs/ip.md)
 	- [Syslog - restoring Buster-style rotation](./docs/logrotate.md)
+	- [Upgrading a "treeless" Git clone](./docs/upgrade-treeless-clone.md)
 	- [Using local Network Time Protocol servers](./docs/ntp.md)
 	- [VNC](./docs/vnc.md)
 

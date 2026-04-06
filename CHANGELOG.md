@@ -1,5 +1,15 @@
 # PiBuilder Change Summary
 
+* 2026-04-06
+
+	- Reverts change made 2023-12-18 which defaulted to "treeless" clones of Git repositories. Per [github blog](https://github.blog/open-source/git/get-up-to-speed-with-partial-clone-and-shallow-clone/):
+
+		> We strongly recommend that developers do not use treeless clones for their daily work. Treeless clones are really only helpful for automated builds when you want to quickly clone, compile a project, then throw away the repository. In environments like GitHub Actions using public runners, you want to minimize your clone time so you can spend your machine time actually building your software! Treeless clones might be an excellent option for those environments
+
+		This is good advice!
+		
+	- Adds helper script `upgrade_treeless_clone.sh` to aid in migrating a "treeless" clone to a regular clone.
+
 * 2026-02-19
 
 	- renames `set_timezone_for_IOTstack.sh` to `set_timezone_for_project.sh`
@@ -322,7 +332,7 @@
 	- When omitted, `SKIP_FULL_UPGRADE` now defaults to false on Debian, true on non-Debian (eg Ubuntu). This is a workaround for a problem where Ubuntu seems to hang on full upgrades.
 	- `DEBIAN_BOOKWORM_UPGRADE` (added 2023-07-03) removed. At that time the Raspberry Pi releases page only had Bullseye images so the only way to get Bookworm was to start with Bullseye and upgrade. That is no longer the case so this control is redundant.
 
-* 2023-12-18
+* 2023-12-18 (reverted 2026-04-06)
 
 	- Git clone commands in 03 script now default to:
 

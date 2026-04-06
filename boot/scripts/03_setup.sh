@@ -39,26 +39,6 @@ IOTSTACKALIASES_BRANCH="${IOTSTACKALIASES_BRANCH:-"master"}"
 IOTSTACKBACKUP_URL="${IOTSTACKBACKUP_URL:-"https://github.com/Paraphraser/IOTstackBackup.git"}"
 IOTSTACKBACKUP_BRANCH="${IOTSTACKBACKUP_BRANCH:-"master"}"
 
-# set up the "git clone" command and options depending on whether the
-# GIT_CLONE_OPTIONS variable exists and, if so, whether it is null or
-# has content. The user is responsible for passing valid options. The
-# default options are --filter=tree:0 which is a recommendation from
-# Slyke in
-#    https://github.com/SensorsIot/IOTstack/pull/740
-# These are the useful patterns for invoking this script:
-#    ./03_setup.sh                         =  git clone --filter=tree:0
-#    GIT_CLONE_OPTIONS= ./03_setup.sh      =  git clone
-#    GIT_CLONE_OPTIONS="" ./03_setup.sh    =  git clone
-#    GIT_CLONE_OPTIONS=-v" ./03_setup.sh   =  git clone -v
-if [[ -v GIT_CLONE_OPTIONS ]] ; then
-   if [ -n "$GIT_CLONE_OPTIONS" ] ; then
-      GIT_CLONE_CMD="git clone $GIT_CLONE_OPTIONS"
-   else
-      GIT_CLONE_CMD="git clone"
-   fi
-else
-   GIT_CLONE_CMD="git clone --filter=tree:0"
-fi
 
 # canned general advisory if IOTstack already exists
 read -r -d "\n" IOTSTACKFAIL <<-EOM
@@ -220,7 +200,7 @@ if try_merge "$TARGET" "USB device rules" ; then
 fi
 
 echo "Cloning IOTstack from $IOTSTACK_URL"
-$GIT_CLONE_CMD -b "$IOTSTACK_BRANCH" "$IOTSTACK_URL" "$IOTSTACK"
+git clone -b "$IOTSTACK_BRANCH" "$IOTSTACK_URL" "$IOTSTACK"
 
 # set the timezone (initialises .env)
 PROJECT="$IOTSTACK" $HELPERS/set_timezone_for_project.sh
@@ -236,14 +216,14 @@ echo "Protective creation of sub-folders which should be user-owned"
 mkdir -p "$IOTSTACK/backups" "$IOTSTACK/services"
 
 echo "Cloning IOTstackAliases from $IOTSTACKALIASES_URL"
-$GIT_CLONE_CMD -b "$IOTSTACKALIASES_BRANCH" "$IOTSTACKALIASES_URL" ~/.local/IOTstackAliases
+git clone -b "$IOTSTACKALIASES_BRANCH" "$IOTSTACKALIASES_URL" ~/.local/IOTstackAliases
 
 echo "Installing rclone and shell yaml support"
 curl https://rclone.org/install.sh | sudo bash
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install -U shyaml
 
 echo "Cloning IOTstackBackup from $IOTSTACKBACKUP_URL"
-$GIT_CLONE_CMD -b "$IOTSTACKBACKUP_BRANCH" "$IOTSTACKBACKUP_URL" ~/.local/IOTstackBackup
+git clone -b "$IOTSTACKBACKUP_BRANCH" "$IOTSTACKBACKUP_URL" ~/.local/IOTstackBackup
 echo "Installing IOTstackBackup scripts"
 ~/.local/IOTstackBackup/install_scripts.sh
 
