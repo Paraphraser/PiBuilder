@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-04-07
+
+	- Alters `set_timezone_for_project.sh` to try using `timedatectl` to fetch the machine timezone, only falling back to the brute force method based on `/etc/localtime` if that fails.
+
 * 2026-04-06
 
 	- Reverts change made 2023-12-18 which defaulted to "treeless" clones of Git repositories. Per [github blog](https://github.blog/open-source/git/get-up-to-speed-with-partial-clone-and-shallow-clone/):

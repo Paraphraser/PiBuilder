@@ -86,4 +86,19 @@ set_timezone_for_project() {
 # ----------------------------------------------------------------------
 # copy the current machine timezone to the project timezone
 # ----------------------------------------------------------------------
-set_timezone_for_project
+
+# try to fetch timezone from timedatectl (works on Linux, fails macOS)
+TIMEZONE=$(timedatectl show --value --property=Timezone 2>/dev/null)
+
+# did that succeed?
+if [ -n "${TIMEZONE}" ] ; then
+
+	# yes! use that value ("modern")
+	set_dot_env "TZ" "${TIMEZONE}"
+	
+else
+
+	# no! fall back to brute force method
+	set_timezone_for_project
+
+fi
