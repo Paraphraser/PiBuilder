@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-04-10
+
+	- Fix command syntax error in `upgrade_treeless_clone.sh`.
+
 * 2026-04-07
 
 	- Alters `set_timezone_for_project.sh` to try using `timedatectl` to fetch the machine timezone, only falling back to the brute force method based on `/etc/localtime` if that fails.

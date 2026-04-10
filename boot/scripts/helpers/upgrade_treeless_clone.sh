@@ -90,6 +90,6 @@ echo "Step 1: re-fetching from ${REMOTE} without --filter=${OPTION_EXPECTED}"
 git fetch --refetch --no-filter
 
 echo "Steo 2: removing ${OPTION_KEY} from local configuration"
-git config unset --local "${OPTION_KEY}"
+git config --unset --local "${OPTION_KEY}"
 
 echo "Completed."
