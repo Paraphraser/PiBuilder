@@ -22,6 +22,10 @@ As of 2026-04-06, PiBuilder has reverted to making regular clones. That, however
 
 On balance, these problems are less likely to occur for IOTstackAliases and IOTstackBackup than they are for IOTstack. For that reason, the remainder of this document is dedicated to resolving problems with IOTstack but the same principles apply to the other repositories and, indeed, to treeless clones generally. However, please read [general case](#general-case) before you actually try anything.
 
+## convert IOTstack to full clone
+
+### assumptions
+
 PiBuilder includes a script to help convert a treeless clone into a regular clone. The script makes two assumptions:
 
 1. That the treeless clone of IOTstack was created by running:
@@ -43,7 +47,9 @@ PiBuilder includes a script to help convert a treeless clone into a regular clon
 	
 	The last two lines are the expected response.
 
-Procedure:
+### procedure
+
+The upgrade procedure is:
 
 1. Your working directory needs to be that of the treeless clone:
 
@@ -57,9 +63,11 @@ Procedure:
 	$ ~/PiBuilder/boot/scripts/helpers/upgrade_treeless_clone.sh
 	```
 
-Git is a complex beast and it is impossible to guarantee a perfect outcome in all possible situations. Absolute worst case is that everything turns to custard.
+### if it all turns to custard
 
-The simplest approach to solving any problems is to re-clone and perform a manual merge. Something like this will get the job done:
+Git is a complex beast and it is impossible to guarantee a perfect outcome in all possible IOTstack deployments on the planet. Absolute worst case is that you follow the upgrade procedure, then everything turns to custard with Git throwing up weird errors.
+
+The simplest approach to solving any problem with IOTstack is to re-clone and perform a manual merge. Something like this will get the job done:
 
 1. Stop your stack:
 
@@ -95,10 +103,14 @@ The simplest approach to solving any problems is to re-clone and perform a manua
 		$ mv backups services docker-compose*.yml* ../IOTstack
 		```
 		
-		If you encounter permission errors, you should fix those before re-trying the command. The rules are simple:
+		If you encounter permission errors, you should fix those **before** re-trying the command. Please don't resort to using `sudo` to force the `mv` command to work.
+		
+		The rules are simple:
 		
 		* `backups/influxdb` and its contents should be owned `root:root`;
 		* everything else should be owned by `$USER:$USER`.
+
+		You may need to use `sudo` to change ownership. That's OK. Just don't use `sudo` to force the move.
 
 	* Move the `volumes` directory, which **does** need `sudo`:
 
@@ -120,12 +132,14 @@ The simplest approach to solving any problems is to re-clone and perform a manua
 	$ rm -rf IOTstack.old
 	```
 
-	It should not be necessary to use `sudo` to remove the `.old` directory but if you run into permission issues, it is acceptable to re-run the command with `sudo`, providing you double-check the command **before** pressing <kbd>return</kbd>.
+	It should not be necessary to use `sudo` to remove the `.old` directory but if you run into permission issues, it is acceptable to re-run the `rm` command with `sudo`, providing you double-check the command **before** pressing <kbd>return</kbd>.
 
 <a name="general-case"></a>
-### general case
+## general case
 
-Rather than the manual re-clone and merge recommended for IOTstack, you can adopt the approach of making a backup copy of the repo before running `upgrade_treeless_clone.sh`. For example:
+### procedure
+
+Rather than the manual re-clone and merge recommended for IOTstack, you can adopt the approach of making a backup copy of the repo before running the upgrade script. For example:
 
 ``` console
 $ cd ~/.local
@@ -134,7 +148,9 @@ $ cd IOTstackAliases
 $ ~/PiBuilder/boot/scripts/helpers/upgrade_treeless_clone.sh
 ```
 
-Then, if you get a mess, reverting is a matter of:
+### if it all turns to custard
+
+If you get a mess, reverting is a matter of:
 
 ``` console
 $ cd ..
@@ -142,4 +158,11 @@ $ rm -rf IOTstackAliases
 $ mv IOTstackAliases.bak IOTstackAliases
 ```
 
-Conversely, if the upgrade script succeeds, clean up by removing the `.bak` directory.
+### if the upgrade succeeds
+
+Conversely, if the upgrade script succeeds, clean up by removing the `.bak` directory:
+
+``` console
+$ cd ..
+$ rm -rf IOTstackAliases.bak
+```
