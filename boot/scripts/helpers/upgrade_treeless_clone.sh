@@ -85,11 +85,22 @@ fi
 echo "This repository passes the tests for a treeless clone."
 echo "Attempting to convert."
 
+# turn off background garbage collection for this repo
+git config --local gc.auto 0
+
 # attempt to re-fetch everything, without a tree:0 filter
 echo "Step 1: re-fetching from ${REMOTE} without --filter=${OPTION_EXPECTED}"
-git fetch --refetch --no-filter
+git fetch --refetch --no-filter --prune
 
 echo "Step 2: removing ${OPTION_KEY} from local configuration"
 git config --unset --local "${OPTION_KEY}"
+
+echo "Step 3: performing housekeeping"
+git prune
+git gc --aggressive --prune=now
+rm -f .git/gc.log 
+
+# re-enable automatic garbage collection
+git config --unset --local gc.auto 0
 
 echo "Completed."

@@ -41,11 +41,11 @@ PiBuilder includes a script to help convert a treeless clone into a regular clon
 	```
 	$ cd ~/IOTstack
 	$ git remote -v
-	origin	https://github.com/SensorsIot/IOTstack.git (fetch)
-	origin	https://github.com/SensorsIot/IOTstack.git (push)
+	origin  https://github.com/SensorsIot/IOTstack.git (fetch) [tree:0]
+	origin  https://github.com/SensorsIot/IOTstack.git (push)
 	```
 	
-	The last two lines are the expected response.
+	The last two lines are the expected response. Also, the presence of `[tree:0]` in the first line of that response confirms that you have a treeless clone.
 
 ### procedure
 

@@ -1,5 +1,10 @@
 # PiBuilder Change Summary
 
+* 2026-04-16
+
+	- Use correct screen output for `git remote -v` when executed in treeless clone.
+	- Perform manual garbage-collection in `upgrade_treeless_clone.sh` (avoids confusing error messages and left-over logs).
+
 * 2026-04-10
 
 	- Fix command syntax error in `upgrade_treeless_clone.sh`.
