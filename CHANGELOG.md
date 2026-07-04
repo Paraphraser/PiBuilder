@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-07-04
+
+	- Code in 02 script to harmonise network names removed. NetworkManager keeps fighting back. It was only ever a nice-to-have.
+
 * 2026-07-03
 
 	- Fix main README to account for changes to Raspberry Pi Imager.
