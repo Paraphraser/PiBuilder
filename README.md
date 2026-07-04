@@ -34,7 +34,6 @@ The scripts are written in `bash` and there is a reasonable chance that they wil
 - [The Build Process](#buildProcess)
 
 	- [Download Raspberry Pi Imager](#downloadImager)
-	- [Download Raspberry Pi OS image](#chooseOSForImager)
 	- [Transfer Raspberry Pi OS to SD or SSD](#burnImage)
 	- [Boot your Raspberry Pi](#bootRPi)
 	- [Connect to your Raspberry Pi using SSH](#connectRPiSSH)
@@ -98,133 +97,74 @@ This process is intended for first-time users. No configuration is required. The
 
 Follow the instructions at [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to download and install the Raspberry Pi Imager application onto your support machine. If you launch the Imager and it prompts you to update, you should do that.
 
-<a name="chooseOSForImager"></a>
-### Download Raspberry Pi OS image
-
-Although [Raspberry Pi Imager](#downloadImager) can download current Raspberry Pi OS images dynamically, I strongly recommend downloading images to your support host beforehand. 
-
-1. You can be certain which image you are starting from. The alternatives displayed on the releases page (URL below) are laid out sensibly in groups, whereas Raspberry Pi Imager's <kbd>CHOOSE OS</kbd> dialog both co-mingles and distributes the alternatives between menu levels.
-2. You can retain downloaded image files for as long as you need them and, providing you also save the hashes, you can be 100% certain they have not changed. This means you repeat a build as many times as necessary (eg audit requirements, testing various scenarios, building multiple Pis alike) without any risk of the base operating system changing underneath you. Although it is possible to find historical images at the [Raspberry Pi OS downloads](http://downloads.raspberrypi.org) page, you have to know exactly what you are looking for, you have to take it on faith that the image hasn't changed, **and** you still have to download the desired image anyway.
-
-The most recent Raspberry Pi OS can always be found at:
-
-* [https://www.raspberrypi.com/software/operating-systems](https://www.raspberrypi.com/software/operating-systems/)
-
-Unless you have specialised requirements, there is no point installing any 32-bit system. I always start from "Raspberry Pi OS (64-bit)" so that is what I recommend. You are building a *server class* device (rather than a general purpose *desktop class* device) so your practical options are:
-
-1. <a name="desktopOS"></a>Raspberry Pi OS with Desktop. This retains the ability to enable the Desktop (a screen connected to the HDMI port displays a Graphical User Interface) or enable connection over VNC.
-
-	> PiBuilder disables both by default. See [why PiBuilder disables RealVNC and Desktop](./docs/vnc.md#theStory) if you want to understand the pros and cons of re-enabling the Desktop and/or VNC.
-
-2. <a name="liteOS"></a>Raspberry Pi OS Lite. Choosing this version essentially commits you to a console (a screen connected to the HDMI port displays a Command Line Interface), and you won't have the ability to connect over VNC without doing extra work. However, you get a lean, mean system which is well-optimised for running IOTstack.
-
-Either image will work so, ultimately, it's your Raspberry Pi and your choice.
-
-![download 64-bit Bullseye](./images/download-raspbian.jpg)
-
-Images for the Raspberry Pi are downloaded as `.xz` files (previously these were `.zip` files). You have the choice of:
-
-1. downloading the image *directly* via the <kbd>Download</kbd> button; or
-2. downloading the image *indirectly* by clicking the "Download torrent" link.
- 
-It is always a good idea to check the SHA256 signature on each image. It gives you assurance that the image has not been tampered with and wasn't corrupted during download. The magic incantation is:
-
-``` bash
-$ SIGNATURE=«hash»
-$ IMAGE=«pathToDownloadedFile»
-$ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
-```
-
-You get the «hash» by clicking the `Show SHA256 file integrity hash` link. Here's an example run. It assumes the `.xz` file:
-
-``` bash
-$ SIGNATURE=ffe864dec3f6ee183f1fa553c496753febd6ed5f7393cbe24ae00f5fcba7b7d1
-$ IMAGE=2024-03-12-raspios-bookworm-arm64-lite.img.xz
-$ shasum -a 256 -c <<< "$SIGNATURE *$IMAGE"
-2024-03-12-raspios-bookworm-arm64-lite.img.xz: OK
-```
-
-If you don't see "OK", start over!
-
-> If your first attempt was a *direct* download of the image, consider trying the *indirect* method using a torrent.
-
-Tip:
-
-* Once you have verified that a hash matches an image, consider saving the hash in a text file alongside the image. That way, you always have the means to re-verify that the image is unchanged.
-
 <a name="burnImage"></a>
 ### Transfer Raspberry Pi OS to SD or SSD
+
+This used to be so simple. But, in the name of "security", it's been made tedious in the extreme. It's also become a case of moving goal-posts where every new designer wants to impose her/his views on the user interface.
 
 The steps are:
 
 1. Connect your media (SD or SSD) to your support host (eg Mac/PC). 
 2. Launch Raspberry Pi Imager.
-3. Click <kbd>CHOOSE DEVICE</kbd>, then
+3. Click <kbd>Device</kbd>, then
 
-	* Select your hardware platform.
+	* Select your hardware platform (eg Raspberry Pi 5).
+	* Click <kbd>NEXT</kbd>.
 
-4. Click <kbd>CHOOSE OS</kbd>, then
+4. Under "Choose operating system"
 
-	* Scroll down and choose "Use custom".
-	* Select the `.xz` (or `.zip`) you downloaded earlier.
+	* Scroll until you see "Raspberry Pi OS (other)", and click that.
+	* <a name="liteOS"></a>From the list that appears, choose "Raspberry Pi OS Lite (64-bit)".
+	* Click <kbd>NEXT</kbd>.
 
-5. Click <kbd>CHOOSE STORAGE</kbd>, then
+5. Under "Select your storage device"
 
 	* Select the media connected in step 1. *Be careful with this step!*
+	* Click <kbd>NEXT</kbd>.
 
-6. Click "NEXT".
-7. Click "EDIT SETTINGS". This opens the "OS Customisation" panel at the "GENERAL" tab <!--A-->&#x1F130;:
+6. Under "Customisation: Choose hostname".
 
-	![Raspberry Pi Imager Customisation dialog General tab](./images/imager-custom-general.jpg)
+	* <a name="firstBootHostName"></a>Enter a name. I recommend "raspberrypi". These instructions assume you accept that recommendation. Don't worry, you can (and should) change the name later.
+	* Click <kbd>NEXT</kbd>.
 
-	Unless you have good reasons to do otherwise, I recommend:
+7. Under "Customisation: Localisation".
 
-	- Enable <!--B-->&#x1F131;, then enter a name for your host at <a name="firstBootHostName"></a><!--C-->&#x1F132;.
+	* Set the three fields to whatever is appropriate.
+	* Click <kbd>NEXT</kbd>.
 
-		I **strongly** recommend using the name "raspberrypi" (one word, all lower-case) in this panel, and then changing the name later when you run the first PiBuilder script. These instructions assume you accept this advice.
+8. Under "Customisation: Choose username".
 
-		However, if you decide to choose a unique name for your host in this panel, then:
+	* Enter a username. I recommend "pi". Once again, these instructions assume you accept this recommendation. If you choose a different username, you will have to substitute accordingly as you follow these instructions.
+	* <a name="firstBootUserPassword"></a>Enter a password of your choice, twice.
+	* Click <kbd>NEXT</kbd>.
 
-		1. You need to follow the rules for domain names:
+9. Under "Customisation: Choose Wi-Fi".
 
-			- letters ("a".."z", "A".."Z") but lower case is recommended
-			- digits ("0".."9")
-			- hyphen ("-") **not** underscore
+	* Enter the SSID of your WiFi network.
+	* Enter the network's pre-shared key, twice.
+	* Click <kbd>NEXT</kbd>.
 
-		2. You will have to remember to come back into this panel each time you run Raspberry Pi Imager.
+10. Under "Customisation: SSH authentication".
 
-	- Enable user credentials at <!--D-->&#x1F133;, then:
+	* Turn on "Enable SSH".
+	* Leave the "Authentication mechanism" at its default setting of "Use password authentication"
+	* Click <kbd>NEXT</kbd>.
 
-		- Enter a username at <!--E-->&#x1F134;. You can either stick with the traditional "pi" user or choose a different name. It is tricky to change the username once a system has been built so, if you don't like "pi", you should change it now.
+11. Under "Customisation: Raspberry Pi Connect".
 
-			The choice you make here will become the username for *all* of your Raspberry Pis. If you want a different username for each of your Raspberry Pis then you will have to remember to come back into this panel each time you run Raspberry Pi Imager.
+	* Disable "Enable Raspberry Pi Connect".
+	* Click <kbd>NEXT</kbd>.
 
-			This documentation uses "«username»" to represent the choice you make here.
+12. At "Write image".
 
-		- Set a strong password at <a name="firstBootUserPassword"></a><!--F-->&#x1F135;. Please don't use the old default password of "raspberry". Although your user password is easy to change later, the PiBuilder 01 script no longer does that for you because it assumes you have already chosen a strong password.
+	* Click <kbd>WRITE</kbd>.
+	* Follow the prompts.
 
-	- If you want the Raspberry Pi's WiFi interface to be active, enable <!--G-->&#x1F136;, then:
+	At this point, and particularly if you're on a slow Internet connection, you get to curse whoever thought it was a Good Idea to prevent everyone from burning images via the old "download once, burn many" methodology. Now you get to download Every Single Time.
 
-		- enter your WiFi network name in <!--H-->&#x1F137;.
-		- enter your WiFi password in <!--I-->&#x1F138;.
-		- use the popup menu <!--J-->&#x1F139; to select your country code.
+13. One the write completes:
 
-			> Your support host may pre-populate some or all of these fields.
-
-	- Enable locale settings at <!--K-->&#x1F13A; and then use the popup menus <!--L-->&#x1F13B; and <!--M-->&#x1F13C; to set appropriate values for your time zone and keyboard layout, respectively.
-	- Click <!--N-->&#x1F13D; to switch to the "SERVICES" tab.
-
-	![Raspberry Pi Imager Customisation dialog Services tab](./images/imager-custom-services.jpg)
-
-	- Enable SSH at <!--O-->&#x1F13E; and select password authentication at <!--P-->&#x1F13F;.
-	- Click <!--Q-->&#x1F140; to switch to the "OPTIONS" tab.
-
-	![Raspberry Pi Imager Customisation dialog Options tab](./images/imager-custom-options.jpg)
-	
-	- Enable "Eject media when finished" at <!--R-->&#x1F141;.
-	- Click <kbd>SAVE</kbd> (<!--S-->&#x1F142;) to save your settings.
-
-9. Click <kbd>YES</kbd> and respond to any system prompts to transfer the prepared image to your media.
+	* Click <kbd>FINISH</kbd>.
 
 <a name="bootRPi"></a>
 ### Boot your Raspberry Pi
@@ -287,7 +227,7 @@ Once you are logged-in to your Raspberry Pi:
 	$ sudo apt update ; sudo apt install -y git
 	```
 	
-	`git` is pre-installed in the non-Lite images so you can skip this step if you started from the [Raspberry Pi OS with Desktop](#desktopOS) image.
+	`git` is pre-installed in the non-Lite images so you can skip this step if you started from the Raspberry Pi OS with Desktop image.
 
 2. Clone the PiBuilder repository:
 
@@ -494,7 +434,7 @@ Once you are logged-in to your Raspberry Pi:
 
 * Tutorials:
 
-	- [Adding a privileged user and disabling root](./add-privileged-user.md)
+	- [Adding a privileged user and disabling root](./docs/add-privileged-user.md)
 	- [Domain Name System servers](./docs/dns.md)
 	- [Localisation options](./docs/locales.md)
 	- [Login profiles)](./docs/login.md)

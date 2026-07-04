@@ -1,5 +1,11 @@
 # PiBuilder Change Summary
 
+* 2026-07-03
+
+	- Fix main README to account for changes to Raspberry Pi Imager.
+	- Code in 02 script to harmonise network names was not working as intended.
+	- Adds `argon2` package in 03 script.
+
 * 2026-04-16
 
 	- Use correct screen output for `git remote -v` when executed in treeless clone.
