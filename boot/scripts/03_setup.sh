@@ -80,6 +80,7 @@ argon2
 avahi-utils
 curl
 bridge-utils
+dnsmasq-base
 dnsutils
 git
 inotify-tools

@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-09-24
+
+	- Adds `dnsmasq-base` to dependencies. Can be useful in certain NetworkManager situations where its omission causes silent failures.
+
 * 2026-07-04
 
 	- Code in 02 script to harmonise network names removed. NetworkManager keeps fighting back. It was only ever a nice-to-have.
