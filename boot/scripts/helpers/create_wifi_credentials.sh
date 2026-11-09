@@ -52,4 +52,15 @@ $CREDENTIALS
 ENDCONFIG
 
 # report
-echo "$TARGET created - needs to be copied to /boot"
+cat <<-REPORT
+
+	$TARGET created with the following content:
+
+	$(sed "s/^/   /g" "$TARGET")
+
+	That file needs to be copied to the target drive. For safety, copy it to both:
+
+	   /boot/$TARGET
+	   /boot/firmware/$TARGET
+
+REPORT

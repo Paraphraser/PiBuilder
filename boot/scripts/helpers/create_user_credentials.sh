@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Refer https://www.raspberrypi.com/documentation/computers/getting-started.html#manual-ssh-setup
+# (URL checked 2026-11-09)
+# In theory this is still relevant to Raspberry Pi OS (Trixie).
+
 # support user renaming of script
 SCRIPT=$(basename "$0")
 
@@ -34,4 +38,20 @@ HASH=$(echo "$NEW_PASSWORD" | openssl passwd -6 -stdin)
 echo "$USER:$HASH" >"$TARGET"
 
 # report
-echo "$TARGET created - needs to be copied to /boot"
+cat <<-REPORT
+
+	$TARGET created with the following content:
+
+	   $(cat "$TARGET")
+
+	That file needs to be copied to the target drive. For safety, copy it to both:
+
+	   /boot/$TARGET
+	   /boot/firmware/$TARGET
+
+	Also consider doing both of the following on the target drive:
+
+	   \$ touch /boot/ssh
+	   \$ touch /boot/firmware/ssh
+
+REPORT

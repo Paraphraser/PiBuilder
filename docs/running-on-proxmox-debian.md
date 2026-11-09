@@ -705,7 +705,7 @@ Note:
 <a name="backuptip"></a>
 #### automating your backups
 
-PiBuilder installs [IOTstackBackup](#https://github.com/Paraphraser/IOTstackBackup) and all required dependencies but can't configure it for you. To configure IOTstackBackup you either need to:
+PiBuilder installs [IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup) and all required dependencies but can't configure it for you. To configure IOTstackBackup you either need to:
 
 * start from scratch and follow the instructions to set up [the configuration file](https://github.com/Paraphraser/IOTstackBackup?tab=readme-ov-file#the-configuration-file); or
 * copy an existing configuration file from another host.

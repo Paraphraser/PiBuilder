@@ -1,5 +1,27 @@
 # PiBuilder Change Summary
 
+* 2026-11-09
+
+	* adds "user configuration" section to main readme to explain how to set up passwordless sudo (now that Raspberry Pi Imager + Trixie has departed from that heretofore long-established convention).
+	
+	* adds Network Manager helper scripts:
+	
+		- `nm_convert_phy_ipv4_to_static.sh`
+		- `nm_restore_phy_ipv4_to_dynamic.sh`
+		- `nm_set_connections_to_device_names.sh`
+	
+	* removes `reset_menu_enviroment.sh` script as not needed in `iotstack-menu.sh` environment.
+	
+	* consolidates `dns.md` and `ip.md` documentation, removing the former in favour of the latter. 
+	
+	* replaces advanced-readme content explaining how to set up static IP addressing with a link to `ip.md`.
+	
+	* added Network Manager connection "up" to 02 script where IPv6 is disabled. That cements the change.
+	
+	* augments user and wifi credential creation scripts to take account of Bookworm and later. The ability to enable ssh and define an initial user are claimed to still be available in Trixie.
+	
+	* Fixed broken cross-reference in `running-on-proxmox-debian.md`
+
 * 2026-09-24
 
 	- Adds `dnsmasq-base` to dependencies. Can be useful in certain NetworkManager situations where its omission causes silent failures.

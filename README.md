@@ -37,6 +37,7 @@ The scripts are written in `bash` and there is a reasonable chance that they wil
 	- [Transfer Raspberry Pi OS to SD or SSD](#burnImage)
 	- [Boot your Raspberry Pi](#bootRPi)
 	- [Connect to your Raspberry Pi using SSH](#connectRPiSSH)
+	- [User configuration](#userConfig)
 	- [Clone PiBuilder onto your Raspberry Pi](#clonePiBuilder)
 	- [Run the PiBuilder scripts in order](#runScripts)
 
@@ -216,10 +217,32 @@ Notes:
 
 	Your Raspberry Pi will ask for the password for the user «username». Respond with the password you set in [Raspberry Pi Imager](#firstBootUserPassword).
 
+<a name="userConfig"></a>
+### User configuration
+
+Until fairly recently, the default user ("pi", or whatever name you set in Raspberry Pi Imager) had the ability to run the `sudo` command without needing to enter a password. This seems to have changed. You can check whether your system is affected like this:
+
+``` console
+$ sudo echo "hello"
+```
+
+If you are prompted for the user's password, enter it. If you want to restore the ability to run `sudo` commands without being prompted for a password, run the following commands, one at a time:
+
+``` console
+$ echo "$USER  ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$USER" >/dev/null
+$ exit
+```
+
+The `exit` command logs you out of the session. Login again and confirm that you can run `sudo` commands without being prompted for a password:
+
+``` console
+$ sudo echo "hello"
+```
+
 <a name="clonePiBuilder"></a>
 ### Clone PiBuilder onto your Raspberry Pi
 
-Once you are logged-in to your Raspberry Pi:
+Proceed as follows:
 
 1. If you started from the [Raspberry Pi OS Lite](#liteOS) image, you will need to install `git`:
 
@@ -435,12 +458,11 @@ Once you are logged-in to your Raspberry Pi:
 * Tutorials:
 
 	- [Adding a privileged user and disabling root](./docs/add-privileged-user.md)
-	- [Domain Name System servers](./docs/dns.md)
 	- [Localisation options](./docs/locales.md)
 	- [Login profiles)](./docs/login.md)
 	- [Running IOTstack on Proxmox VE](./docs/running-on-proxmox-debian.md)
 	- [SAMBA](./docs/samba.md)
-	- [Static IP addresses](./docs/ip.md)
+	- [Configuring Static IP addressing on Raspbian](./docs/ip.md).
 	- [Syslog - restoring Buster-style rotation](./docs/logrotate.md)
 	- [Upgrading a "treeless" Git clone](./docs/upgrade-treeless-clone.md)
 	- [Using local Network Time Protocol servers](./docs/ntp.md)

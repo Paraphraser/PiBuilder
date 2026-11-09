@@ -921,44 +921,7 @@ Two hook points are provided for customising network manager:
 	
 	If present, the effect of this file is to enforce options set in `/etc/sysctl.conf` and `/etc/sysctl.d` after each NetworkManager configuration change. Numerous web recipes mention these files so it is useful for the two ecosystems to coexist.
 
-* `/etc/NetworkManager/custom_settings.sh` - if this file exists, it is executed. Here is an example of how to set a static IP address. First, start with a *shebang*:
-
-	```
-	#!/usr/bin/env bash
-	```
-
-	Next:
-	
-	* if you know the connection name, define it:
-	
-		```
-		CONN="Wired connection 1"
-		```
-
-	* alternatively, if you only know the interface name, you can ask Network Manager to lookup the corresponding connection name:
-
-		```
-		PHY=eth0
-		CONN=$(nmcli -g GENERAL.CONNECTION dev show "$PHY" 2>/dev/null)
-		```
-		
-	Then, set the static IP address on the connection:
-	
-	```
-	STATIC="203.0.132.100/24"
-	GATEWAY="203.0.132.1"
-	if [ -n "$CONN" ] ; then
-	   sudo nmcli con mod "$CONN" \
-	      ipv4.addresses "$STATIC" \
-	      ipv4.gateway "$GATEWAY" \
-	      ipv4.method "manual"
-	   echo "Note: $PHY->$CONN set to static IP address $STATIC"
-	else
-	   echo "Warning: Unable to set static IP address $STATIC for $PHY"
-	fi
-	```
-	
-	Remember to give the script execute permission:
+* `/etc/NetworkManager/custom_settings.sh` - if this file exists, it is executed. If you create this script, remember to give it execute permission:
 	
 	```
 	$ chmod +x custom_settings.sh
@@ -966,6 +929,8 @@ Two hook points are provided for customising network manager:
 	
 	PiBuilder will apply the changes when the 02 script runs, and the changes will take effect on the reboot at the end of the 02 script.
 	
+* See also [Configuring Static IP addressing on Raspbian](./docs/ip.md). You may find it more convenient to use the helper scripts documented there.
+
 <a name="etc_resolvconf_conf"></a>
 ### DNS resolver
 
@@ -986,7 +951,7 @@ There is no default patch. If you supply a general or host-specific patch file, 
 	resolv_conf_local_only=NO
 	```
 
-See also [Configuring DNS for Raspbian](./docs/dns.md).
+See also [Configuring Static IP addressing on Raspbian](./docs/ip.md).
 
 <a name="etc_samba_smb_conf"></a>
 ### Samba (SMB)
