@@ -135,7 +135,9 @@ if is_raspberry_pi ; then
    case "$(running_OS_release)+$ENABLE_PI_CAMERA" in
 
       "buster+legacy" ) ;&
-      "buster+true" )
+      "buster+true" )  ;&
+      "bullseye+true" ) ;&
+      "bookworm+true" )
          echo "Enabling Raspberry Pi ribbon-cable camera"
          sudo raspi-config nonint do_camera 0
          ;;
@@ -146,10 +148,8 @@ if is_raspberry_pi ; then
          sudo raspi-config nonint do_legacy 0
          ;;
 
-      "bullseye+true" ) ;&
-      "bookworm+true" )
-         echo "Enabling Raspberry Pi ribbon-cable camera"
-         sudo raspi-config nonint do_camera 0
+      "trixie+"* )
+         echo "Raspberry Pi ribbon-cable camera is enabled by default on trixie - ignored"
          ;;
 
       *)

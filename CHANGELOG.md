@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-11-10
+
+	* Camera support is always on in Trixie. Explicitly ignore `ENABLE_PI_CAMERA` option.
+
 * 2026-11-09
 
 	* adds "user configuration" section to main readme to explain how to set up passwordless sudo (now that Raspberry Pi Imager + Trixie has departed from that heretofore long-established convention).
