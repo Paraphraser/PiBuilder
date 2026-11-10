@@ -179,5 +179,5 @@ run_pibuilder_epilog
 
 # reboot (applies usermods and any cmdline.txt changes)
 echo "$SCRIPT complete - rebooting..."
-sudo touch /boot/ssh
+sudo touch /boot/ssh /boot/firmware/ssh
 sudo /usr/sbin/reboot

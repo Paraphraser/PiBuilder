@@ -231,5 +231,5 @@ echo "and re-apply power. A normal reboot takes about 30-40 seconds. A good"
 echo "test of whether the Pi has hung is if you can 'ping' the Pi but ssh says"
 echo "'Connection refused' when you try to connect."
 
-sudo touch /boot/ssh
+sudo touch /boot/ssh /boot/firmware/ssh
 sudo /usr/sbin/reboot

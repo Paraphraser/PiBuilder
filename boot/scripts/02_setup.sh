@@ -307,5 +307,5 @@ fi
 run_pibuilder_epilog
 
 echo "$SCRIPT complete - rebooting..."
-sudo touch /boot/ssh
+sudo touch /boot/ssh /boot/firmware/ssh
 sudo /usr/sbin/reboot
