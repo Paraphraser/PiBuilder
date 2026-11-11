@@ -1,5 +1,9 @@
 # PiBuilder Change Summary
 
+* 2026-11-11
+
+	* Adds `nftables` and `ca-certificates` to dependencies list.
+
 * 2026-11-10
 
 	* Camera support is always on in Trixie. Explicitly ignore `ENABLE_PI_CAMERA` option.

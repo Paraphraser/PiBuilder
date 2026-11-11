@@ -95,6 +95,7 @@ libnss3-tools
 libreadline-dev
 mosquitto-clients
 netcat-openbsd
+nftables
 nmap
 pwgen
 python3-pip
@@ -121,6 +122,7 @@ install_packages "$PACKAGES" 1
 
 cat <<-CRYPTO_PACKAGES >"$PACKAGES"
 at
+ca-certificates
 cryptsetup
 dirmngr
 gnutls-bin
